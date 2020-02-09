@@ -1,0 +1,264 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>credit_model</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-02-10"><meta name="DC.source" content="credit_model.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Graphs</a></li></ul></div><pre class="codeinput">dynare <span class="string">simple_model_kl_2</span>
+</pre><pre class="codeoutput">
+Configuring Dynare ...
+[mex] Generalized QZ.
+[mex] Sylvester equation solution.
+[mex] Kronecker products.
+[mex] Sparse kronecker products.
+[mex] Local state space iteration (second order).
+[mex] Bytecode evaluation.
+[mex] k-order perturbation solver.
+[mex] k-order solution simulation.
+[mex] Quasi Monte-Carlo sequence (Sobol).
+[mex] Markov Switching SBVAR.
+
+Using 64-bit preprocessor
+Starting Dynare (version 4.5.7).
+Starting preprocessing of the model file ...
+Found 6 equation(s).
+Evaluating expressions...done
+Computing static model derivatives:
+ - order 1
+Computing dynamic model derivatives:
+ - order 1
+Processing outputs ...
+done
+Preprocessing completed.
+
+
+EIGENVALUES:
+         Modulus             Real        Imaginary
+
+          0.9798           0.9798                0
+           1.109            1.109                0
+
+
+There are 1 eigenvalue(s) larger than 1 in modulus 
+for 1 forward-looking variable(s)
+
+The rank condition is verified.
+
+
+--------------------------------------------------------
+MODEL SIMULATION:
+
+Iter: 1,	 err. = 2384.5164, 	 time = 0.019
+Iter: 2,	 err. = 632.9656, 	 time = 0.003
+Iter: 3,	 err. = 23.6302, 	 time = 0.003
+Iter: 4,	 err. = 0.036943, 	 time = 0.003
+Iter: 5,	 err. = 8.9286e-08, 	 time = 0.003
+
+Total time of simulation: 0.035
+--------------------------------------------------------
+
+Perfect foresight solution found.
+
+
+--------------------------------------------------------
+MODEL SIMULATION:
+
+Iter: 1,	 err. = 2384.5164, 	 time = 0.003
+Iter: 2,	 err. = 632.9656, 	 time = 0.003
+Iter: 3,	 err. = 23.6302, 	 time = 0.004
+Iter: 4,	 err. = 0.036943, 	 time = 0.003
+Iter: 5,	 err. = 8.9286e-08, 	 time = 0.003
+
+Total time of simulation: 0.021
+--------------------------------------------------------
+
+Perfect foresight solution found.
+
+
+
+
+
+Residuals of the static equations:
+
+Equation number 1 : 0 : Aggregate Output
+Equation number 2 : 0 : Euler Equation
+Equation number 3 : 0 : Budget Constrain
+Equation number 4 : 0 : low-tech capital
+Equation number 5 : 0 : total capital
+Equation number 6 : 0
+
+
+Total computing time : 0h00m00s
+</pre><h2 id="2">Graphs</h2><pre class="codeinput">figure;
+set(gcf,<span class="string">'Color'</span>,[1,1,1]);
+
+subplot(2,2,1);
+plot(c,<span class="string">'r-'</span>,<span class="string">'LineWidth'</span>,1);
+set(gca,<span class="string">'Fontsize'</span>,8);
+<span class="comment">%xlim([2003 2017]);</span>
+title([<span class="string">'Consumption'</span>],<span class="string">'FontSize'</span>,8,<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+
+
+subplot(2,2,2);
+plot(i,<span class="string">'r-'</span>,<span class="string">'LineWidth'</span>,1);
+set(gca,<span class="string">'Fontsize'</span>,8);
+<span class="comment">%xlim([2003 2017]);</span>
+title([<span class="string">'Investment'</span>],<span class="string">'FontSize'</span>,8,<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+
+
+subplot(2,2,3);
+plot(k,<span class="string">'r-'</span>,<span class="string">'LineWidth'</span>,1);
+set(gca,<span class="string">'Fontsize'</span>,8);
+<span class="comment">%xlim([2003 2017]);</span>
+title([<span class="string">'Capital'</span>],<span class="string">'FontSize'</span>,8,<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+
+subplot(2,2,4);
+plot(y,<span class="string">'r-'</span>,<span class="string">'LineWidth'</span>,1);
+set(gca,<span class="string">'Fontsize'</span>,8);
+<span class="comment">%xlim([2003 2017]);</span>
+title([<span class="string">'Output'</span>],<span class="string">'FontSize'</span>,8,<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+suptitle([<span class="string">'all wedges'</span>]);
+snapnow
+
+<span class="comment">% The k/y its not compatible with the values from the inventory capital</span>
+<span class="comment">% measure. Should be &gt; 1</span>
+figure;
+plot(k/y,<span class="string">'b-'</span>,<span class="string">'LineWidth'</span>,1);
+set(gca,<span class="string">'Fontsize'</span>,8);
+<span class="comment">%xlim([2003 2017]);</span>
+title([<span class="string">'Capital Output Ratio'</span>],<span class="string">'FontSize'</span>,8,<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+snapnow
+<span class="comment">% The results are far away from the observed values</span>
+
+
+[c(2)-9.63 y(2)-9.87 i(2)-8.28]
+
+[c(end)-9.60  y(end)-9.77 i(end)-7.9]
+</pre><img vspace="5" hspace="5" src="credit_model_01.png" alt=""> <img vspace="5" hspace="5" src="credit_model_02.png" alt=""> <pre class="codeoutput">
+ans =
+
+   -2.8683   -2.9434   -3.2372
+
+
+ans =
+
+   -3.1435   -3.1156   -2.9629
+
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+dynare simple_model_kl_2
+%% Graphs
+
+figure;
+set(gcf,'Color',[1,1,1]);
+
+subplot(2,2,1);
+plot(c,'r-','LineWidth',1);
+set(gca,'Fontsize',8);
+%xlim([2003 2017]);
+title(['Consumption'],'FontSize',8,'FontWeight','bold');
+
+
+subplot(2,2,2);
+plot(i,'r-','LineWidth',1);
+set(gca,'Fontsize',8);
+%xlim([2003 2017]);
+title(['Investment'],'FontSize',8,'FontWeight','bold');
+
+
+subplot(2,2,3);
+plot(k,'r-','LineWidth',1);
+set(gca,'Fontsize',8);
+%xlim([2003 2017]);
+title(['Capital'],'FontSize',8,'FontWeight','bold');
+
+subplot(2,2,4);
+plot(y,'r-','LineWidth',1);
+set(gca,'Fontsize',8);
+%xlim([2003 2017]);
+title(['Output'],'FontSize',8,'FontWeight','bold');
+suptitle(['all wedges']);
+snapnow
+
+% The k/y its not compatible with the values from the inventory capital 
+% measure. Should be > 1
+figure;
+plot(k/y,'b-','LineWidth',1);
+set(gca,'Fontsize',8);
+%xlim([2003 2017]);
+title(['Capital Output Ratio'],'FontSize',8,'FontWeight','bold');
+snapnow
+% The results are far away from the observed values
+
+
+[c(2)-9.63 y(2)-9.87 i(2)-8.28]
+
+[c(end)-9.60  y(end)-9.77 i(end)-7.9]
+
+
+
+
+##### SOURCE END #####
+--></body></html>
