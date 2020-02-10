@@ -29,19 +29,26 @@ plot(y,'r-','LineWidth',1);
 set(gca,'Fontsize',8);
 %xlim([2003 2017]);
 title(['Output'],'FontSize',8,'FontWeight','bold');
-suptitle(['all wedges']);
+%suptitle(['all wedges']);
 snapnow
 
 % The k/y its not compatible with the values from the inventory capital 
-% measure. Should be > 1
+% measure -- too high
 figure;
-plot(k/y,'b-','LineWidth',1);
+plot(exp(k)./exp(y),'b-','LineWidth',1);
 set(gca,'Fontsize',8);
 %xlim([2003 2017]);
 title(['Capital Output Ratio'],'FontSize',8,'FontWeight','bold');
 snapnow
 % The results are far away from the observed values
 
+% the i/y is ok
+figure;
+plot(exp(i)./exp(y),'b-','LineWidth',1);
+set(gca,'Fontsize',8);
+%xlim([2003 2017]);
+title(['Investment Output Ratio'],'FontSize',8,'FontWeight','bold');
+snapnow
 
 [c(2)-9.63 y(2)-9.87 i(2)-8.28]
 
