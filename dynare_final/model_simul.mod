@@ -28,12 +28,18 @@ parameters varpi $\varpi$,
 %----------------------------------------------------------------
 // parameters values
 %Parameters RBC Cycles
-beta =0.92;  % ok
-varpi = 1/2;
-al =  0.5;
-ah =0.8;
-sigma = 2;
-delta = 0.03; % Depreciation rate 
+
+
+ load parameterfile;
+ set_param_value('beta',beta)
+ set_param_value('varpi',varpi)
+ set_param_value('al',al)
+ set_param_value('ah',ah)
+ set_param_value('al',al)
+ set_param_value('ah',ah)
+ set_param_value('sigma',sigma)
+ set_param_value('delta',delta)
+
 a = (ah^varpi)*(al^(1-varpi));
 alpha =0.5;
 theta = (1-varpi)/varpi;
@@ -107,8 +113,8 @@ end;
 %----------------------------------------------------------------
 initval;
 
-pi_p = 1.76;
-pi_g =1.47;
+pi_p = pi_p0;
+pi_g =pi_g0;
 
 
 kh = (a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alpha*(1-varpi)))/(((1/beta-1+delta)*(pi_p))/(alpha*varpi)))^(1/(1-alpha));
@@ -136,8 +142,8 @@ check;
 %----------------------------------------------------------------
 endval;
 
-pi_p = 1;
-pi_g =1;
+pi_p = pi_pF_simul;
+pi_g =pi_gF_simul;
 
 
 kh = log((a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alpha*(1-varpi)))/(((1/beta-1+delta)*(pi_p))/(alpha*varpi)))^(1/(1-alpha)));
@@ -184,7 +190,7 @@ resid;
 %----------------------------------------------------------------
 % 8. plots
 %----------------------------------------------------------------
-%Plots
+
 //rplot kh;
 //rplot kl;
 //rplot k;
