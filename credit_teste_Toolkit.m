@@ -25,8 +25,6 @@ Params.ce=1; % Fixed cost of entry (this is a normalization)
 Params.lambda=0.1; % Probability of firm exit
 
 
-Params.Dbar=100; % Part of the (inverse) demand function that determines the price.
-
 %% Exogenous processes; productivity and subsidies
 n_s=10; %Firm-specific Productivity level
 n_sub = 10; %credit subsidy (must be an even number)
@@ -94,7 +92,7 @@ disp(n_d)
 Params.p=1; % "value of ce is chosen so that [Free entry condition] is satisfied with p=1, pg 930, Hopenhayn & Rogerson (1993)
 Params.w=1; % Normalization
 %% Distribution of potential entrants
-%%%%%% CHANGE pistar_s is not sum 1
+%%%%%% CHANGE pistar_s is not sum to 1
 
 entrantsdist = 1:round(500/n_sub,1):500;
 entrantsmean = 0;
@@ -144,81 +142,82 @@ title('Value fn')
 
 simoptions.agententryandexit=1;
 
+% Aspects of entry/exit
+
 % upsilon has to be a PMF
 pistar_tau = unidpdf(1:n_sub,n_sub);
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
+% Probability of being in tau category
 Params.upsilon=pistar_s.*(pistar_tau);
 
 
-
-% Initial guess for enter/not-enter: one for enter, zero for not-enter.
-EntryExitParamNames.CondlEntryDecisions={'ebar'};
-Params.ebar=ones([n_a,n_z]); 
-
-
-% aspects of entry/exit
-
-
-% Solution to Benchmark Economy (Undistorted)
-% For every s, p(.,tau) represents the probability of being in tau category
-% For benchmark economy, p only has mass in the middle tau, i.e. tau=0.
-%p=[zeros(ns,1) ones(ns,1) zeros(ns,1)];
-%hsmatrix=hs*ones(1,ntau);
-%g=hsmatrix.*p;
-
-% how the new entrants distribuition should look? (read about that)
-% your case is the same as RR 2008
-
-EntryExitParamNames.CondlEntryDecisions={'ebar'};
-Params.ebar=ones([n_a,n_z]); % Takes value of one for enter, zero for not-enter. This is just an initial guess as the actual decisions are determined as part of general equilibrium.
-
+% Percentage of entering firms relative to existing agents
+%%%%%%%%% ???????????
+% The initial guess for the mass of existing agents is always 1
+Params.Ne=0.5;
 EntryExitParamNames.MassOfNewAgents={'Ne'};
 
+% Exogenous survival probability
 EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 
 
 simoptions.parallel=Parallel;
+simoptions % Show which options are being set
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions, Params, EntryExitParamNames);
-surf(shiftdim(StationaryDist.pdf,1))
-%%
 
 
-GEPriceParamNames={'ebar','ce'};
+% If you wanted to look at the pdf:
+figure;
+ surf(shiftdim(StationaryDist.pdf,1))
+%% General equilibrium conditions 
+
+%%%%%%% CHECK CHECK
+%Use the toolkit to find the equilibrium prices
+GEPriceParamNames={'Ne'};
 
 FnsToEvaluateParamNames(1).Names={};
-
+% Note: With entry-exit the mass of the distribution of agents often
+% matters. So it becomes an extra input arguement in all functions to be evaluated.
+% FnsToEvaluateFn_1 = @(aprime_val,a_val,z_val,agentmass,alpha,p) p*z_val*(aprime_val^alpha); % Total output
 FnsToEvaluate={};
 
-heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
+% Just to test: (note, is same command as usual, just need to include the optional extra inputs 'simoptions' and 'EntryExitParamNames' which contains all the needed info about entry/exit)
+AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
 
+% The general equilibrium condition is that the EV^e-ce=0.
+% This does not fit standard format for general equilibrium conditions.
+heteroagentoptions.specialgeneqmcondn={0,'entry'};
+% Certain kinds of general equilibrium conditions that are non-standard can
+% be used via heteroagentoptions.specialgeneqmcondn
+
+GeneralEqmEqnParamNames(2).Names={'p'};
+GeneralEqmEqn_Entry = @(EValueFn,GEprices,p) EValueFn-p*GEprices(1); % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
+
+% The entry condition looks slightly different to more standard @(EValueFn,p,params)
+% This is because 'p' is the name of a parameter, and so have used 'GEprices'
+% instead of my usual 'p' to refer to the general equilibrium prices (here 'ce' and 'Ne')
+GeneralEqmEqns={GeneralEqmEqn_Entry};
+% Note that GeneralEqmEqn_Entry needed to be pointed out as special because
+% it depends on the distribution of entrants and not the distribution of
+% existing agents (all standard general eqm conditions involve the later).
+
+teste=0000
 
 %%
-%Use the toolkit to find the equilibrium price index
-GEPriceParamNames={'w'}; 
-    % Note that this parameter does not directly appear in any of the general eqm conditions, only indirectly by it's effect on the value fn.
-    % Note that 'ebar', the conditional entry decision, is also determined as part of general eqm, and so in some sense is a general eqm parameter. But since this is unavoidably the case for conditional entry there is no need to declare it.
-GeneralEqmEqnParamNames(1).Names={'beta'};
-GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0; % % Conditional entry condition
-% (ValueFn>=0): should this be changed to (beta*ValueFn>=0)? Yes, because of timing.
-GeneralEqmEqnParamNames(2).Names={'beta','ce'};
-GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
-GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry};
-
-%%
-
 heteroagentoptions.verbose=1;
 n_p=0;
 disp('Calculating price vector corresponding to the stationary eqm')
 % tic;
 % NOTE: EntryExitParamNames has to be passed as an additional input compared to the standard case.
-[p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1(V0, 0, n_a, n_z, n_p, pi_z, [], a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
+[p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1(V0, n_d, n_a, ...
+    n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns,...
+    Params, DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames,...
+    GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions, simoptions,...
+    vfoptions, EntryExitParamNames);
 % findeqmtime=toc
-Params.w=p_eqm.w;
-Params.ebar=p_eqm.ebar;
 
-% Calculate some things in the general eqm
-[V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,[],a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
-StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions, Params, EntryExitParamNames);
+Params.ce=p_eqm.ce;
+Params.Ne=p_eqm.Ne;
 %%
 
 
