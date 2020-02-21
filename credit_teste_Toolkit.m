@@ -29,7 +29,7 @@ Params.Dbar=100; % Part of the (inverse) demand function that determines the pri
 
 %% Exogenous processes; productivity and subsidies
 n_s=10; %Firm-specific Productivity level
-n_sub = 6; %credit subsidy (must be an even number)
+n_sub = 10; %credit subsidy (must be an even number)
 
 
 % Exogenous AR(1) process on (log) productivity
@@ -74,7 +74,7 @@ end
 end
 pi_z=pi_z';
 
-%%
+%% Check endogenous, exogenous and decision variables
 
 % Grids for a variables: there are none
 n_a=1; % number of endogenous state variabels, if none na=1
@@ -82,10 +82,6 @@ a_grid=1;
 n_d=0; 
 d_grid=[];
 
-% Legend:
-% a <- vector of endogenous state variables
-% z <- vector of exogenous state variable
-% d <- vector of decision variabes
 disp('sizes')
 disp('vector(s) of endogenous state variables')
 disp(n_a)
@@ -94,11 +90,13 @@ disp(n_z)
 disp('vector(s) of decision variabes')
 disp(n_d)
 
+%%%%%%%%% should I have this value for p or just the one for w 
 Params.p=1; % "value of ce is chosen so that [Free entry condition] is satisfied with p=1, pg 930, Hopenhayn & Rogerson (1993)
 Params.w=1; % Normalization
 %% Distribution of potential entrants
+%%%%%% CHANGE pistar_s is not sum 1
 
-entrantsdist = 1:500/n_s:500;
+entrantsdist = 1:round(500/n_sub,1):500;
 entrantsmean = 0;
 entrantssigma = 4;
 cusum_pistar_z = logncdf(entrantsdist,entrantsmean,entrantssigma);
@@ -109,20 +107,18 @@ plot(entrantsdist,pistar_s)
 %xlim([1 10])
 
 %% Value Function Problem
-% There is a distocionary tax on capital
-% The model extention would be a adjustment cost 
+% The model extention would be an adjustment cost 
 
-% Exit is exogenous 
-%probability of survival is 1-lambda. lambda is the exit percentage
-%observed between 2007--2017 (https://sidra.ibge.gov.br/Tabela/2718#resultado)
-% For exogenous exit, you simply need to include the 'conditional surivival probability' as another 'DiscountFactorParamNames'
+% Exit is exogenous - include as another 'DiscountFactorParamNames'
 Params.oneminuslambda=1-Params.lambda; % This is now the conditional probability of survival.
-DiscountFactorParamNames={'beta'};
-
-vfoptions.parallel=Parallel;
+% lambda is the average observed exit percentage between 2007--2017 
+% (https://sidra.ibge.gov.br/Tabela/2718#resultado)
+DiscountFactorParamNames={'beta','oneminuslambda'};
 
 
 % Incumbents exit in the beginning of the period
+%%%%%%%% CHANGE has to adjust (mix of Hopenhayan and RR 2008 function)
+%%%%% CHANGE ReturnFn AND ReturnFnParamNames
 ReturnFn=@(n_val,aprime_val, a_val, s_val, p, alpha, cf) Hopenhayn1992_ReturnFn(n_val,aprime_val, a_val, s_val, p, alpha, cf);
 ReturnFnParamNames={'p', 'alpha', 'cf'}; %It is important that these are in same order as they appear in 'Hopenhayn1992_ReturnFn'
 
@@ -133,22 +129,35 @@ if vfoptions.parallel==2
 else
     V0=zeros([n_a,n_z]);
 end
-%%
 [V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
 
 
 figure(3)
- surf(shiftdim(V,1))
- title('Value fn')
+surf(shiftdim(V,1))
+title('Value fn')
 
 %% Stationary Distribution of Agents with entry and exit
+% Entry is endogenous and exit exogenous
 % Both entry and exit matter for stationary distribution of agents
 % Note: Because they are not a default part of agent simulation, you need 
 % to pass the entry/exit aspects as part of simoptions.
 
 simoptions.agententryandexit=1;
 
-pistar_tau = unidpdf(1:2*sz(1),2*sz(1));
+% upsilon has to be a PMF
+pistar_tau = unidpdf(1:n_sub,n_sub);
+EntryExitParamNames.DistOfNewAgents={'upsilon'};
+Params.upsilon=pistar_s.*(pistar_tau);
+
+
+
+% Initial guess for enter/not-enter: one for enter, zero for not-enter.
+EntryExitParamNames.CondlEntryDecisions={'ebar'};
+Params.ebar=ones([n_a,n_z]); 
+
+
+% aspects of entry/exit
+
 
 % Solution to Benchmark Economy (Undistorted)
 % For every s, p(.,tau) represents the probability of being in tau category
@@ -159,8 +168,7 @@ pistar_tau = unidpdf(1:2*sz(1),2*sz(1));
 
 % how the new entrants distribuition should look? (read about that)
 % your case is the same as RR 2008
-EntryExitParamNames.DistOfNewAgents={'upsilon'};
-Params.upsilon=pistar_s.*(pistar_tau);
+
 EntryExitParamNames.CondlEntryDecisions={'ebar'};
 Params.ebar=ones([n_a,n_z]); % Takes value of one for enter, zero for not-enter. This is just an initial guess as the actual decisions are determined as part of general equilibrium.
 
