@@ -37,7 +37,7 @@ Params.subsidyrate=0; % This is the rate for the subsidy.
 
 
 %% Exogenous processes; productivity and subsidies
-n_s=20; %Firm-specific Productivity level
+n_s= 10; %Firm-specific Productivity level
 n_sub = 20; %credit subsidy (must be an even number)
 
 
@@ -64,10 +64,6 @@ mu_b = 4;       % Mean (b).
 sigma_b = 1;    % Standard deviation (b).
 sz = [n_sub/states, 1];  % Size vector.
 tau_grid = reshape([normrnd(mu_a, sigma_a, sz), normrnd(mu_b, sigma_b, sz)],[2*sz(1),1]);
-
-figure(1)
-subplot(1, 2, 1); hist(s_grid); title('Productivity');
-subplot(1, 2, 2); histogram(tau_grid); title('Subsidy');
 
 % Transition matrix (considering that productivity and subsidy are independent) 
 n_z=[n_s,length(tau_grid)];
@@ -100,18 +96,27 @@ disp('vector(s) of decision variabes')
 disp(n_d)
 
 
-%% Distribution of potential entrants
+%% Potential draws for the pair (s, psi)
 
-entrantsdist = 1:round(500/n_s,1):500;
-entrantsmean = 1.5;
-entrantssigma = 1;
-cumsum_pistar_s = logncdf(entrantsdist,entrantsmean,entrantssigma);
-logncdf(10,entrantsmean,entrantssigma) %has to be close to 0.78
+sdist = 1:round(500/n_s,1):500;
+smean = 1.5;
+ssigma = 1;
+cumsum_pistar_s = logncdf(sdist,smean,ssigma);
 pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)])';
-figure;
-plot(entrantsdist,cumsum_pistar_s)
-title('cumulative distribution of potential entrants')
-%xlim([1 50])
+
+
+taudist = 0:1/(n_sub-1):1;
+cumsum_pistar_tau = betacdf(taudist,.5,.4);
+pistar_tau =(cumsum_pistar_tau-[0,cumsum_pistar_tau(1:end-1)]);
+
+
+%figure(1)
+%subplot(1,2,1);
+%plot(taudist,cumsum_pistar_tau)
+%title('Potential draws for psi')
+%subplot(1,2,2);
+%plot(entrantsdist,cumsum_pistar_s)
+%title('Potential draws for s')
 
 %% Return Function
 % The model extention would be an adjustment cost 
@@ -135,9 +140,6 @@ ReturnFnParamNames={'p','r','alpha','gamma','taurate','subsidyrate','cf'};
 % Note: Because they are not a default part of agent simulation, you need 
 % to pass the entry/exit aspects as part of simoptions.
 
-
-% upsilon has to be a PMF
-pistar_tau = unidpdf(1:n_sub,n_sub);
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 % Probability of being in tau category
 Params.upsilon=pistar_s.*(pistar_tau);
@@ -154,29 +156,17 @@ EntryExitParamNames.MassOfNewAgents={'Ne'};
 EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 
 %% Descriptions of SS values as functions
+GEPriceParamNames={'p','Ne'};
 
 FnsToEvaluateParamNames(1).Names={};
 FnsToEvaluate={};
 
 heteroagentoptions.specialgeneqmcondn={'entry'};
 
-GEPriceParamNames={'p', 'Ne'};
-FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','w','taurate'};
-
-
 GeneralEqmEqnParamNames(1).Names={'beta','ce'};
 GeneralEqmEqn_Entry = @(EValueFn,p,beta,ce) beta*EValueFn-ce;
 
 
-
-%FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,w,taurate)((...
-%(1-taurate*z2_val)*z1_val*gamma)/w)^(1/(1-gamma)) *((alpha/r)^((1-gamma)/...
-%(1-gamma-alpha)) *(gamma/w)^(gamma/(1-gamma-alpha...
-%)) *(z1_val*(1-taurate*z2_val))^(1/(1-alpha-gamma))...
-%     )^(alpha/(1-gamma)); % which evaluates to Nbar in the aggregate
-%FnsToEvaluate={FnsToEvaluateFn_nbar};
-%GeneralEqmEqnParamNames(2).Names={};
-%GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) AggVars-1;
 %% Equilibrium conditions
 
 % 1 - Euler Equations
@@ -210,7 +200,7 @@ else
 end
 n_p=0;
 
-% 4/6 Stationary Distribution 
+
 disp('Calculating price vector corresponding to the stationary eqm')
 [p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1(V0, 0,...
     n_a, n_z, 0, pi_z, [], a_grid, z_grid, ReturnFn, FnsToEvaluate,...
@@ -226,6 +216,8 @@ Params.p=p_eqm.p;
 % 5/6 Optimal production 6/6 Entry/Exit Policies
 [V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,[],a_grid,z_grid, pi_z, ReturnFn,...
     Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
+
+% 4/6 Stationary Distribution 
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions, Params, EntryExitParamNames);
 
 % Impose the labour market clearance, which involves calculating Ne. 
@@ -243,11 +235,11 @@ StationaryDist.mass=StationaryDist.mass*(Params.Ne/InitialNe); % Take advantage 
 
 
 FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
-FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,w,taurate,subsidyrate) (alpha/r)^((1-gamma)/(1-gamma-alpha)) *(gamma/w)^(gamma/(1-gamma-alpha)) *(z1_val*(1-((z2_val>=0)*taurate+(z2_val<0)*subsidyrate)*z2_val))^(1/(1-alpha-gamma));
+FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate) (alpha/r)^((1-gamma)/(1-gamma-alpha)) *(gamma)^(gamma/(1-gamma-alpha)) *(z1_val*(1-((z2_val>=0)*taurate+(z2_val<0)*subsidyrate)*z2_val))^(1/(1-alpha-gamma));
 FnsToEvaluateParamNames(2).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
-FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,w,taurate,subsidyrate) ((1-((z2_val>=0)*taurate+(z2_val<0)*subsidyrate)*z2_val)*z1_val)^(1/(1-alpha-gamma)) *(alpha/r)^(alpha/(1-gamma-alpha)) *(gamma/w)^((1-alpha)/(1-gamma-alpha)); % which evaluates to Nbar in the aggregate
+FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate) ((1-((z2_val>=0)*taurate+(z2_val<0)*subsidyrate)*p*z2_val)*z1_val)^(1/(1-alpha-gamma)) *(alpha/r)^(alpha/(1-gamma-alpha)) *(gamma)^((1-alpha)/(1-gamma-alpha)); % which evaluates to Nbar in the aggregate
 FnsToEvaluateParamNames(3).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
-FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,mass, alpha,gamma,r,w,taurate,subsidyrate) ((1-((z2_val>=0)*taurate+(z2_val<0)*subsidyrate)*z2_val))^((alpha+gamma)/(1-gamma-alpha))*z1_val^(1/(1-gamma-alpha)) *(alpha/r)^(alpha/(1-gamma-alpha)) *(gamma/w)^(gamma/(1-gamma-alpha));
+FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,mass, alpha,gamma,r,p,taurate,subsidyrate) ((1-((z2_val>=0)*taurate+(z2_val<0)*subsidyrate)*p*z2_val))^((alpha+gamma)/(1-gamma-alpha))*z1_val^(1/(1-gamma-alpha)) *(alpha/r)^(alpha/(1-gamma-alpha)) *(gamma)^(gamma/(1-gamma-alpha));
 FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_nbar, FnsToEvaluateFn_output};
 
 ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1_Mass(StationaryDist.pdf,StationaryDist.mass, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames,EntryExitParamNames, n_d, n_a, n_z, [], a_grid, z_grid, Parallel,simoptions);
