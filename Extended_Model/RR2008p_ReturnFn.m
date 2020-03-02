@@ -7,7 +7,7 @@ gnnlag=0;
 if aprime_val>a_val
     gnnlag=-gcost*((a_val-aprime_val)/a_val); % Note that gnnlag>=0, it is 'minus a negative number'
 end
-tau=taurate*(tau_val>=0)-subsidyrate*(tau_val<0);
+tau=taurate;%*(tau_val>=0)-subsidyrate*(tau_val<0);
 
 % Physical capital:
 

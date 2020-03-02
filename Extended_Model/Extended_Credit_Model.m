@@ -13,7 +13,7 @@ vfoptions.parallel=Parallel;
 simoptions.parallel=Parallel;
 heteroagentoptions.verbose=1;
 simoptions.agententryandexit=1;
-
+simoptions.endogenousexit=0;
 
 %% Parameters
 
@@ -82,7 +82,7 @@ pi_z=pi_z';
 
 %% Check endogenous, exogenous and decision variables
 
-n_a=40; % Hopenhayn & Rogerson (1993) use 250, this is intended as an approximation of continuous variable, so I use more.
+n_a=10;  % 401-- Hopenhayn & Rogerson (1993) use 250, this is intended as an approximation of continuous variable, so I use more.
 a_grid=[linspace(0,100,101),((logspace(0,pi,n_a-101-1)-1)/(pi-1))*(5000-101)+101,10^6]'; % One less point in standard grid, instead add the 10^6 point to keep track of the new entrants.
 n_d=0; % None.
 d_grid=[];
@@ -147,7 +147,7 @@ end
 [V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
 
 figure;
-surf(shiftdim(V,1))
+surf(V(:,:,1))
 %% Aspects of entry/exit
 % Entry is endogenous and exit exogenous
 
@@ -169,6 +169,28 @@ EntryExitParamNames.MassOfNewAgents={'Ne'};
 
 % Exogenous survival probability
 EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
+
+%% CHECK (erase)
+
+% Check that everything is working so far by solving the simulation of agent distribution to get the stationary distribution.
+simoptions.parallel=Parallel;
+simoptions % Show which options are being set
+StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,Params,EntryExitParamNames);
+
+% Note: When using models, such as entry and exit, where the mass of agents is not equal to 1
+% the toolkit will automatically keep track of distributions as StationaryDist.pdf and StationaryDist.mass
+
+% Note: when tau=0, conditional on z there is a value of aprime that all
+% firms will choose. This means that next period all firms will appear in
+% just one of n_z values on a_grid (the pdf over on a_grid will appear as
+% just n_z point masses; actually n_z+1 because of new entrants).
+figure(2)
+temp=sum(StationaryDist.pdf,2);
+temp2=temp(1:end-1); temp2(1)=temp(1)+temp(end);
+plot(a_grid(1:end-1), cumsum(temp2))
+title('Stationary Distribution over lagged employment (sum/integral over z)')
+
+
 
 %% Descriptions of SS values as functions
 GEPriceParamNames={'p','Ne'};
