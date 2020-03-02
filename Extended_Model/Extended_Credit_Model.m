@@ -34,7 +34,7 @@ Params.lambda=0.1; % Probability of firm exit
 % The actual 'distortionary policy rate'
 Params.taurate=0; % This is the rate for the tax.
 Params.subsidyrate=0; % This is the rate for the subsidy.
-
+Params.gcost=0.5;
 
 %% Exogenous processes; productivity and subsidies
 n_s= 10; %Firm-specific Productivity level
@@ -82,9 +82,9 @@ pi_z=pi_z';
 
 %% Check endogenous, exogenous and decision variables
 
-n_a=1; % number of endogenous state variables, if none na=1
-a_grid=1;
-n_d=0; 
+n_a=40; % Hopenhayn & Rogerson (1993) use 250, this is intended as an approximation of continuous variable, so I use more.
+a_grid=[linspace(0,100,101),((logspace(0,pi,n_a-101-1)-1)/(pi-1))*(5000-101)+101,10^6]'; % One less point in standard grid, instead add the 10^6 point to keep track of the new entrants.
+n_d=0; % None.
 d_grid=[];
 
 disp('sizes')
@@ -127,12 +127,27 @@ Params.oneminuslambda=1-Params.lambda; % This is now the conditional probability
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
 DiscountFactorParamNames={'beta','oneminuslambda'};
 
+ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf,gcost) RR2008p_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf,gcost);
+ReturnFnParamNames={'p','r','alpha','gamma','taurate','subsidyrate','cf','gcost'};
 
+%% CHECK (erase)
 % Incumbents exit in the beginning of the period
+Params.i=1/Params.beta-1; % This is standard general eqm result in complete market models, comes from consumption euler eqn together with requirements of stationary eqm.
+% The net return to capital in equilibrium will thus be
+Params.r=Params.i+Params.delta; % That the gross return is just 1/beta-1 and equals i (that the gross return to capital equals the interest rate is a requirement of capital market clearance in model)
+Params.p=1; 
+Params.Ne=0.5;
 
-ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf) RR2008p_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf);
-ReturnFnParamNames={'p','r','alpha','gamma','taurate','subsidyrate','cf'};
+vfoptions.parallel=Parallel;
+if vfoptions.parallel==2
+    V0=zeros([n_a,n_z,'gpuArray']);
+else
+    V0=zeros([n_a,n_z]);
+end
+[V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
 
+figure;
+surf(shiftdim(V,1))
 %% Aspects of entry/exit
 % Entry is endogenous and exit exogenous
 
