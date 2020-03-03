@@ -83,7 +83,9 @@ pi_z=pi_z';
 %% Check endogenous, exogenous and decision variables
 
 n_a=10;  % 401-- Hopenhayn & Rogerson (1993) use 250, this is intended as an approximation of continuous variable, so I use more.
-a_grid=[linspace(0,100,101),((logspace(0,pi,n_a-101-1)-1)/(pi-1))*(5000-101)+101,10^6]'; % One less point in standard grid, instead add the 10^6 point to keep track of the new entrants.
+%%%%% FIX FIX a_grid
+%a_grid=[linspace(0,100,9),((logspace(0,pi,n_a-9-1)-1)/(pi-1))*(5000-9)+9,10^6]'; % One less point in standard grid
+a_grid = sort(unifrnd(1,1000,n_a,1), 'descend');
 n_d=0; % None.
 d_grid=[];
 
@@ -144,7 +146,9 @@ if vfoptions.parallel==2
 else
     V0=zeros([n_a,n_z]);
 end
-[V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
+[V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,d_grid,...
+    a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames,...
+    ReturnFnParamNames, vfoptions);
 
 figure;
 surf(V(:,:,1))
@@ -157,9 +161,14 @@ surf(V(:,:,1))
 
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 % Probability of being in tau category
-Params.upsilon=pistar_s.*(pistar_tau);
 
-if (round(sum(sum(pistar_s.*(pistar_tau))),5) ~= 1)
+%%%%% FIX FIX teste
+teste = repmat(1,[n_z n_a]);
+%teste = eye(n_z(1), n_z(2),n_a);
+Params.upsilon=pistar_s.*(pistar_tau).*teste;
+Params.upsilon=Params.upsilon/sum(sum(sum(Params.upsilon)));
+
+if (round(sum(sum(sum(Params.upsilon))),5) ~= 1)
     error('Upsilon is NOT a PMD.')
 end
 
@@ -175,7 +184,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % Check that everything is working so far by solving the simulation of agent distribution to get the stationary distribution.
 simoptions.parallel=Parallel;
 simoptions % Show which options are being set
-StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,Params,EntryExitParamNames);
+StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
+    simoptions,Params,EntryExitParamNames);
 
 % Note: When using models, such as entry and exit, where the mass of agents is not equal to 1
 % the toolkit will automatically keep track of distributions as StationaryDist.pdf and StationaryDist.mass
@@ -185,22 +195,31 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,Params,E
 % just one of n_z values on a_grid (the pdf over on a_grid will appear as
 % just n_z point masses; actually n_z+1 because of new entrants).
 figure(2)
-temp=sum(StationaryDist.pdf,2);
-temp2=temp(1:end-1); temp2(1)=temp(1)+temp(end);
-plot(a_grid(1:end-1), cumsum(temp2))
-title('Stationary Distribution over lagged employment (sum/integral over z)')
-
+surf(StationaryDist.pdf(:,:,1))
 
 
 %% Descriptions of SS values as functions
+%Set initial values for prices
+Params.p=1; 
+Params.Ne=0.5;
+
 GEPriceParamNames={'p','Ne'};
 
-FnsToEvaluateParamNames(1).Names={};
-FnsToEvaluate={};
+FnsToEvaluateParamNames(1).Names={'alpha','gamma'};
+FnsToEvaluateFn_1 = @(aprime_val, s_val, tau_val, p,r, alpha,gamma,taurate)...
+    (1-taurate)*p*s_val*(aprime_val^alpha)*(((((1-taurate)*s_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma); % Total output
+FnsToEvaluate={FnsToEvaluateFn_1};
 
-heteroagentoptions.specialgeneqmcondn={'entry'};
+%FnsToEvaluateParamNames(1).Names={};
+%FnsToEvaluate={};
 
-GeneralEqmEqnParamNames(1).Names={'beta','ce'};
+AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel, simoptions, EntryExitParamNames);
+
+heteroagentoptions.specialgeneqmcondn={0,'entry'};
+
+GeneralEqmEqn_1 = @(AggVars,p) 1/AggVars-p; 
+
+GeneralEqmEqnParamNames(2).Names={'beta','ce'};
 GeneralEqmEqn_Entry = @(EValueFn,p,beta,ce) beta*EValueFn-ce;
 
 
@@ -221,14 +240,12 @@ Params.r=Params.i+Params.delta; % That the gross return is just 1/beta-1 and equ
 
 
 %2/6 Free entry and 3/5 Labor Market Clearing
-GeneralEqmEqns={GeneralEqmEqn_Entry};
+GeneralEqmEqns={GeneralEqmEqn_1,GeneralEqmEqn_Entry};
 
 %%
 %Use the toolkit to find the equilibrium price index
 
-%Set initial values for prices
-Params.p=1; 
-Params.Ne=0.5;
+
 
 if vfoptions.parallel==2
     V0=zeros([n_a,n_z],'gpuArray');
