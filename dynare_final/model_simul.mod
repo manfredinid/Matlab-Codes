@@ -13,14 +13,14 @@ varexo pi_g pi_p;
 
 // list of parameters
 parameters varpi $\varpi$, 
-           beta $\beta$,
+           betaa $\betaa$,
            al $a_l$,
 
            ah $a_h$,
-           sigma $\sigma$,
-           delta $\delta$
+           sigmaa $\sigmaa$,
+           deltaa $\deltaa$
            a $(a_h^\varpi)(a_l^{1-\varpi})$,
-           alpha $\alpha$,
+           alphaa $\alphaa$,
            theta  $\dfrac{(1-\varpi)}{\varpi}$;
 
 %----------------------------------------------------------------
@@ -31,17 +31,17 @@ parameters varpi $\varpi$,
 
 
  load parameterfile;
- set_param_value('beta',beta)
+ set_param_value('betaa',betaa)
  set_param_value('varpi',varpi)
  set_param_value('al',al)
  set_param_value('ah',ah)
  set_param_value('al',al)
  set_param_value('ah',ah)
- set_param_value('sigma',sigma)
- set_param_value('delta',delta)
+ set_param_value('sigmaa',sigmaa)
+ set_param_value('deltaa',deltaa)
+ set_param_value('alphaa',alphaa)
 
 a = (ah^varpi)*(al^(1-varpi));
-alpha =0.5;
 theta = (1-varpi)/varpi;
 
 
@@ -56,9 +56,9 @@ model;
 
 # A = (ah^varpi)*(al^(1-varpi));
 
-# expH = alpha*varpi;
+# expH = alphaa*varpi;
 
-# expL = alpha*(1-varpi);
+# expL = alphaa*(1-varpi);
 
 
 [name='Aggregate Output']
@@ -67,12 +67,12 @@ y = A*(kh(-1)^expH)*((psi*kh(-1))^expL);
 
 [name='Euler Equation']
 
-c^(-sigma) = beta*(c(+1)^(-sigma))*( (expH*(A*(kh^expH)*((psi*kh)^expL)))/(kh*(pi_p+pi_g)) + (expL*(A*(kh^expH)*((psi*kh)^expL)))/((pi_p+pi_g)*(psi*kh)) + (1-delta));
+c^(-sigmaa) = betaa*(c(+1)^(-sigmaa))*( (expH*(A*(kh^expH)*((psi*kh)^expL)))/(kh*(pi_p+pi_g)) + (expL*(A*(kh^expH)*((psi*kh)^expL)))/((pi_p+pi_g)*(psi*kh)) + (1-deltaa));
 
 
 [name='Budget Constrain']
 
-c= (A*(kh(-1)^expH)*((psi*kh(-1))^expL)) - pi_g*(psi*kh - (1-delta)*(psi*kh(-1))) - pi_p*(kh - (1-delta)*kh(-1));
+c= (A*(kh(-1)^expH)*((psi*kh(-1))^expL)) - pi_g*(psi*kh - (1-deltaa)*(psi*kh(-1))) - pi_p*(kh - (1-deltaa)*kh(-1));
 
 
 [name='low-tech capital']
@@ -90,12 +90,12 @@ end;
 %----------------------------------------------------------------
 steady_state_model;
 
-kh = (a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alpha*(1-varpi)))/(((1/beta-1+delta)*(pi_p))/(alpha*varpi)))^(1/(1-alpha));
+kh = (a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa));
 
 
-y = a*(kh^(alpha*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alpha*(1-varpi))); // output
+y = a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi))); // output
 
-c= (a*(kh^(alpha*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alpha*(1-varpi)))) - pi_g*delta*(((pi_p*(1-varpi))/(pi_g*varpi))*kh) - pi_p*delta*kh; // consumption
+c= (a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi)))) - pi_g*deltaa*(((pi_p*(1-varpi))/(pi_g*varpi))*kh) - pi_p*deltaa*kh; // consumption
 
 kl = ((pi_p*(1-varpi))/(pi_g*varpi))*kh;
 
@@ -117,12 +117,12 @@ pi_p = pi_p0;
 pi_g =pi_g0;
 
 
-kh = (a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alpha*(1-varpi)))/(((1/beta-1+delta)*(pi_p))/(alpha*varpi)))^(1/(1-alpha));
+kh = (a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa));
 
 
-y = a*(kh^(alpha*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alpha*(1-varpi))); // output
+y = a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi))); // output
 
-c= (a*(kh^(alpha*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alpha*(1-varpi)))) - pi_g*delta*(((pi_p*(1-varpi))/(pi_g*varpi))*kh) - pi_p*delta*kh; // consumption
+c= (a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi)))) - pi_g*deltaa*(((pi_p*(1-varpi))/(pi_g*varpi))*kh) - pi_p*deltaa*kh; // consumption
 
 kl = ((pi_p*(1-varpi))/(pi_g*varpi))*kh;
 
@@ -146,12 +146,12 @@ pi_p = pi_pF_simul;
 pi_g =pi_gF_simul;
 
 
-kh = log((a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alpha*(1-varpi)))/(((1/beta-1+delta)*(pi_p))/(alpha*varpi)))^(1/(1-alpha)));
+kh = log((a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa)));
 
 
-y = log(a*(exp(kh)^(alpha*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh))^(alpha*(1-varpi)))); // output
+y = log(a*(exp(kh)^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh))^(alphaa*(1-varpi)))); // output
 
-c= log((a*(exp(kh)^(alpha*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh))^(alpha*(1-varpi)))) - pi_g*delta*(((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh)) - pi_p*delta*exp(kh)); // consumption
+c= log((a*(exp(kh)^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh))^(alphaa*(1-varpi)))) - pi_g*deltaa*(((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh)) - pi_p*deltaa*exp(kh)); // consumption
 
 kl = log(((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh));
 
