@@ -1,24 +1,35 @@
 %%
 close all;
 
-beta =0.92;  
-varpi = 1/3;
+betaa =0.9;  
+varpi = 0.5;
 al =  1;
-ah =1.1;
-sigma = 2;
-delta = 0.03; 
+ah =1.5;
+sigmaa = 1.5;
+deltaa = 0.03; 
+alphaa = 0.7;
 
-save parameterfile  beta varpi al ah sigma delta
+save parameterfile  betaa varpi al ah sigmaa deltaa alphaa
 
 
-pi_p0=1.76;
-pi_g0=1.47;
+%pi_p0=1.76;
+%pi_g0=1.47;
 
-pi_pF_obser=1.4;
-pi_gF_obser=0.7;
+%pi_pF_obser=1.4;
+%pi_gF_obser=0.7;
 
-pi_pF_simul=0.8;
-pi_gF_simul=0.8;
+%pi_pF_simul=0.8;
+%pi_gF_simul=0.8;
+
+%%
+pi_p0=1.027/1.008; %2011 2.7 p.m.
+pi_g0=1; % 2011 0.8 p.m.
+
+pi_pF_obser=1.0356/1.008; %2013 2.36 p.m. % 2017 3.56
+pi_gF_obser= 1; %2013 0.6 p.m.  % 2017 0.79
+ 
+pi_pF_simul=1;
+pi_gF_simul=1;
 
 %%
 dynare model_observed
