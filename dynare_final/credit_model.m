@@ -131,6 +131,10 @@ title(['high-technology capital'],'FontSize',8,'FontWeight','bold');
 legend('observed','alternative', 'Location', 'Best')
 snapnow
 
+%% Selected Graphs
+
+% In construction
+%saveas(gcf,'kl_kh.eps') % save plot - place after the figure code
 
 
 

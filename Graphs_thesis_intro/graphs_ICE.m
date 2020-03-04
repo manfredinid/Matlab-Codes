@@ -84,3 +84,5 @@ hold on;
 line([quarter_gad(1) quarter_gad(end)],[mean(GAD),mean(GAD)],'Color','red','LineStyle','-');
 legend('Antidumping Investigations', 'Average','Location', 'northwest');
 snapnow
+
+
