@@ -5,6 +5,8 @@ close all;
 
 Parallel=0 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
 
+rng('default') % For reproducibility
+tic;
 %% Toolkit options
 tauchenoptions.parallel=Parallel;
 
@@ -144,11 +146,13 @@ end
 
 
 figure(1)
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder','-|-|--|:','DefaultLineLineWidth',1);
 subplot(1,2,1);
-plot(psi_grid,cumsum_pistar_psi)
+plot(psi_grid,cumsum_pistar_psi,'r')
 title('Potential draws for psi')
 subplot(1,2,2);
-plot(s_grid,cumsum_pistar_s)
+plot(s_grid,cumsum_pistar_s,'r')
 title('Potential draws for s')
 
 %% Return Function
@@ -175,12 +179,18 @@ surf(squeeze(Policy(1,:,1,:)))
 
 %% Aspects of the Endogenous entry
 % Exit is exogenous with probability lambda
+simoptions.agententryandexit=1;
 
 % Probability of being in the (s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
+%%%%%%%% FIX IT %%%%%%%%%%%%%%%%%%%%%
 Params.upsilon=pistar_s.*(pistar_psi)';
-Params.upsilon(end,end,1:n_a)=0;
+A = rand(1,n_a);
+Params.upsilon(end+1,end+1,1:n_a)=A./sum(A);
+Params.upsilon = Params.upsilon(1:end-1,1:end-1,1:end);
+ size(Params.upsilon)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 disp('upsilon size')
 disp(size(Params.upsilon))
@@ -189,12 +199,13 @@ disp('sum of upsilon')
 disp(sum(Params.upsilon(:)))
 
 %% CHECK (to be erased)
+simoptions.parallel=Parallel
 
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
     simoptions,Params,EntryExitParamNames);
 
 figure;
-surf(squeeze(StationaryDist(:,1,:)))
+surf(squeeze(StationaryDist.pdf(:,1,:)))
 
 %%
 heteroagentoptions.specialgeneqmcondn={0,'entry'};
@@ -211,7 +222,9 @@ FnsToEvaluateFn_nbar = @(aprime_val,a_val,s_val,mass,alpha,gamma,r,p,taurate,sub
 (((1-taurate)*s_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
 FnsToEvaluate={FnsToEvaluateFn_nbar};
 
-AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
+    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
+    d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
 AggVars
 
 GeneralEqmEqnParamNames(1).Names={};
@@ -224,6 +237,7 @@ GeneralEqmEqns={GeneralEqmEqn_LabourMarket,GeneralEqmEqn_Entry};
 %% Find equilibrium prices
 heteroagentoptions.verbose=1;
 n_p=0;
+% uncomment after erase the 'to be erase' chunks
 % initial value function
 if vfoptions.parallel==2
     V0=zeros([n_a,n_z,'gpuArray']);
@@ -232,7 +246,35 @@ else
 end
 
 disp('Calculating price vector corresponding to the stationary eqm')
-[p_eqm,p_eqm_index,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(V0, n_d, n_a, n_s, n_p, pi_s, d_grid, a_grid, s_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions, simoptions, vfoptions);
+[p_eqm,p_eqm_index,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(V0,...
+    n_d, n_a, n_z, n_p, pi_z, [], a_grid, z_grid, ReturnFn,...
+    FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames,...
+    ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
+    GEPriceParamNames,heteroagentoptions, simoptions, vfoptions);
+%%
+Params.p=p_eqm(1);
+Params.Ne=p_eqm(2);
 
-p_eqm
 
+% Calculate some things in the general eqm
+[V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,[],a_grid,z_grid, pi_z,...
+    ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames,vfoptions);
+
+StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
+    simoptions, Params, EntryExitParamNames);
+
+%%
+FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+
+FnsToEvaluateParamNames(1).Names={};
+% Capital
+FnsToEvaluateFn_capital = @(aprime_val,a_val,z_val,AgentDistMass) aprime_val; 
+FnsToEvaluate={FnsToEvaluateFn_capital};
+    
+AggValues=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+
+% Average Firm Size (i.e., Average number of employees)
+AvgFirmSize=AggValues(1)/StationaryDist.pdf
+
+toc;
