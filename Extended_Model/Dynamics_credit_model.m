@@ -34,14 +34,26 @@ Params.cf=0; % Fixed cost of production
 
 % Entry and Exit
 Params.ce=1; % Fixed cost of entry 
-Params.lambda=0.1; % Probability of firm exit
+Params.lambda=0; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
 Params.oneminuslambda=1-Params.lambda; % Probability of survival
 
 % Distortions
-Params.psi=0; % tax rate.
-Params.gcost=0.5; % capital adjustment cost parameter
+Params.taurate=0; % This is the rate for the tax.
+Params.subsidyrate=0; % This is the rate for the subsidy.
+Params.gcost=0.05; % capital adjustment cost parameter
+
+% Initial guesses
+Params.p=1; % output price
+Params.Ne=0.5; % total mass of new entrants
+
+% Declare discount factors
+DiscountFactorParamNames={'beta','oneminuslambda'};
+% Declare percentage of entrants
+EntryExitParamNames.MassOfNewAgents={'Ne'};
+% Exogenous survival probability
+EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 
 %% Steady-state interest rate
 
@@ -140,3 +152,38 @@ plot(s_grid,cumsum_pistar_s)
 title('Potential draws for s')
 
 %% Return Function
+ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf, gcost)...
+RR2008p_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf, gcost);
+
+ReturnFnParamNames={ 'p','r', 'alpha','gamma','taurate','subsidyrate', 'cf', 'gcost'};
+
+%% CHECK (to be erase)
+if vfoptions.parallel==2
+    V0=zeros([n_a,n_z,'gpuArray']);
+else
+    V0=zeros([n_a,n_z]);
+end
+[V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,d_grid,...
+    a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames,...
+    ReturnFnParamNames, vfoptions);
+
+figure;
+ surf(squeeze(V(:,1,:)))
+ 
+figure;
+surf(squeeze(Policy(1,:,1,:)))
+
+%% Aspects of the Endogenous entry
+% Exit is exogenous with probability lambda
+
+% Probability of being in the (s, psi) category
+EntryExitParamNames.DistOfNewAgents={'upsilon'};
+
+Params.upsilon=pistar_s.*(pistar_psi)';
+Params.upsilon(end,end,1:n_a)=0;
+
+disp('upsilon size')
+disp(size(Params.upsilon))
+
+disp('sum of upsilon')
+disp(sum(Params.upsilon(:)))
