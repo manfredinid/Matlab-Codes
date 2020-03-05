@@ -168,7 +168,7 @@ end
     ReturnFnParamNames, vfoptions);
 
 figure;
- surf(squeeze(V(:,1,:)))
+surf(squeeze(V(:,1,:)))
  
 figure;
 surf(squeeze(Policy(1,:,1,:)))
@@ -187,3 +187,52 @@ disp(size(Params.upsilon))
 
 disp('sum of upsilon')
 disp(sum(Params.upsilon(:)))
+
+%% CHECK (to be erased)
+
+StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
+    simoptions,Params,EntryExitParamNames);
+
+figure;
+surf(squeeze(StationaryDist(:,1,:)))
+
+%%
+heteroagentoptions.specialgeneqmcondn={0,'entry'};
+
+%Use the toolkit to find the equilibrium price index
+GEPriceParamNames={'p', 'Ne'};
+
+FnsToEvaluateParamNames(1).Names={};
+FnsToEvaluate={};
+
+
+FnsToEvaluateParamNames(1).Names={'alpha','gamma','p','r','taurate'};
+FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate)...
+(((1-tau)*s_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+FnsToEvaluate={FnsToEvaluateFn_nbar};
+
+AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+AggVars
+
+GeneralEqmEqnParamNames(1).Names={};
+GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
+
+GeneralEqmEqnParamNames(2).Names={'beta','ce'};
+GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
+
+GeneralEqmEqns={GeneralEqmEqn_LabourMarket,GeneralEqmEqn_Entry};
+%% Find equilibrium prices
+heteroagentoptions.verbose=1;
+n_p=0;
+% initial value function
+if vfoptions.parallel==2
+    V0=zeros([n_a,n_z,'gpuArray']);
+else
+    V0=zeros([n_a,n_z]);
+end
+
+disp('Calculating price vector corresponding to the stationary eqm')
+[p_eqm,p_eqm_index,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(V0, n_d, n_a, n_s, n_p, pi_s, d_grid, a_grid, s_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions, simoptions, vfoptions);
+
+p_eqm
+
