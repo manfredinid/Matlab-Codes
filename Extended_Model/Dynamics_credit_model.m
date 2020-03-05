@@ -207,8 +207,8 @@ FnsToEvaluate={};
 
 
 FnsToEvaluateParamNames(1).Names={'alpha','gamma','p','r','taurate'};
-FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate)...
-(((1-tau)*s_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+FnsToEvaluateFn_nbar = @(aprime_val,a_val,s_val,mass,alpha,gamma,r,p,taurate,subsidyrate)...
+(((1-taurate)*s_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
 FnsToEvaluate={FnsToEvaluateFn_nbar};
 
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
