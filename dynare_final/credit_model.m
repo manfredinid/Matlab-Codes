@@ -2,13 +2,13 @@
 %clear all;
 close all;
 
-betaa =0.96;  
+betaa =0.9;  
 varpi = 0.5;
 al =  1;
 ah =1.5;
-sigmaa = 1;
-deltaa = 0.03; 
-alphaa = 0.3;
+sigmaa = 0.63;
+deltaa = 0.04; 
+alphaa = 0.6;
 
 % periods in the plot
 n=40;
