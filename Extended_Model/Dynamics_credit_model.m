@@ -187,7 +187,7 @@ EntryExitParamNames.DistOfNewAgents={'upsilon'};
 %%%%%%%% FIX IT %%%%%%%%%%%%%%%%%%%%%
 Params.upsilon=pistar_s.*(pistar_psi)';
 A = rand(1,n_a);
-Params.upsilon(end+1,end+1,1:n_a)=A./sum(A);
+Params.upsilon(end+1,end+1,1:n_a)=0;%A./sum(A);
 Params.upsilon = Params.upsilon(1:end-1,1:end-1,1:end);
  size(Params.upsilon)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -208,7 +208,7 @@ figure;
 surf(squeeze(StationaryDist.pdf(:,1,:)))
 
 %%
-heteroagentoptions.specialgeneqmcondn={0,'entry'};
+
 
 %Use the toolkit to find the equilibrium price index
 GEPriceParamNames={'p', 'Ne'};
@@ -216,17 +216,23 @@ GEPriceParamNames={'p', 'Ne'};
 FnsToEvaluateParamNames(1).Names={};
 FnsToEvaluate={};
 
+heteroagentoptions.specialgeneqmcondn={0,'entry'};
 
-FnsToEvaluateParamNames(1).Names={'alpha','gamma','p','r','taurate'};
-FnsToEvaluateFn_nbar = @(aprime_val,a_val,s_val,mass,alpha,gamma,r,p,taurate,subsidyrate)...
-(((1-taurate)*s_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate'};
+FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,w,taurate)...
+(((1-taurate*z2_val)*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
 FnsToEvaluate={FnsToEvaluateFn_nbar};
+
+%%%%%%%%% ERROR
+%%%%%%% WARNING: SteadyState_Case1 stopped due to reaching simoptions.maxit, this might be causing a problem
 
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
     d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
 AggVars
 
+%%
+GEPriceParamNames={'p'}; 
 GeneralEqmEqnParamNames(1).Names={};
 GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
 
@@ -247,10 +253,10 @@ end
 
 disp('Calculating price vector corresponding to the stationary eqm')
 [p_eqm,p_eqm_index,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(V0,...
-    n_d, n_a, n_z, n_p, pi_z, [], a_grid, z_grid, ReturnFn,...
+    0, n_a, n_z, n_p, pi_z, [], a_grid, z_grid, ReturnFn,...
     FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames,...
     ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
-    GEPriceParamNames,heteroagentoptions, simoptions, vfoptions);
+    GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
 %%
 Params.p=p_eqm(1);
 Params.Ne=p_eqm(2);
