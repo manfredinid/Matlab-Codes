@@ -191,9 +191,8 @@ A = zeros(1,n_a);
 A(1,1) = 1;
 Params.upsilon=NaN(n_psi,n_s,n_a);
  for n=1:n_a
-    Params.upsilon(:,:,n)=pistar_psi_s*A(n);
-end
-
+    Params.upsilon(:,:,n)=pistar_psi_s.*A(n);
+ end
 
 disp('upsilon size')
 disp(size(Params.upsilon))
