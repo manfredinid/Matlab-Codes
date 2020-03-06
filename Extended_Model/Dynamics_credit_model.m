@@ -21,6 +21,8 @@ simoptions.simperiods=10^5; % if iterate=0 then simperiod=10^6
 simoptions.iterate=1;
 simoptions.parallel=Parallel; 
 
+simoptions.maxit=10^4;
+
 heteroagentoptions.verbose=1;
 
 %% Parameters Calibration
@@ -190,6 +192,12 @@ A = rand(1,n_a);
 Params.upsilon(end+1,end+1,1:n_a)=0;%A./sum(A);
 Params.upsilon = Params.upsilon(1:end-1,1:end-1,1:end);
  size(Params.upsilon)
+
+ A = rand(1,n_a);
+ B=pistar_s.*(pistar_psi)';
+ C = (A./sum(A)).*(pistar_psi)';
+ D = B.*C;
+ size(D)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 disp('upsilon size')
