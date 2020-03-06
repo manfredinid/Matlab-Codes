@@ -186,19 +186,14 @@ simoptions.agententryandexit=1;
 % Probability of being in the (s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
-%%%%%%%% FIX IT %%%%%%%%%%%%%%%%%%%%%
-Params.upsilon=pistar_s.*(pistar_psi)';
-A = rand(1,n_a);
-Params.upsilon(end+1,end+1,1:n_a)=0;%A./sum(A);
-Params.upsilon = Params.upsilon(1:end-1,1:end-1,1:end);
- size(Params.upsilon)
+pistar_psi_s=pistar_s.*(pistar_psi)';
+A = zeros(1,n_a);
+A(1,1) = 1;
+Params.upsilon=NaN(n_psi,n_s,n_a);
+ for n=1:n_a
+    Params.upsilon(:,:,n)=pistar_psi_s*A(n);
+end
 
- A = rand(1,n_a);
- B=pistar_s.*(pistar_psi)';
- C = (A./sum(A)).*(pistar_psi)';
- D = B.*C;
- size(D)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 disp('upsilon size')
 disp(size(Params.upsilon))
