@@ -38,7 +38,7 @@ Params.cf=0; % Fixed cost of production
 
 % Entry and Exit
 Params.ce=1; % Fixed cost of entry 
-Params.lambda=0; % Probability of firm exit
+Params.lambda=0.2; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
 Params.oneminuslambda=1-Params.lambda; % Probability of survival
@@ -46,7 +46,7 @@ Params.oneminuslambda=1-Params.lambda; % Probability of survival
 % Distortions
 Params.taurate=0; % This is the rate for the tax.
 Params.subsidyrate=0; % This is the rate for the subsidy.
-Params.gcost=0.05; % capital adjustment cost parameter
+Params.gcost=0.01; % capital adjustment cost parameter
 
 % Initial guesses
 Params.p=1; % output price
@@ -119,7 +119,7 @@ a_grid = sort([linspace(0,k_ss,nk1),linspace(k_ss+0.0001,3*k_ss,nk2),...
 %% Decision varibles
 %There is no d variable
 
-d_grid=0; 
+d_grid=[]; 
 n_d=0;
 
 %% Check endogenous, exogenous and decision variables
@@ -190,6 +190,7 @@ surf(squeeze(Policy(1,:,1,:)))
 %% Aspects of the Endogenous entry
 % Exit is exogenous with probability lambda
 simoptions.agententryandexit=1;
+simoptions.endogenousexit=0;
 
 % Probability of being in the (s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
@@ -219,28 +220,27 @@ surf(squeeze(StationaryDist.pdf(:,1,:)))
 
 
 %Use the toolkit to find the equilibrium price index
-GEPriceParamNames={'p', 'Ne'};
+GEPriceParamNames={'p'}%, 'Ne'};
 
-FnsToEvaluateParamNames(1).Names={};
-FnsToEvaluate={};
+%FnsToEvaluateParamNames(1).Names={};
+%FnsToEvaluate={};
 
 heteroagentoptions.specialgeneqmcondn={0,'entry'};
 
 FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate'};
-FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,w,taurate)...
-(((1-taurate*z2_val)*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate)...
+(((1-taurate*z2_val)*p*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
 FnsToEvaluate={FnsToEvaluateFn_nbar};
-
-%%%%%%%%% ERROR
-%%%%%%% WARNING: SteadyState_Case1 stopped due to reaching simoptions.maxit, this might be causing a problem
 
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
     d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+
+%%%%%%%%%%%AggVars is to high
 AggVars
 
 %%
-GEPriceParamNames={'p'}; 
+GEPriceParamNames={'p', 'Ne'}; 
 GeneralEqmEqnParamNames(1).Names={};
 GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
 
@@ -266,8 +266,8 @@ disp('Calculating price vector corresponding to the stationary eqm')
     ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
     GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
 %%
-Params.p=p_eqm(1);
-Params.Ne=p_eqm(2);
+Params.p=p_eqm.p;
+Params.Ne=p_eqm.Ne;
 
 
 % Calculate some things in the general eqm
@@ -285,7 +285,10 @@ FnsToEvaluateParamNames(1).Names={};
 FnsToEvaluateFn_capital = @(aprime_val,a_val,z_val,AgentDistMass) aprime_val; 
 FnsToEvaluate={FnsToEvaluateFn_capital};
     
-AggValues=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+AggValues=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
+    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
+    d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+
 ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
 
 % Average Firm Size (i.e., Average number of employees)
