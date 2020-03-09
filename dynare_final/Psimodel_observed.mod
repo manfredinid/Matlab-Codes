@@ -51,33 +51,33 @@ theta = (1-varpi)/varpi;
 model;
 
 
-# psi = ((pi_p*(1-varpi))/(pi_g*varpi));
+# psi = (((1-varpi))/(varpi));
 
 # A = (ah^varpi)*(al^(1-varpi));
-
 
 # expH = alphaa*varpi;
 
 # expL = alphaa*(1-varpi);
 
 
+
 [name='Aggregate Output']
-y = A*(1-pi_g)*(1-pi_l)*(kh(-1)^expH)*((psi*kh(-1))^expL);
+y = A*(1-pi_g)*(1-pi_p)*(kh(-1)^expH)*((psi*kh(-1))^expL);
 
 
 [name='Euler Equation']
-change
-c^(-sigmaa) = betaa*(c(+1)^(-sigmaa))*( (expH*(A*(kh^expH)*((psi*kh)^expL)))/(kh*(pi_p+pi_g)) + (expL*(A*(kh^expH)*((psi*kh)^expL)))/((pi_p+pi_g)*(psi*kh)) + (1-deltaa));
+
+c^(-sigmaa) = betaa*(c(+1)^(-sigmaa))*( (expH*(A*(1-pi_g)*(1-pi_p)*(kh^expH)*((psi*kh)^expL)))/(kh*(pi_p+pi_g)) + (expL*(A*(1-pi_g)*(1-pi_p)*(kh^expH)*((psi*kh)^expL)))/((pi_p+pi_g)*(psi*kh)) + (1-deltaa));
 
 
 [name='Budget Constrain']
-change
 
-c= (A*(kh(-1)^expH)*((psi*kh(-1))^expL)) - pi_g*(psi*kh - (1-deltaa)*(psi*kh(-1))) - pi_p*(kh - (1-deltaa)*kh(-1));
+
+c= (A*(1-pi_g)*(1-pi_p)*(kh(-1)^expH)*((psi*kh(-1))^expL)) - (psi*kh - (1-deltaa)*(psi*kh(-1))) - (kh - (1-deltaa)*kh(-1));
 
 
 [name='low-tech capital']
-kl = ((pi_p*(1-varpi))/(pi_g*varpi))*kh;
+kl = (((1-varpi))/(varpi))*kh;
 
 [name='total capital']
 k= kh + kl;
@@ -91,14 +91,14 @@ end;
 %----------------------------------------------------------------
 steady_state_model;
 
-kh = (a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa));
+kh = (a*(((((1-varpi))/(varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa));
 
 
-y = a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi))); // output
+y = a*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi))); // output
 
-c= (a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi)))) - pi_g*deltaa*(((pi_p*(1-varpi))/(pi_g*varpi))*kh) - pi_p*deltaa*kh; // consumption
+c= (a*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi)))) - deltaa*((((1-varpi))/(varpi))*kh) - deltaa*kh; // consumption
 
-kl = ((pi_p*(1-varpi))/(pi_g*varpi))*kh;
+kl = (((1-varpi))/(varpi))*kh;
 
 
 k= kh + kl;
@@ -118,14 +118,14 @@ pi_p = pi_p0;
 pi_g =pi_g0;
 
 
-kh = (a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa));
+kh = (a*(((((1-varpi))/(varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa));
 
 
-y = a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi))); // output
+y = a*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi))); // output
 
-c= (a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi)))) - pi_g*deltaa*(((pi_p*(1-varpi))/(pi_g*varpi))*kh) - pi_p*deltaa*kh; // consumption
+c= (a*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi)))) - deltaa*((((1-varpi))/(varpi))*kh) - deltaa*kh; // consumption
 
-kl = ((pi_p*(1-varpi))/(pi_g*varpi))*kh;
+kl = (((1-varpi))/(varpi))*kh;
 
 
 k= kh + kl;
@@ -146,14 +146,14 @@ endval;
 pi_p = pi_pF_obser;
 pi_g =pi_gF_obser;
 
-kh = log((a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa)));
+kh = log((a*(((((1-varpi))/(varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa)));
 
 
-y = log(a*(exp(kh)^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh))^(alphaa*(1-varpi)))); // output
+y = log(a*(exp(kh)^(alphaa*varpi))*(((((1-varpi))/(varpi))*exp(kh))^(alphaa*(1-varpi)))); // output
 
-c= log((a*(exp(kh)^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh))^(alphaa*(1-varpi)))) - pi_g*deltaa*(((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh)) - pi_p*deltaa*exp(kh)); // consumption
+c= log((a*(exp(kh)^(alphaa*varpi))*(((((1-varpi))/(varpi))*exp(kh))^(alphaa*(1-varpi)))) - deltaa*((((1-varpi))/(varpi))*exp(kh)) - deltaa*exp(kh)); // consumption
 
-kl = log(((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh));
+kl = log((((1-varpi))/(varpi))*exp(kh));
 
 
 i= log(exp(y)-exp(c));
