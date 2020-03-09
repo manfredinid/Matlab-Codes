@@ -36,8 +36,10 @@ pi_gF_simul=0.8;
 %pi_gF_simul=1;
 
 %%
-dynare model_observed
-load('model_observed_results.mat')
+%dynare model_observed
+dynare Psimodel_observed
+
+load('Psimodel_observed_results.mat')
 y_obser = y(1:n);
 i_obser = i(1:n);
 k_obser = k(1:n);
@@ -46,8 +48,10 @@ kl_obser = kl(1:n);
 kh_obser = kh(1:n);
 
 %% 
-dynare model_simul
-load('model_simul_results.mat')
+%dynare model_simul
+dynare Psimodel_simul
+
+load('Psimodel_simul_results.mat')
 y_simul = y(1:n);
 i_simul = i(1:n);
 k_simul = k(1:n);
