@@ -55,21 +55,23 @@ model;
 
 # A = (ah^varpi)*(al^(1-varpi));
 
+
 # expH = alphaa*varpi;
 
 # expL = alphaa*(1-varpi);
 
 
 [name='Aggregate Output']
-y = A*(kh(-1)^expH)*((psi*kh(-1))^expL);
+y = A*(1-pi_g)*(1-pi_l)*(kh(-1)^expH)*((psi*kh(-1))^expL);
 
 
 [name='Euler Equation']
-
+change
 c^(-sigmaa) = betaa*(c(+1)^(-sigmaa))*( (expH*(A*(kh^expH)*((psi*kh)^expL)))/(kh*(pi_p+pi_g)) + (expL*(A*(kh^expH)*((psi*kh)^expL)))/((pi_p+pi_g)*(psi*kh)) + (1-deltaa));
 
 
 [name='Budget Constrain']
+change
 
 c= (A*(kh(-1)^expH)*((psi*kh(-1))^expL)) - pi_g*(psi*kh - (1-deltaa)*(psi*kh(-1))) - pi_p*(kh - (1-deltaa)*kh(-1));
 
