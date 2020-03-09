@@ -34,10 +34,10 @@ Params.beta=0.96;% Discount rate
 Params.alpha=0.3;  % Capital share
 Params.gamma=0.5; % alpha + gamma must be ~= 1
 Params.delta=0.05; % Depreciation rate of physical capital
-Params.cf=0; % Fixed cost of production
+Params.cf=0.5; % Fixed cost of production
 
 % Entry and Exit
-Params.ce=1; % Fixed cost of entry 
+Params.ce=0.5; % Fixed cost of entry 
 Params.lambda=0.2; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
@@ -107,7 +107,7 @@ pi_z=pi_z';
 %% Endogenous state variables
 
 % grid for capital
-n_a=10;
+n_a=50;
 
 % steady-state capital without distotions
 %%%%% The grid is the same as the Aiygari example
