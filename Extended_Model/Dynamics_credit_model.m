@@ -66,8 +66,8 @@ Params.r=Params.i+Params.delta; % net capital return
 
 %% Exogenous state variables
 
-n_s= 10; % firm-specific Productivity level
-n_psi = 20; % credit tax 
+n_s= 40; % firm-specific Productivity level
+n_psi = 10; % credit tax 
 
 
 % Exogenous AR(1) process on (log) productivity
