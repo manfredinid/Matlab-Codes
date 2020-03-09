@@ -132,17 +132,22 @@ disp(n_z)
 disp('vector(s) of decision variabes')
 disp(n_d)
 
-%% Potential New Entrants Distribution over the pair (s, psi)
+%% Potential New Entrants Distribution over the states (s, psi, k)
 
-% productivity
+% productivity (exogenous state)
 cumsum_pistar_s = logncdf(s_grid,1,0.5)';
 pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
 
-% credit tax
+% credit tax (exogenous state)
 cumsum_pistar_psi = betacdf(psi_grid,.5,.4)';
 pistar_psi =(cumsum_pistar_psi-[0,cumsum_pistar_psi(1:end-1)]);
 
-if (abs(1-sum(pistar_psi)) || abs(sum(pistar_psi)-1) > 1e-7)
+% capital (endogenous state)
+pistar_k = zeros(1,n_a);
+pistar_k(1,1) = 1;
+cumsum_pistar_k = cumsum(pistar_k);
+
+if (abs(1-sum(pistar_psi)) || abs(sum(pistar_psi)-1)||abs(sum(pistar_k)-1) > 1e-7)
     error('Draws are NOT a PMD.')
 end
 
@@ -150,12 +155,15 @@ end
 figure(1)
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|-|--|:','DefaultLineLineWidth',1);
-subplot(1,2,1);
+subplot(3,1,1);
 plot(psi_grid,cumsum_pistar_psi,'r')
 title('Potential draws for psi')
-subplot(1,2,2);
+subplot(3,1,2);
 plot(s_grid,cumsum_pistar_s,'r')
 title('Potential draws for s')
+subplot(3,1,3);
+plot(a_grid,cumsum_pistar_k,'r')
+title('Potential draws for k')
 
 %% Return Function
 ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf, gcost)...
@@ -187,11 +195,9 @@ simoptions.agententryandexit=1;
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
 pistar_psi_s=pistar_s.*(pistar_psi)';
-A = zeros(1,n_a);
-A(1,1) = 1;
 Params.upsilon=NaN(n_psi,n_s,n_a);
  for n=1:n_a
-    Params.upsilon(:,:,n)=pistar_psi_s.*A(n);
+    Params.upsilon(:,:,n)=pistar_psi_s.*pistar_k(n);
  end
 
 disp('upsilon size')
