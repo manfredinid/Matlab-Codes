@@ -77,10 +77,10 @@ n_psi = 5; % credit tax
 Params.rho=0.93; 
 Params.sigma_logz=sqrt(0.53); 
 Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
-Params.a=0.078; 
+Params.a=0.098; 
 
 tauchenoptions.parallel=Parallel;
-Params.q=4; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
+Params.q=2; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
 [s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
 s_grid=exp(s_grid);
 
@@ -391,7 +391,7 @@ fprintf('Share of employment      %8.2f  %8.2f  %8.2f  %8.2f\n', AverageEmployme
 fprintf('The equilibrium output price is p=%.4f \n', Params.p)
 fprintf('The equilibrium value for the mass of entrants is Ne=%.4f \n', Params.Ne)
 
-fprintf('Average Capital is n=%.4f \n', Output.perN)
+fprintf('Average Labor is n=%.4f \n', Output.perN)
 fprintf('Average Capital is k=%.4f \n', Output.perK)
 fprintf('Average Output is y=%.4f \n', Output.perY)
 fprintf('Total Factor Productivity is TFP=%.4f \n', Output.TFP)
