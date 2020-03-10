@@ -51,8 +51,8 @@ Params.subsidyrate=0; % This is the rate for the subsidy.
 Params.gcost=0.01; % capital adjustment cost parameter
 
 % Initial guesses
-Params.p=1; % output price
-Params.Ne=0.5; % total mass of new entrants
+Params.p=0.446; % output price
+Params.Ne=0.281; % total mass of new entrants
 
 % Declare discount factors
 DiscountFactorParamNames={'beta','oneminuslambda'};
@@ -270,33 +270,83 @@ disp('Calculating price vector corresponding to the stationary eqm')
     FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames,...
     ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
     GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
-%% 
+%% Value Function, Policy and Firm Distribution in GE
+
+disp('Calculating various equilibrium objects')
 Params.p=p_eqm.p;
 Params.Ne=p_eqm.Ne;
-
-
-% Calculate some things in the general eqm
 [V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,[],a_grid,z_grid, pi_z,...
     ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames,vfoptions);
 
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
     simoptions, Params, EntryExitParamNames);
-
-%% 
+%% Post GE values
 FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,...
+    taurate,subsidyrate) aprime_val;
+FnsToEvaluateParamNames(2).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,mass, alpha,gamma,...
+    r,p,taurate,subsidyrate)  p*((1-taurate*z2_val)*z1_val)*(aprime_val^alpha)*...
+    ((((((1-taurate*z2_val)*z1_val)*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma);
+FnsToEvaluateParamNames(3).Names={'alpha','gamma','r','p','taurate'};
+FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate)...
+(((1-taurate*z2_val)*p*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output,FnsToEvaluateFn_nbar};
+%%
+%FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
 
-FnsToEvaluateParamNames(1).Names={};
+%FnsToEvaluateParamNames(1).Names={};
 % Capital
-FnsToEvaluateFn_capital = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate) aprime_val; 
-FnsToEvaluate={FnsToEvaluateFn_capital};
-%%    
+%FnsToEvaluateFn_capital = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate) aprime_val; 
+%FnsToEvaluate={FnsToEvaluateFn_capital};
+  
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
     d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+
+ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1_Mass(StationaryDist.pdf,...
+    StationaryDist.mass, Policy, FnsToEvaluate, Params,...
+    FnsToEvaluateParamNames,EntryExitParamNames, n_d, n_a, n_z,...
+    [], a_grid, z_grid, Parallel,simoptions);
+
+
+ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate,...
+    Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid,...
+    simoptions.parallel,simoptions,EntryExitParamNames);
+%% Agggregate Values
+Output.Y=AggVars(2);
+Output.N=AggVars(3);
+Output.K=AggVars(1);
+Output.KdivY=Output.K/Output.Y;
+%% Average values
+Output.perY=AggVars(2)/StationaryDist.mass;
+Output.perN=AggVars(3)/StationaryDist.mass;
+Output.perK=AggVars(1)/StationaryDist.mass;
+
 %%
-ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+Output.TFP=(Output.Y/Output.N)./((Output.K/Output.N)^Params.alpha);
+
 %%
-% Average Firm Size (i.e., Average number of employees)
-AvgFirmSize=AggValues/StationaryDist.pdf;
+nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
+nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
+normalize_employment=ValuesOnGrid(1,1,3); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
+nbarValues=nbarValues./normalize_employment;
+
+
+Partion1Indicator=logical(nbarValues<5);
+Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
+Partion3Indicator=logical(nbarValues>=50);
+
+if (sum(sum(Partion1Indicator+Partion2Indicator+Partion3Indicator)) - prod(n_z) > 1e-3)
+    error('error')
+end
+%% Display some output about the solution
+
+fprintf('The equilibrium output price is p=%.4f \n', Params.p)
+fprintf('The equilibrium value for the mass of entrants is Ne=%.4f \n', Params.Ne)
+
+fprintf('Average Capital is k=%.4f \n', Output.perK)
+fprintf('Average Output is y=%.4f \n', Output.perY)
+fprintf('Total Factor Productivity is TFP=%.4f \n', Output.TFP)
 
 toc;
