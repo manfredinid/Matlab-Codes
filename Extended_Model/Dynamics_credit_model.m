@@ -326,10 +326,11 @@ Output.perK=AggVars(1)/StationaryDist.mass;
 %%
 Output.TFP=(Output.Y/Output.N)./((Output.K/Output.N)^Params.alpha);
 
-%%
+%% EROR nbar
+
+%%%%%%%%%%%%%%%
 nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
-nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
-normalize_employment=ValuesOnGrid(1,1,3); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
+normalize_employment=min(min(min(shiftdim(ValuesOnGrid(3,2:end,:,:),1)))); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
 nbarValues=nbarValues./normalize_employment;
 
 
@@ -337,9 +338,45 @@ Partion1Indicator=logical(nbarValues<5);
 Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
 Partion3Indicator=logical(nbarValues>=50);
 
-if (sum(sum(Partion1Indicator+Partion2Indicator+Partion3Indicator)) - prod(n_z) > 1e-3)
+if ((sum(sum(sum(Partion1Indicator+Partion2Indicator+Partion3Indicator)))) - prod(n_z)*(n_a) > 1e-3)
     error('error')
 end
+
+ShareOfEstablishments(1)=sum(sum(sum(StationaryDist.pdf(Partion1Indicator))));
+ShareOfEstablishments(2)=sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
+ShareOfEstablishments(3)=sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
+ShareOfEstablishments(4)=sum(sum(sum(StationaryDist.pdf)));
+
+Output_pdf=shiftdim(ProbDensityFns(3,:,:,:),1);
+ShareOfOutput(1)=sum(sum(sum(Output_pdf(Partion1Indicator))));
+ShareOfOutput(2)=sum(sum(sum(Output_pdf(Partion2Indicator))));
+ShareOfOutput(3)=sum(sum(sum(Output_pdf(Partion3Indicator))));
+ShareOfOutput(4)=sum(sum(sum(Output_pdf)));
+
+Labour_pdf=shiftdim(ProbDensityFns(2,:,:,:),1);
+ShareOfLabour(1)=sum(sum(sum(Labour_pdf(Partion1Indicator))));
+ShareOfLabour(2)=sum(sum(sum(Labour_pdf(Partion2Indicator))));
+ShareOfLabour(3)=sum(sum(sum(Labour_pdf(Partion3Indicator))));
+ShareOfLabour(4)=sum(sum(sum(Labour_pdf)));
+
+Capital_pdf=shiftdim(ProbDensityFns(1,:,:,:),1);
+ShareOfCapital(1)=sum(sum(sum(Capital_pdf(Partion1Indicator))));
+ShareOfCapital(2)=sum(sum(sum(Capital_pdf(Partion2Indicator))));
+ShareOfCapital(3)=sum(sum(sum(Capital_pdf(Partion3Indicator))));
+ShareOfCapital(4)=sum(sum(sum(Capital_pdf)));
+
+%AverageEmployment(1)=sum(sum(nbarValues(Partion1Indicator).*StationaryDist.pdf(Partion1Indicator)))/sum(sum(StationaryDist.pdf(Partion1Indicator)));
+%AverageEmployment(2)=sum(sum(nbarValues(Partion2Indicator).*StationaryDist.pdf(Partion2Indicator)))/sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
+%AverageEmployment(3)=sum(sum(sum(nbarValues(Partion3Indicator).*StationaryDist.pdf(Partion3Indicator))))/sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
+
+fprintf('Distribution statistics of benchmark economy  \n');
+fprintf('                               <5     5 to 49     >=50    total\n');
+fprintf('Share of establishments  %8.2f  %8.2f  %8.2f  %8.2f  \n', ShareOfEstablishments);
+fprintf('Share of output          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfOutput);
+fprintf('Share of labour          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfLabour);
+fprintf('Share of capital         %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfCapital);
+%fprintf('Share of employment      %8.2f  %8.2f  %8.2f  %8.2f\n', AverageEmployment);
+
 %% Display some output about the solution
 
 fprintf('The equilibrium output price is p=%.4f \n', Params.p)
