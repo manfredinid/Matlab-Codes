@@ -30,7 +30,7 @@ heteroagentoptions.verbose=1;
 %% Parameters Calibration
 
 % Preferences 
-Params.beta=0.96;% Discount rate
+Params.beta=0.9;% Discount rate
 
 % Firm-level technology
 Params.alpha=0.3;  % Capital share
@@ -40,7 +40,7 @@ Params.cf=0.5; % Fixed cost of production
 
 % Entry and Exit
 Params.ce=0.5; % Fixed cost of entry 
-Params.lambda=0.2; % Probability of firm exit
+Params.lambda=0.1; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
 Params.oneminuslambda=1-Params.lambda; % Probability of survival
@@ -85,7 +85,7 @@ Params.q=4; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is see
 s_grid=exp(s_grid);
 
 % Tax credit
-psi_grid = linspace(0,1,n_psi)';
+psi_grid = linspace(-1,1,n_psi)';
 
 % Transition matrix 
 % Note: considering that productivity and taxes are independent 
@@ -347,13 +347,13 @@ ShareOfEstablishments(2)=sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
 ShareOfEstablishments(3)=sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
 ShareOfEstablishments(4)=sum(sum(sum(StationaryDist.pdf)));
 
-Output_pdf=shiftdim(ProbDensityFns(3,:,:,:),1);
+Output_pdf=shiftdim(ProbDensityFns(2,:,:,:),1);
 ShareOfOutput(1)=sum(sum(sum(Output_pdf(Partion1Indicator))));
 ShareOfOutput(2)=sum(sum(sum(Output_pdf(Partion2Indicator))));
 ShareOfOutput(3)=sum(sum(sum(Output_pdf(Partion3Indicator))));
 ShareOfOutput(4)=sum(sum(sum(Output_pdf)));
 
-Labour_pdf=shiftdim(ProbDensityFns(2,:,:,:),1);
+Labour_pdf=shiftdim(ProbDensityFns(3,:,:,:),1);
 ShareOfLabour(1)=sum(sum(sum(Labour_pdf(Partion1Indicator))));
 ShareOfLabour(2)=sum(sum(sum(Labour_pdf(Partion2Indicator))));
 ShareOfLabour(3)=sum(sum(sum(Labour_pdf(Partion3Indicator))));
@@ -365,9 +365,18 @@ ShareOfCapital(2)=sum(sum(sum(Capital_pdf(Partion2Indicator))));
 ShareOfCapital(3)=sum(sum(sum(Capital_pdf(Partion3Indicator))));
 ShareOfCapital(4)=sum(sum(sum(Capital_pdf)));
 
-%AverageEmployment(1)=sum(sum(nbarValues(Partion1Indicator).*StationaryDist.pdf(Partion1Indicator)))/sum(sum(StationaryDist.pdf(Partion1Indicator)));
-%AverageEmployment(2)=sum(sum(nbarValues(Partion2Indicator).*StationaryDist.pdf(Partion2Indicator)))/sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
-%AverageEmployment(3)=sum(sum(sum(nbarValues(Partion3Indicator).*StationaryDist.pdf(Partion3Indicator))))/sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
+AverageEmployment(1)=sum(sum(sum(nbarValues(Partion1Indicator).*...
+StationaryDist.pdf(Partion1Indicator))))/sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)));
+AverageEmployment(2)=sum(sum(sum(nbarValues(Partion2Indicator).*...
+StationaryDist.pdf(Partion2Indicator))))/sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)));
+AverageEmployment(3)=sum(sum(sum(nbarValues(Partion3Indicator).*...
+StationaryDist.pdf(Partion3Indicator))))/sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)));
+AverageEmployment(4)=sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)))/sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)));
 
 fprintf('Distribution statistics of benchmark economy  \n');
 fprintf('                               <5     5 to 49     >=50    total\n');
@@ -375,15 +384,17 @@ fprintf('Share of establishments  %8.2f  %8.2f  %8.2f  %8.2f  \n', ShareOfEstabl
 fprintf('Share of output          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfOutput);
 fprintf('Share of labour          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfLabour);
 fprintf('Share of capital         %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfCapital);
-%fprintf('Share of employment      %8.2f  %8.2f  %8.2f  %8.2f\n', AverageEmployment);
+fprintf('Share of employment      %8.2f  %8.2f  %8.2f  %8.2f\n', AverageEmployment);
 
 %% Display some output about the solution
 
 fprintf('The equilibrium output price is p=%.4f \n', Params.p)
 fprintf('The equilibrium value for the mass of entrants is Ne=%.4f \n', Params.Ne)
 
+fprintf('Average Capital is n=%.4f \n', Output.perN)
 fprintf('Average Capital is k=%.4f \n', Output.perK)
 fprintf('Average Output is y=%.4f \n', Output.perY)
 fprintf('Total Factor Productivity is TFP=%.4f \n', Output.TFP)
+
 
 toc;
