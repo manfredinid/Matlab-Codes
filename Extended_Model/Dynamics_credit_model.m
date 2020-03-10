@@ -51,8 +51,8 @@ Params.subsidyrate=0; % This is the rate for the subsidy.
 Params.gcost=0.01; % capital adjustment cost parameter
 
 % Initial guesses
-Params.p=0.446; % output price
-Params.Ne=0.281; % total mass of new entrants
+Params.p=1; % output price
+Params.Ne=0.5; % total mass of new entrants
 
 % Declare discount factors
 DiscountFactorParamNames={'beta','oneminuslambda'};
@@ -68,7 +68,7 @@ Params.r=Params.i+Params.delta; % net capital return
 
 %% Exogenous state variables
 
-n_s= 20; % firm-specific Productivity level
+n_s= 10; % firm-specific Productivity level
 n_psi = 5; % credit tax 
 
 
@@ -80,7 +80,7 @@ Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
 Params.a=0.098; 
 
 tauchenoptions.parallel=Parallel;
-Params.q=2; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
+Params.q=3; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
 [s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
 s_grid=exp(s_grid);
 
@@ -109,11 +109,12 @@ pi_z=pi_z';
 %% Endogenous state variables
 
 % grid for capital
-n_a=40;
+n_a=100;
 
 % steady-state capital without distotions
-%%%%% The grid is the same as the Aiygari example
-k_ss = ((Params.i+Params.delta/Params.alpha)^(1/Params.alpha-1));
+%%%%% The grid is like the one in the Aiygari example
+k_ss = (Params.alpha/Params.r)^(1-Params.gamma/1-Params.gamma-Params.alpha)*...
+    (Params.gamma)^(Params.gamma/1-Params.alpha-Params.gamma);
 nk1 = floor(n_a/3); nk2=floor(n_a/3); nk3=n_a-nk1-nk2;
 a_grid = sort([linspace(0,k_ss,nk1),linspace(k_ss+0.0001,3*k_ss,nk2),...
       linspace(3*k_ss+0.0001,15*k_ss,nk3)])';
@@ -168,10 +169,10 @@ plot(a_grid,cumsum_pistar_k,'r')
 title('Potential draws for k')
 
 %% Return Function
-ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf, gcost)...
-RR2008p_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf, gcost);
+ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost)...
+RR2008p_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost);
 
-ReturnFnParamNames={ 'p','r', 'alpha','gamma','taurate','subsidyrate', 'cf', 'gcost'};
+ReturnFnParamNames={ 'p','r', 'alpha','gamma', 'delta','taurate','subsidyrate', 'cf', 'gcost'};
 
 %% CHECK (to be erase)
 if vfoptions.parallel==2
@@ -233,8 +234,8 @@ GEPriceParamNames={'p'}%, 'Ne'};
 
 heteroagentoptions.specialgeneqmcondn={0,'entry'};
 
-FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate'};
-FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate)...
+FnsToEvaluateParamNames(1).Names={'alpha','gamma', 'delta','r','p','taurate'};
+FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,delta,r,p,taurate)...
 (((1-taurate*z2_val)*p*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
 FnsToEvaluate={FnsToEvaluateFn_nbar};
 
@@ -281,19 +282,19 @@ Params.Ne=p_eqm.Ne;
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
     simoptions, Params, EntryExitParamNames);
 %% Post GE values
-FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+FnsToEvaluateParamNames(1).Names={'alpha','gamma', 'delta','r','p','taurate','subsidyrate'};
 FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,...
     taurate,subsidyrate) aprime_val;
-FnsToEvaluateParamNames(2).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
-FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,mass, alpha,gamma,...
+FnsToEvaluateParamNames(2).Names={'alpha','gamma', 'delta','r','p','taurate','subsidyrate'};
+FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,delta,...
     r,p,taurate,subsidyrate)  p*((1-taurate*z2_val)*z1_val)*(aprime_val^alpha)*...
     ((((((1-taurate*z2_val)*z1_val)*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma);
-FnsToEvaluateParamNames(3).Names={'alpha','gamma','r','p','taurate'};
-FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate)...
+FnsToEvaluateParamNames(3).Names={'alpha','gamma', 'delta','r','p','taurate'};
+FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,delta,r,p,taurate)...
 (((1-taurate*z2_val)*p*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
 FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output,FnsToEvaluateFn_nbar};
 %%
-%FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+%FnsToEvaluateParamNames(1).Names={'alpha','gamma', 'delta','r','p','taurate','subsidyrate'};
 
 %FnsToEvaluateParamNames(1).Names={};
 % Capital

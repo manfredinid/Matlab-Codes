@@ -1,11 +1,11 @@
-function F=RR2008p_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,taurate,subsidyrate, cf, gcost)
+function F=RR2008p_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma, delta, taurate,subsidyrate, cf, gcost)
 % a_val is what HopenhaynRogerson1993 call n_{t-1}, aprime_val is n_t.
 
 F=-Inf;
 
 gnnlag=0; 
-if aprime_val>a_val
-    gnnlag=-gcost*((a_val-aprime_val)/a_val); % Note that gnnlag>=0, it is 'minus a negative number'
+if (1-delta)*aprime_val>a_val
+    gnnlag=-gcost*((a_val-(1-delta)*aprime_val)/a_val); % Note that gnnlag>=0, it is 'minus a negative number'
 end
 tau=taurate;%*(tau_val>=0)-subsidyrate*(tau_val<0);
 
