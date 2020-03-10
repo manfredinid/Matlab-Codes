@@ -326,7 +326,6 @@ Output.perK=AggVars(1)/StationaryDist.mass;
 %%
 Output.TFP=(Output.Y/Output.N)./((Output.K/Output.N)^Params.alpha);
 
-%% EROR nbar
 
 %%%%%%%%%%%%%%%
 nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
