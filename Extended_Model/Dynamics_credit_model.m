@@ -1,4 +1,6 @@
 %% Credit Modol with Firm Dynamics
+
+
 clear all;
 close all;
 % Second version
@@ -66,8 +68,8 @@ Params.r=Params.i+Params.delta; % net capital return
 
 %% Exogenous state variables
 
-n_s= 40; % firm-specific Productivity level
-n_psi = 10; % credit tax 
+n_s= 20; % firm-specific Productivity level
+n_psi = 5; % credit tax 
 
 
 % Exogenous AR(1) process on (log) productivity
@@ -107,7 +109,7 @@ pi_z=pi_z';
 %% Endogenous state variables
 
 % grid for capital
-n_a=50;
+n_a=40;
 
 % steady-state capital without distotions
 %%%%% The grid is the same as the Aiygari example
@@ -216,6 +218,10 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
 figure;
 surf(squeeze(StationaryDist.pdf(:,1,:)))
 
+
+plot(squeeze(StationaryDist.pdf(:,1,:)))
+title('capital')
+
 %%
 
 
@@ -236,7 +242,6 @@ AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
     d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
 
-%%%%%%%%%%%AggVars is to high
 AggVars
 
 %%
@@ -253,19 +258,19 @@ heteroagentoptions.verbose=1;
 n_p=0;
 % uncomment after erase the 'to be erase' chunks
 % initial value function
-if vfoptions.parallel==2
-    V0=zeros([n_a,n_z,'gpuArray']);
-else
-    V0=zeros([n_a,n_z]);
-end
+%if vfoptions.parallel==2
+%    V0=zeros([n_a,n_z,'gpuArray']);
+%else
+%    V0=zeros([n_a,n_z]);
+%end
 
 disp('Calculating price vector corresponding to the stationary eqm')
 [p_eqm,p_eqm_index,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(V0,...
-    0, n_a, n_z, n_p, pi_z, [], a_grid, z_grid, ReturnFn,...
+    n_d, n_a, n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn,...
     FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames,...
     ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
     GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
-%%
+%% 
 Params.p=p_eqm.p;
 Params.Ne=p_eqm.Ne;
 
@@ -277,21 +282,21 @@ Params.Ne=p_eqm.Ne;
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
     simoptions, Params, EntryExitParamNames);
 
-%%
+%% 
 FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
 
 FnsToEvaluateParamNames(1).Names={};
 % Capital
-FnsToEvaluateFn_capital = @(aprime_val,a_val,z_val,AgentDistMass) aprime_val; 
+FnsToEvaluateFn_capital = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate) aprime_val; 
 FnsToEvaluate={FnsToEvaluateFn_capital};
-    
-AggValues=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
+%%    
+AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
     d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
-
+%%
 ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
-
+%%
 % Average Firm Size (i.e., Average number of employees)
-AvgFirmSize=AggValues(1)/StationaryDist.pdf
+AvgFirmSize=AggValues/StationaryDist.pdf;
 
 toc;
