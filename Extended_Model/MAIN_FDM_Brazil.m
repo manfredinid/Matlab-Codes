@@ -1,8 +1,8 @@
 
 %% Stationary Equilibrium and Transition path for the Firm Dynamics Model
 
-clear all;
-close all;
+%clear all;
+%close all;
 
 Parallel=0 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
 SkipInitialFinal= 1 % 1 to SKIP transition path
@@ -18,7 +18,7 @@ fprintf(2,'\nStacionary Equilibrium\n')
     
 %Policy parameters
 Params.gcost=0.01;   
-psi_grid = linspace(0,100,n_psi)';
+psi_grid = linspace(-10,10,n_psi)';
 
 % Initial guesses
 Params.p=1; % output pricecap
