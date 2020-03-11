@@ -26,7 +26,7 @@ Params.Ne=0.5; % total mass of new entrants
 % Parameters and initialization options
 Dynamics_credit_model;
 % Stationary Equilibrium and Results
-stationary;
+SS_dynamics_credit;
 
 
 %% Transition Path
