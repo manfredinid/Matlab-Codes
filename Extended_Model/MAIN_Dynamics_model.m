@@ -8,9 +8,9 @@ Parallel=0 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
 SkipInitialFinal= 0 % 1 to SKIP transition path
 
 %% Endogenous and Exogenous States
-n_s= 20; % firm-specific Productivity level
-n_psi = 5; % credit tax 
-n_a=50; % grid for capital
+n_s= 20; % number of firm-specific Productivity level
+n_psi = 5; % number of credit tax 
+n_a=50; % grid size for capital
 
 %% Stacionary Equilibrium
 if SkipInitialFinal==1
