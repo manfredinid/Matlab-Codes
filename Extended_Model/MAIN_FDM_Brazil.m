@@ -5,11 +5,11 @@ clear all;
 close all;
 
 Parallel=0 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 0 % 1 to SKIP transition path
+SkipInitialFinal= 1 % 1 to SKIP transition path
 
 %% Endogenous and Exogenous States
 n_s= 5; % number of firm-specific Productivity level
-n_psi = 5; % number of credit tax 
+n_psi = 10; % number of credit tax 
 n_a=20; % grid size for capital
 
 %% Stacionary Equilibrium
@@ -18,10 +18,10 @@ fprintf(2,'\nStacionary Equilibrium\n')
     
 %Policy parameters
 Params.gcost=0.01;   
-psi_grid = linspace(-1,1,n_psi)';
+psi_grid = linspace(0,100,n_psi)';
 
 % Initial guesses
-Params.p=1; % output price
+Params.p=1; % output pricecap
 Params.Ne=0.5; % total mass of new entrants
 
 % Parameters and initialization options
@@ -131,11 +131,12 @@ T=50 % number of time periods to transtion path
 
 Params=Params_initial;
 
-transpathoptions.agententryandexit=1
-transpathoptions.parallel=0;
-transpath_shootingalgo=0
-vfoptions.endogenousexit=0;
 
+transpathoptions.parallel=0;
+transpath_shootingalgo=0;
+vfoptions.endogenousexit=0;
+transpathoptions.agentexit=0;
+transpathoptions.agententry=1;
 %%
 ParamPath=Params.gcost_final*ones(T,1);
 ParamPathNames={'gcost'};
@@ -147,20 +148,19 @@ PricePath0=[PricePath0_p, PricePath0_Ne]; % PricePath0 is matrix of size T-by-'n
 PricePathNames={'p','Ne'};
 
 % Rewrite the General Eqm conditions as rules for updating the price
-transpathoptions.specialgeneqmcondn={'entry',0};
+transpathoptions.specialgeneqmcondn={0,'entry'};
 
  % Alternative attempt, based on minimizing weighted sum of squares.
     transpathoptions.GEnewprice=2;
     transpathoptions.weightsforpath=ones(T,2); % Same size as PricePath
-    
- GEPriceParamNames={'p', 'Ne'}; 
+
 GeneralEqmEqnParamNames(1).Names={};
-GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
+GeneralEqmEqn_GoodsMarket = @(AggVars,GEprices) 1-AggVars;
 
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
 GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
 
-GeneralEqmEqns={GeneralEqmEqn_LabourMarket,GeneralEqmEqn_Entry};   
+GeneralEqmEqns={GeneralEqmEqn_GoodsMarket,GeneralEqmEqn_Entry};   
 
 transpathoptions.weightscheme=1
 transpathoptions.verbose=1

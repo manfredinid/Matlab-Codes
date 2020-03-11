@@ -88,39 +88,39 @@ if ((sum(sum(sum(Partion1Indicator+Partion2Indicator+Partion3Indicator)))) - pro
     error('error')
 end
 
-ShareOfEstablishments(1)=sum(sum(sum(StationaryDist.pdf(Partion1Indicator))));
-ShareOfEstablishments(2)=sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
-ShareOfEstablishments(3)=sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
-ShareOfEstablishments(4)=sum(sum(sum(StationaryDist.pdf)));
+ShareOfEstablishments(1)=100*sum(sum(sum(StationaryDist.pdf(Partion1Indicator))));
+ShareOfEstablishments(2)=100*sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
+ShareOfEstablishments(3)=100*sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
+ShareOfEstablishments(4)=100*sum(sum(sum(StationaryDist.pdf)));
 
 Output_pdf=shiftdim(ProbDensityFns(2,:,:,:),1);
-ShareOfOutput(1)=sum(sum(sum(Output_pdf(Partion1Indicator))));
-ShareOfOutput(2)=sum(sum(sum(Output_pdf(Partion2Indicator))));
-ShareOfOutput(3)=sum(sum(sum(Output_pdf(Partion3Indicator))));
-ShareOfOutput(4)=sum(sum(sum(Output_pdf)));
+ShareOfOutput(1)=100*sum(sum(sum(Output_pdf(Partion1Indicator))));
+ShareOfOutput(2)=100*sum(sum(sum(Output_pdf(Partion2Indicator))));
+ShareOfOutput(3)=100*sum(sum(sum(Output_pdf(Partion3Indicator))));
+ShareOfOutput(4)=100*sum(sum(sum(Output_pdf)));
 
 Labour_pdf=shiftdim(ProbDensityFns(3,:,:,:),1);
-ShareOfLabour(1)=sum(sum(sum(Labour_pdf(Partion1Indicator))));
-ShareOfLabour(2)=sum(sum(sum(Labour_pdf(Partion2Indicator))));
-ShareOfLabour(3)=sum(sum(sum(Labour_pdf(Partion3Indicator))));
-ShareOfLabour(4)=sum(sum(sum(Labour_pdf)));
+ShareOfLabour(1)=100*sum(sum(sum(Labour_pdf(Partion1Indicator))));
+ShareOfLabour(2)=100*sum(sum(sum(Labour_pdf(Partion2Indicator))));
+ShareOfLabour(3)=100*sum(sum(sum(Labour_pdf(Partion3Indicator))));
+ShareOfLabour(4)=100*sum(sum(sum(Labour_pdf)));
 
 Capital_pdf=shiftdim(ProbDensityFns(1,:,:,:),1);
-ShareOfCapital(1)=sum(sum(sum(Capital_pdf(Partion1Indicator))));
-ShareOfCapital(2)=sum(sum(sum(Capital_pdf(Partion2Indicator))));
-ShareOfCapital(3)=sum(sum(sum(Capital_pdf(Partion3Indicator))));
-ShareOfCapital(4)=sum(sum(sum(Capital_pdf)));
+ShareOfCapital(1)=100*sum(sum(sum(Capital_pdf(Partion1Indicator))));
+ShareOfCapital(2)=100*sum(sum(sum(Capital_pdf(Partion2Indicator))));
+ShareOfCapital(3)=100*sum(sum(sum(Capital_pdf(Partion3Indicator))));
+ShareOfCapital(4)=100*sum(sum(sum(Capital_pdf)));
 
-AverageEmployment(1)=sum(sum(sum(nbarValues(Partion1Indicator).*...
+AverageEmployment(1)=100*sum(sum(sum(nbarValues(Partion1Indicator).*...
 StationaryDist.pdf(Partion1Indicator))))/sum(sum(sum(nbarValues.*...
 StationaryDist.pdf)));
-AverageEmployment(2)=sum(sum(sum(nbarValues(Partion2Indicator).*...
+AverageEmployment(2)=100*sum(sum(sum(nbarValues(Partion2Indicator).*...
 StationaryDist.pdf(Partion2Indicator))))/sum(sum(sum(nbarValues.*...
 StationaryDist.pdf)));
-AverageEmployment(3)=sum(sum(sum(nbarValues(Partion3Indicator).*...
+AverageEmployment(3)=100*sum(sum(sum(nbarValues(Partion3Indicator).*...
 StationaryDist.pdf(Partion3Indicator))))/sum(sum(sum(nbarValues.*...
 StationaryDist.pdf)));
-AverageEmployment(4)=sum(sum(sum(nbarValues.*...
+AverageEmployment(4)=100*sum(sum(sum(nbarValues.*...
 StationaryDist.pdf)))/sum(sum(sum(nbarValues.*...
 StationaryDist.pdf)));
 

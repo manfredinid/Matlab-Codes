@@ -85,7 +85,7 @@ Params.q=2; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is see
 s_grid=exp(s_grid);
 
 % Tax credit
-psi_grid = linspace(-1,1,n_psi)';
+%psi_grid = Params.psi;
 
 
 % Transition matrix 
@@ -249,12 +249,12 @@ AggVars
 %%
 GEPriceParamNames={'p', 'Ne'}; 
 GeneralEqmEqnParamNames(1).Names={};
-GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
+GeneralEqmEqn_GoodsMarket = @(AggVars,GEprices) 1-AggVars;
 
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
 GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
 
-GeneralEqmEqns={GeneralEqmEqn_LabourMarket,GeneralEqmEqn_Entry};
+GeneralEqmEqns={GeneralEqmEqn_GoodsMarket,GeneralEqmEqn_Entry};
 
 %%
 
