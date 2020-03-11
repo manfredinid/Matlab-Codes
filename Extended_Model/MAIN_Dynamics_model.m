@@ -24,7 +24,7 @@ Params.p=1; % output price
 Params.Ne=0.5; % total mass of new entrants
 
 % Parameters and initialization options
-Dynamics_credit_model;
+Parameters_dynamics_credit;
 % Stationary Equilibrium and Results
 SS_dynamics_credit;
 
