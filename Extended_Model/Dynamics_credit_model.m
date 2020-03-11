@@ -36,11 +36,11 @@ Params.beta=0.9;% Discount rate
 Params.alpha=0.3;  % Capital share
 Params.gamma=0.5; % alpha + gamma must be ~= 1
 Params.delta=0.05; % Depreciation rate of physical capital
-Params.cf=0.5; % Fixed cost of production
+Params.cf=1; % Fixed cost of production
 
 % Entry and Exit
-Params.ce=0.5; % Fixed cost of entry 
-Params.lambda=0.1; % Probability of firm exit
+Params.ce=1; % Fixed cost of entry 
+Params.lambda=0.2; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
 Params.oneminuslambda=1-Params.lambda; % Probability of survival
@@ -68,7 +68,7 @@ Params.r=Params.i+Params.delta; % net capital return
 
 %% Exogenous state variables
 
-n_s= 10; % firm-specific Productivity level
+n_s= 20; % firm-specific Productivity level
 n_psi = 5; % credit tax 
 
 
@@ -80,7 +80,7 @@ Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
 Params.a=0.098; 
 
 tauchenoptions.parallel=Parallel;
-Params.q=3; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
+Params.q=2; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
 [s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
 s_grid=exp(s_grid);
 
@@ -109,7 +109,7 @@ pi_z=pi_z';
 %% Endogenous state variables
 
 % grid for capital
-n_a=100;
+n_a=50;
 
 % steady-state capital without distotions
 %%%%% The grid is like the one in the Aiygari example
