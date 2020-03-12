@@ -149,17 +149,14 @@ beta = betarnd(.5,.4, 1, n_psi);
 cumsum_pistar_psi = cumsum(beta./sum(beta));
 pistar_psi =(cumsum_pistar_psi-[0,cumsum_pistar_psi(1:end-1)]);
 
-
-
-
 % capital (endogenous state)
 pistar_k = zeros(1,n_a);
 pistar_k(1,1) = 1;
 cumsum_pistar_k = cumsum(pistar_k);
 
-%if (abs(1-sum(pistar_psi)) || abs(1-sum(pistar_psi))||abs(1-sum(pistar_k)) > 1)
-%    error('Draws are NOT a PMD.')
-%end
+if (abs(1-round(sum(pistar_psi),2)) || abs(1-round(sum(pistar_psi),2))||abs(1-sum(pistar_k)) > 1e-5)
+   error('Draws are NOT a PMD.')
+end
 
 
 figure(1)
@@ -241,8 +238,8 @@ GEPriceParamNames={'p'}%, 'Ne'};
 
 heteroagentoptions.specialgeneqmcondn={0,'entry'};
 
-FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate'};
-FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate)...
+FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate)...
 (((1-taurate*z2_val)*p*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
 FnsToEvaluate={FnsToEvaluateFn_nbar};
 %%

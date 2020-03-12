@@ -5,7 +5,7 @@ clear all;
 close all;
 
 Parallel=1 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 0 % 1 to SKIP transition path
+SkipInitialFinal= 1 % 1 to SKIP transition path
 
 %% Endogenous and Exogenous States
 n_s= 5; % number of firm-specific Productivity level
@@ -19,11 +19,11 @@ fprintf(2,'\nStacionary Equilibrium\n')
 %Policy parameters
 Params.gcost=0.01;   
 % Distortions
-Params.taurate=1; % This is the rate for the tax.
+Params.taurate=0.2; % This is the rate for the tax.
 Params.subsidyrate=0.2; % This is the rate for the subsidy.
 
-% subsidy-tax distribution
-psi_grid = linspace(-1,1,n_psi)';
+% subsidy-tax distribution (new entrants)
+psi_grid = linspace(1,1,n_psi)';
 
 % Initial guesses
 Params.p=1; % output pricecap
@@ -45,15 +45,15 @@ else
 
 % INITIAL
 Params.taurate_initial=0.2; % This is the rate for the tax.
-Params.subsidyrate_initial=0; % This is the rate for the subsidy.
+Params.subsidyrate_initial=0.2; % This is the rate for the subsidy.
 Params.gcost_initial=0.01;
 
 psi_grid_initial = linspace(-1,1,n_psi)';
 
 % FINAL
-Params.taurate_final=0.5; % This is the rate for the tax.
-Params.subsidyrate_final=0.5; % This is the rate for the subsidy.
-Params.gcost_final = 0.05;
+Params.taurate_final=0.2; % This is the rate for the tax.
+Params.subsidyrate_final=0.2; % This is the rate for the subsidy.
+Params.gcost_final = 0.01;
 
 psi_grid_final = linspace(-0.5,1.5,n_psi)';
 
