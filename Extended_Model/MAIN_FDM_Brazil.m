@@ -1,11 +1,11 @@
 
 %% Stationary Equilibrium and Transition path for the Firm Dynamics Model
 
-%clear all;
-%close all;
+clear all;
+close all;
 
-Parallel=0 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 1 % 1 to SKIP transition path
+Parallel=1 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
+SkipInitialFinal= 0 % 1 to SKIP transition path
 
 %% Endogenous and Exogenous States
 n_s= 5; % number of firm-specific Productivity level
@@ -18,7 +18,12 @@ fprintf(2,'\nStacionary Equilibrium\n')
     
 %Policy parameters
 Params.gcost=0.01;   
-psi_grid = linspace(-10,10,n_psi)';
+% Distortions
+Params.taurate=1; % This is the rate for the tax.
+Params.subsidyrate=0.2; % This is the rate for the subsidy.
+
+% subsidy-tax distribution
+psi_grid = linspace(-1,1,n_psi)';
 
 % Initial guesses
 Params.p=1; % output pricecap
@@ -36,18 +41,30 @@ else
 
 %% Transition
 
-% credit tax
-Params.psi_initial = linspace(-1,1,n_psi)';
-Params.psi_final = linspace(0,5,n_psi)';
+% Distortions
 
-% adjustment cost parameter
+% INITIAL
+Params.taurate_initial=0.2; % This is the rate for the tax.
+Params.subsidyrate_initial=0; % This is the rate for the subsidy.
 Params.gcost_initial=0.01;
+
+psi_grid_initial = linspace(-1,1,n_psi)';
+
+% FINAL
+Params.taurate_final=0.5; % This is the rate for the tax.
+Params.subsidyrate_final=0.5; % This is the rate for the subsidy.
 Params.gcost_final = 0.05;
+
+psi_grid_final = linspace(-0.5,1.5,n_psi)';
+
 %% Initial Period  
 
 %Policy parameters
 Params.gcost=Params.gcost_initial;   
-psi_grid = Params.psi_initial;
+Params.subsidyrate=Params.subsidyrate_initial;
+Params.taurate=Params.taurate_initial;
+
+psi_grid = psi_grid_initial;
 
 % Initial guesses
 Params.p=1; % output price
@@ -88,8 +105,10 @@ Params_initial=Params;
 
 %Policy parameters
 Params.gcost=Params.gcost_final;   
-psi_grid = Params.psi_final;
+Params.subsidyrate=Params.subsidyrate_final;
+Params.taurate=Params.taurate_final;
 
+psi_grid = psi_grid_initial;
 
 % Initial guesses
 Params.p=1; % output price
@@ -132,13 +151,13 @@ T=50 % number of time periods to transtion path
 Params=Params_initial;
 
 
-transpathoptions.parallel=0;
+transpathoptions.parallel=1;
 transpath_shootingalgo=0;
 vfoptions.endogenousexit=0;
 transpathoptions.agentexit=0;
 transpathoptions.agententry=1;
 %%
-ParamPath=Params.gcost_final*ones(T,1);
+ParamPath=Params.taurate_final*ones(T,1);
 ParamPathNames={'gcost'};
 
 % We need to give an initial guess for the price path on interest rates
@@ -158,7 +177,7 @@ GeneralEqmEqnParamNames(1).Names={};
 GeneralEqmEqn_GoodsMarket = @(AggVars,GEprices) 1-AggVars;
 
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
-GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
+GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce;
 
 GeneralEqmEqns={GeneralEqmEqn_GoodsMarket,GeneralEqmEqn_Entry};   
 

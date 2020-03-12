@@ -46,8 +46,8 @@ Params.lambda=0.2; % Probability of firm exit
 Params.oneminuslambda=1-Params.lambda; % Probability of survival
 
 % Distortions
-Params.taurate=0; % This is the rate for the tax.
-Params.subsidyrate=0; % This is the rate for the subsidy.
+%Params.taurate=5; % This is the rate for the tax.
+%Params.subsidyrate=5; % This is the rate for the subsidy.
 %Params.gcost=0.01; % capital adjustment cost parameter
 
 % Initial guesses
@@ -85,7 +85,7 @@ Params.q=2; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is see
 s_grid=exp(s_grid);
 
 % Tax credit
-%psi_grid = Params.psi;
+%psi_grid = linspace(-1,1,n_psi)';
 
 
 % Transition matrix 
@@ -139,21 +139,27 @@ disp(n_d)
 %% Potential New Entrants Distribution over the states (s, psi, k)
 
 % productivity (exogenous state)
-cumsum_pistar_s = logncdf(s_grid,1,0.5)';
+
+logn = lognrnd(1,0.5,1,n_s);
+cumsum_pistar_s = cumsum(logn./sum(logn));
 pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
 
 % credit tax (exogenous state)
-cumsum_pistar_psi = betacdf(psi_grid,.5,.4)';
+beta = betarnd(.5,.4, 1, n_psi);
+cumsum_pistar_psi = cumsum(beta./sum(beta));
 pistar_psi =(cumsum_pistar_psi-[0,cumsum_pistar_psi(1:end-1)]);
+
+
+
 
 % capital (endogenous state)
 pistar_k = zeros(1,n_a);
 pistar_k(1,1) = 1;
 cumsum_pistar_k = cumsum(pistar_k);
 
-if (abs(1-sum(pistar_psi)) || abs(sum(pistar_psi)-1)||abs(sum(pistar_k)-1) > 1e-7)
-    error('Draws are NOT a PMD.')
-end
+%if (abs(1-sum(pistar_psi)) || abs(1-sum(pistar_psi))||abs(1-sum(pistar_k)) > 1)
+%    error('Draws are NOT a PMD.')
+%end
 
 
 figure(1)
@@ -161,6 +167,8 @@ set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|-|--|:','DefaultLineLineWidth',1);
 subplot(3,1,1);
 plot(psi_grid,cumsum_pistar_psi,'r')
+hold on;
+line([0,0], [0 1])
 title('Potential draws for psi')
 subplot(3,1,2);
 plot(s_grid,cumsum_pistar_s,'r')
@@ -221,8 +229,6 @@ figure;
 surf(squeeze(StationaryDist.pdf(:,1,:)))
 
 
-plot(squeeze(StationaryDist.pdf(:,1,:)))
-title('capital')
 
 %%
 

@@ -38,7 +38,14 @@ FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,...
 FnsToEvaluateParamNames(3).Names={'alpha','gamma','r','p','taurate'};
 FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate)...
 (((1-taurate*z2_val)*p*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+
+
 FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output,FnsToEvaluateFn_nbar};
+
+
+
+
+
 %%
 %FnsToEvaluateParamNames(1).Names={'alpha','gamma', 'delta','r','p','taurate','subsidyrate'};
 
@@ -76,7 +83,7 @@ Output.TFP=(Output.Y/Output.N)./((Output.K/Output.N)^Params.alpha);
 
 %%%%%%%%%%%%%%%
 nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
-normalize_employment=min(min(min(shiftdim(ValuesOnGrid(3,2:end,:,:),1)))); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
+normalize_employment=min(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
 nbarValues=nbarValues./normalize_employment;
 
 
