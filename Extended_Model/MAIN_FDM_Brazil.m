@@ -39,7 +39,7 @@ SS_FDM_Brazil;
 else
    fprintf(2,'\nTransition Path\n') 
 
-%% Transition
+
 
 % Distortions
 
