@@ -9,7 +9,7 @@ SkipInitialFinal= 1 % 1 to SKIP transition path
 
 %% Endogenous and Exogenous States
 n_s= 5; % number of firm-specific Productivity level
-n_psi = 10; % number of credit tax 
+n_psi = 3; % number of credit tax 
 n_a=20; % grid size for capital
 
 %% Stacionary Equilibrium
@@ -23,7 +23,9 @@ Params.taurate=0.2; % This is the rate for the tax.
 Params.subsidyrate=0.2; % This is the rate for the subsidy.
 
 % subsidy-tax distribution (new entrants)
-psi_grid = linspace(1,1,n_psi)';
+psi_grid = linspace(-1,1,n_psi)';
+% Why I did not use just 3 values in the psi_grid?
+% Because this way I have more control over the probability distribution of psi
 
 % Initial guesses
 Params.p=1; % output pricecap
