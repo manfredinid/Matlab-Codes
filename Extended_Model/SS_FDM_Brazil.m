@@ -146,7 +146,7 @@ fprintf('Distribution statistics of benchmark economy  \n');
 fprintf('                               <5     5 to 49     >=50    total\n');
 fprintf('Share of establishments  %8.2f  %8.2f  %8.2f  %8.2f  \n', ShareOfEstablishments);
 fprintf('Share of output          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfOutput);
-fprintf('Share of labour          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfLabour);
+fprintf('Share of labor          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfLabour);
 fprintf('Share of capital         %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfCapital);
 fprintf('Share of employment      %8.2f  %8.2f  %8.2f  %8.2f\n', AverageEmployment);
 

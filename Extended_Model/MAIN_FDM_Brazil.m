@@ -87,7 +87,7 @@ Params_initial=Params;
 
 % Value Function, Policy and Firm Distribution in GE
 
-disp('Calculating various equilibrium objects')
+disp('Calculating value function and policy function')
 Params.p=p_eqm.p;
 Params.Ne=p_eqm.Ne;
   [V_initial,Policy_initial]=ValueFnIter_Case1(V0, n_d,n_a,n_z,[],a_grid,z_grid, pi_z,...
@@ -131,7 +131,7 @@ disp('Calculating price vector corresponding to the stationary eqm')
 
 % Value Function, Policy and Firm Distribution in GE
 
-disp('Calculating various equilibrium objects')
+disp('Calculating value function and policy function')
 Params.p=p_eqm.p;
 Params.Ne=p_eqm.Ne;
     [V_final,Policy_final]=ValueFnIter_Case1(V0, n_d,n_a,n_z,[],a_grid,z_grid, pi_z,...
@@ -146,7 +146,7 @@ save ./SavedOutput/HopenhaynRogerson1993_final.mat Params_final...
 
 %% General Equilibrium Transition Path
 
-T=50 % number of time periods to transtion path
+T=50 % number of time periods to transition path
 
 Params=Params_initial;
 

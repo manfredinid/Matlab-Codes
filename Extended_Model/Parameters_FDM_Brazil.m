@@ -120,7 +120,7 @@ nk1 = floor(n_a/3); nk2=floor(n_a/3); nk3=n_a-nk1-nk2;
 a_grid = sort([linspace(0,k_ss,nk1),linspace(k_ss+0.0001,3*k_ss,nk2),...
       linspace(3*k_ss+0.0001,15*k_ss,nk3)])';
 
-%% Decision varibles
+%% Decision variables
 %There is no d variable
 
 d_grid=[]; 
@@ -231,7 +231,7 @@ surf(squeeze(StationaryDist.pdf(:,1,:)))
 
 
 %Use the toolkit to find the equilibrium price index
-GEPriceParamNames={'p'}%, 'Ne'};
+GEPriceParamNames={'p'};
 
 %FnsToEvaluateParamNames(1).Names={};
 %FnsToEvaluate={};
