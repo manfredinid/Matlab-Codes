@@ -46,12 +46,26 @@ FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taur
 
 FnsToEvaluateParamNames(4).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
 FnsToEvaluateFn_subsidy =  @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,...
-    r,p,taurate,subsidyrate)  p*((1-(taurate*(z2_val>=0)-subsidyrate*...
-    (z2_val<0))*z2_val)*z1_val)*(aprime_val^alpha)*...
-    ((((((1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))*z2_val)*z1_val)*p*gamma))...
-    ^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma);
+    r,p,taurate,subsidyrate) (z2_val<0)*p*(1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))...
+    )*z1_val*(aprime_val^alpha)*(...
+    ((((1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))...
+    )*z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma); 
 
-FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output,FnsToEvaluateFn_nbar};
+FnsToEvaluateParamNames(5).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+FnsToEvaluateFn_tax =  @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,...
+    r,p,taurate,subsidyrate) (z2_val>0)*p*(1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))...
+    )*z1_val*(aprime_val^alpha)*(...
+    ((((1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))...
+    )*z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma); 
+
+FnsToEvaluateParamNames(6).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+FnsToEvaluateFn_none=  @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,...
+    r,p,taurate,subsidyrate) (z2_val==0)*p*(1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))...
+    )*z1_val*(aprime_val^alpha)*(...
+    ((((1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))...
+    )*z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma); 
+
+FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output,FnsToEvaluateFn_nbar,FnsToEvaluateFn_subsidy,FnsToEvaluateFn_tax,FnsToEvaluateFn_none};
 
 
 
@@ -84,12 +98,17 @@ Output.N=AggVars(3);
 Output.K=AggVars(1);
 Output.KdivY=Output.K/Output.Y;
 %% Average values
-Output.perY=AggVars(2)/StationaryDist.mass;
+
 Output.perN=AggVars(3)/StationaryDist.mass;
 Output.perK=AggVars(1)/StationaryDist.mass;
 
+Establishments_sub=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(4,:,:,:),1)>0))));
+Establishments100_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(5,:,:,:),1)>0))));
+Establishments_none=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(6,:,:,:),1)>0))));
+Percentage_tax = [Establishments100_tax    Establishments_none    Establishments_sub] ;
 %%
 Output.TFP=(Output.Y/Output.N)./((Output.K/Output.N)^Params.alpha);
+
 
 
 %%%%%%%%%%%%%%%
@@ -155,8 +174,13 @@ fprintf('Share of employment      %8.2f  %8.2f  %8.2f  %8.2f\n', AverageEmployme
 fprintf('The equilibrium output price is p=%.4f \n', Params.p)
 fprintf('The equilibrium value for the mass of entrants is Ne=%.4f \n', Params.Ne)
 
-fprintf('Average Labor is n=%.4f \n', Output.perN)
-fprintf('Average Capital is k=%.4f \n', Output.perK)
-fprintf('Average Output is y=%.4f \n', Output.perY)
+fprintf('Total Output is Y=%.4f \n', Output.Y)
+fprintf('Labor is n=%.4f \n', Output.N)
+fprintf('Capital is k=%.4f \n', Output.K)
 fprintf('Total Factor Productivity is TFP=%.4f \n', Output.TFP)
+fprintf('Total Subsided Output is Ysub=%.4f \n', AggVars(4))
+
+
+fprintf('Taxed Firms      No tax or subsidy   Subsidized Firms \n')
+fprintf('%9.2f  %12.2f  %19.2f  \n',Percentage_tax )
 

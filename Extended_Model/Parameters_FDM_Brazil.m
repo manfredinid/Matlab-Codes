@@ -145,8 +145,8 @@ cumsum_pistar_s = cumsum(logn./sum(logn));
 pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
 
 % credit tax (exogenous state)
-beta = betarnd(.5,.4, 1, n_psi);
-cumsum_pistar_psi = cumsum(beta./sum(beta));
+%beta = betarnd(.5,.4, 1, n_psi);
+cumsum_pistar_psi = cumsum(psi_dist./sum(psi_dist));
 pistar_psi =(cumsum_pistar_psi-[0,cumsum_pistar_psi(1:end-1)]);
 
 % capital (endogenous state)

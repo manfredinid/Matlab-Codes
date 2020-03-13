@@ -20,12 +20,16 @@ fprintf(2,'\nStacionary Equilibrium\n')
 Params.gcost=0.01;   
 % Distortions
 Params.taurate=0.2; % This is the rate for the tax.
-Params.subsidyrate=0.2; % This is the rate for the subsidy.
+Params.subsidyrate=0.6; % This is the rate for the subsidy.
 
 % subsidy-tax distribution (new entrants)
-psi_grid = linspace(-1,1,n_psi)';
+psi_grid = linspace(-1,-1,n_psi)'; % Incumbest first draws
+psi_dist =betarnd(.5,.4, 1, n_psi); % Entrants probability distribution
+%psi_grid = [-1 0 0]'; % Incumbest first draws
+%psi_dist = [0 0 1 ]; % Entrants probability distribution
 % Why I did not use just 3 values in the psi_grid?
 % Because this way I have more control over the probability distribution of psi
+% Maybe a 3 variables grid was best - it was not
 
 % Initial guesses
 Params.p=1; % output pricecap
@@ -50,14 +54,20 @@ Params.taurate_initial=0.2; % This is the rate for the tax.
 Params.subsidyrate_initial=0.2; % This is the rate for the subsidy.
 Params.gcost_initial=0.01;
 
-psi_grid_initial = linspace(-1,1,n_psi)';
+psi_grid_initial = linspace(0,1,n_psi)'; % Incumbest first draws
+psi_dist_initial =betarnd(.5,.4, 1, n_psi);
 
 % FINAL
 Params.taurate_final=0.2; % This is the rate for the tax.
 Params.subsidyrate_final=0.2; % This is the rate for the subsidy.
 Params.gcost_final = 0.01;
 
-psi_grid_final = linspace(-0.5,1.5,n_psi)';
+% psi_grid_final should be the same in the initial and final period
+% psi_dist_final should change based on the policy
+psi_grid_final = linspace(-0.5,1.5,n_psi)'; % Incumbest first draws
+psi_dist_final = betarnd(.5,.4, 1, n_psi);
+
+% Why I did not use just 3 values in the psi_grid?
 
 %% Initial Period  
 
@@ -67,6 +77,7 @@ Params.subsidyrate=Params.subsidyrate_initial;
 Params.taurate=Params.taurate_initial;
 
 psi_grid = psi_grid_initial;
+psi_dist = psi_dist_initial;
 
 % Initial guesses
 Params.p=1; % output price
@@ -111,6 +122,7 @@ Params.subsidyrate=Params.subsidyrate_final;
 Params.taurate=Params.taurate_final;
 
 psi_grid = psi_grid_initial;
+psi_dist = psi_dist_final;
 
 % Initial guesses
 Params.p=1; % output price
