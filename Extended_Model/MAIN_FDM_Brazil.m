@@ -7,10 +7,11 @@ close all;
 Parallel=1 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
 SkipInitialFinal= 1 % 1 to SKIP transition path
 
+tic;
 %% Endogenous and Exogenous States
-n_s= 5; % number of firm-specific Productivity level
-n_psi = 3; % number of credit tax 
-n_a=20; % grid size for capital
+n_s= 10; % number of firm-specific Productivity level
+n_psi = 10; % number of credit tax 
+n_a=250; % grid size for capital
 
 %% Stacionary Equilibrium
 if SkipInitialFinal==1
@@ -23,7 +24,7 @@ Params.taurate=0.2; % This is the rate for the tax.
 Params.subsidyrate=0.6; % This is the rate for the subsidy.
 
 % subsidy-tax distribution (new entrants)
-psi_grid = linspace(-1,-1,n_psi)'; % Incumbest first draws
+psi_grid = linspace(-1,1,n_psi)'; % Incumbest first draws
 psi_dist =betarnd(.5,.4, 1, n_psi); % Entrants probability distribution
 %psi_grid = [-1 0 0]'; % Incumbest first draws
 %psi_dist = [0 0 1 ]; % Entrants probability distribution
@@ -206,3 +207,5 @@ transpathoptions.verbose=1
     GeneralEqmEqnParamNames,transpathoptions, vfoptions, simoptions, EntryExitParamNames);
 
 end
+
+toc;
