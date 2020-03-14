@@ -98,13 +98,13 @@ z_grid=[s_grid; psi_grid];
 pi_z=kron( pi_s,eye(prod(n_psi)))';
 
 % Check transition matrix
-for ii = 1: length(pi_z)
-A = round(sum(pi_z(:,ii)),5);
-if A == 1
-else
-   error('transition matrix sum is not one')
-end
-end
+%for ii = 1: length(pi_z)
+%A = round(sum(pi_z(:,ii)),5);
+%if A == 1
+%else
+%   error('transition matrix sum is not one')
+%end
+%end
 pi_z=pi_z';
 
 %% Endogenous state variables
@@ -182,7 +182,7 @@ ReturnFnParamNames={ 'p','r', 'alpha','gamma', 'delta','taurate','subsidyrate', 
 
 %% CHECK (to be erase)
 if vfoptions.parallel==2
-    V0=zeros([n_a,n_z,'gpuArray']);
+    V0=zeros([n_a,n_z],'gpuArray');
 else
     V0=zeros([n_a,n_z]);
 end

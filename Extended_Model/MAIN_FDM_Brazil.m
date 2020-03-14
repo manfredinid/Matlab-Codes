@@ -11,7 +11,7 @@ tic;
 %% Endogenous and Exogenous States
 n_s= 10; % number of firm-specific Productivity level
 n_psi = 10; % number of credit tax 
-n_a=250; % grid size for capital
+n_a=25; % grid size for capital
 
 %% Stacionary Equilibrium
 if SkipInitialFinal==1
@@ -35,7 +35,7 @@ psi_dist =betarnd(.5,.4, 1, n_psi); % Entrants probability distribution
 % Initial guesses
 Params.p=1; % output pricecap
 Params.Ne=0.5; % total mass of new entrants
-
+%%
 % Parameters and initialization options
 Parameters_FDM_Brazil;
 % Stationary Equilibrium and Results

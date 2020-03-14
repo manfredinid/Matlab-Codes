@@ -1,4 +1,4 @@
-function F=RR2008p_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma, delta, taurate,subsidyrate, cf, gcost)
+function F=FDM_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma, delta, taurate,subsidyrate, cf, gcost)
 % a_val is what HopenhaynRogerson1993 call n_{t-1}, aprime_val is n_t.
 
 F=-Inf;
