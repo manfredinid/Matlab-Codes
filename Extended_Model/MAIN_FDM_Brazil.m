@@ -4,8 +4,8 @@
 clear all;
 close all;
 
-Parallel=1 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 1 % 1 to SKIP transition path
+Parallel=2 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
+SkipInitialFinal= 0 % 1 to SKIP transition path
 
 tic;
 %% Endogenous and Exogenous States
@@ -59,7 +59,7 @@ psi_grid_initial = linspace(0,1,n_psi)'; % Incumbest first draws
 psi_dist_initial =betarnd(.5,.4, 1, n_psi);
 
 % FINAL
-Params.taurate_final=0.2; % This is the rate for the tax.
+Params.taurate_final=0.6; % This is the rate for the tax.
 Params.subsidyrate_final=0.2; % This is the rate for the subsidy.
 Params.gcost_final = 0.01;
 
@@ -156,8 +156,9 @@ StationaryDist_final=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
     simoptions, Params, EntryExitParamNames);
 
 Params_final=Params;
-save ./SavedOutput/HopenhaynRogerson1993_final.mat Params_final...
-    V_final Policy_final StationaryDist_final
+
+ save ./SavedOutput/TPDynamics_final.mat...
+        Params_final V_final Policy_final StationaryDist_final
 
 %% General Equilibrium Transition Path
 
@@ -166,14 +167,12 @@ T=50 % number of time periods to transition path
 Params=Params_initial;
 
 
-transpathoptions.parallel=1;
+transpathoptions.parallel=2;
 transpath_shootingalgo=0;
-vfoptions.endogenousexit=0;
-transpathoptions.agentexit=0;
 transpathoptions.agententry=1;
 %%
 ParamPath=Params.taurate_final*ones(T,1);
-ParamPathNames={'gcost'};
+ParamPathNames={'tau'};
 
 % We need to give an initial guess for the price path on interest rates
 PricePath0_p=[linspace(Params_initial.p, Params_final.p, floor(T/2))'; Params_final.p*ones(T-floor(T/2),1)]; % PricePath0 is matrix of size T-by-'number of prices'
@@ -201,10 +200,11 @@ transpathoptions.verbose=1
 
 
 [PricePath]=TransitionPath_Case1(PricePath0, PricePathNames, ParamPath,....
-    ParamPathNames, T, V_final, StationaryDist_initial, n_d, n_a, n_z, pi_z,...
+    ParamPathNames, T, V_final, StationaryDist_initial.pdf, n_d, n_a, n_z, pi_z,...
     d_grid,a_grid,z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params,...
     DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames,...
-    GeneralEqmEqnParamNames,transpathoptions, vfoptions, simoptions, EntryExitParamNames);
+    GeneralEqmEqnParamNames,transpathoptions, vfoptions, simoptions,...
+   EntryExitParamNames);
 
 end
 
