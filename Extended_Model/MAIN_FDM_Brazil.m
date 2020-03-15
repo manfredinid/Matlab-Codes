@@ -72,6 +72,8 @@ psi_dist_final = betarnd(.5,.4, 1, n_psi);
 
 %% Initial Period  
 
+  fprintf('\nInitial Period\n') 
+  
 %Policy parameters
 Params.gcost=Params.gcost_initial;   
 Params.subsidyrate=Params.subsidyrate_initial;
@@ -117,6 +119,8 @@ Params_initial=Params;
 
 %% Final Period
 
+  fprintf('\nFinal Period\n') 
+
 %Policy parameters
 Params.gcost=Params.gcost_final;   
 Params.subsidyrate=Params.subsidyrate_final;
@@ -161,7 +165,9 @@ Params_final=Params;
         Params_final V_final Policy_final StationaryDist_final
 
 %% General Equilibrium Transition Path
-
+ 
+ fprintf('\nGeneral Equilibrium Transition Path\n') 
+ 
 T=50 % number of time periods to transition path
 
 Params=Params_initial;
@@ -181,30 +187,30 @@ PricePath0=[PricePath0_p, PricePath0_Ne]; % PricePath0 is matrix of size T-by-'n
 PricePathNames={'p','Ne'};
 
 % Rewrite the General Eqm conditions as rules for updating the price
-transpathoptions.specialgeneqmcondn={0,'entry'};
+transpathoptions.specialgeneqmcondn={'entry',0};
 
  % Alternative attempt, based on minimizing weighted sum of squares.
     transpathoptions.GEnewprice=2;
     transpathoptions.weightsforpath=ones(T,2); % Same size as PricePath
 
-GeneralEqmEqnParamNames(1).Names={};
-GeneralEqmEqn_GoodsMarket = @(AggVars,GEprices) 1-AggVars;
+GeneralEqmEqnParamNames(1).Names={'beta','ce'};
+GeneralEqmEqn_Entry2 = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce;
+GeneralEqmEqnParamNames(2).Names={};
+GeneralEqmEqn_GoodsMarket2 = @(AggVars,GEprices) 1-AggVars;
 
-GeneralEqmEqnParamNames(2).Names={'beta','ce'};
-GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce;
 
-GeneralEqmEqns={GeneralEqmEqn_GoodsMarket,GeneralEqmEqn_Entry};   
+
+GeneralEqmEqns={GeneralEqmEqn_GoodsMarket2,GeneralEqmEqn_Entry2};   
 
 transpathoptions.weightscheme=1
 transpathoptions.verbose=1
 
-
-[PricePath]=TransitionPath_Case1(PricePath0, PricePathNames, ParamPath,....
-    ParamPathNames, T, V_final, StationaryDist_initial.pdf, n_d, n_a, n_z, pi_z,...
-    d_grid,a_grid,z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params,...
-    DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames,...
-    GeneralEqmEqnParamNames,transpathoptions, vfoptions, simoptions,...
-   EntryExitParamNames);
+[PricePath]=TransitionPath_Case1(PricePath0, PricePathNames,...
+ ParamPath, ParamPathNames, T, V_final, StationaryDist_initial,...
+  n_d, n_a, n_z, pi_z, d_grid,a_grid,z_grid, ReturnFn, FnsToEvaluate,...
+   GeneralEqmEqns, Params, DiscountFactorParamNames,...
+    ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
+    transpathoptions, vfoptions, simoptions, EntryExitParamNames);
 
 end
 

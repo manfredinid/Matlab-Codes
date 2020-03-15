@@ -159,7 +159,7 @@ if (abs(1-round(sum(pistar_psi),2)) || abs(1-round(sum(pistar_psi),2))||abs(1-su
 end
 
 
-figure(1)
+figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|-|--|:','DefaultLineLineWidth',1);
 subplot(3,1,1);
