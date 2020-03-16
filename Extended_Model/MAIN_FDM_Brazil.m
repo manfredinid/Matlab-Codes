@@ -5,29 +5,31 @@ clear all;
 close all;
 
 Parallel=2 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 0 % 1 to SKIP transition path
+SkipInitialFinal= 1 % 1 to SKIP transition path
+
 
 tic;
 %% Endogenous and Exogenous States
 n_s= 10; % number of firm-specific Productivity level
-n_psi = 10; % number of credit tax 
+n_psi = 3; % number of credit tax 
 n_a=25; % grid size for capital
 
 %% Stacionary Equilibrium
+
 if SkipInitialFinal==1
 fprintf(2,'\nStacionary Equilibrium\n')
     
 %Policy parameters
 Params.gcost=0.01;   
 % Distortions
-Params.taurate=0.2; % This is the rate for the tax.
-Params.subsidyrate=0.6; % This is the rate for the subsidy.
+Params.taurate=0.01; % This is the rate for the tax.
+Params.subsidyrate=0.01; % This is the rate for the subsidy.
 
 % subsidy-tax distribution (new entrants)
-psi_grid = linspace(-1,1,n_psi)'; % Incumbest first draws
-psi_dist =betarnd(.5,.4, 1, n_psi); % Entrants probability distribution
-%psi_grid = [-1 0 0]'; % Incumbest first draws
-%psi_dist = [0 0 1 ]; % Entrants probability distribution
+%psi_grid = linspace(-1,1,n_psi)'; % Incumbest first draws
+%psi_dist =betarnd(.5,.4, 1, n_psi); % Entrants probability distribution
+psi_grid = [-1; 0; 1]; % Incumbest first draws
+psi_dist = [0; 0; 1]; % Entrants probability distribution
 % Why I did not use just 3 values in the psi_grid?
 % Because this way I have more control over the probability distribution of psi
 % Maybe a 3 variables grid was best - it was not

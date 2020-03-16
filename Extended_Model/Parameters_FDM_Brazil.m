@@ -146,12 +146,11 @@ pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
 
 % credit tax (exogenous state)
 %beta = betarnd(.5,.4, 1, n_psi);
-cumsum_pistar_psi = cumsum(psi_dist./sum(psi_dist));
-pistar_psi =(cumsum_pistar_psi-[0,cumsum_pistar_psi(1:end-1)]);
+cumsum_pistar_psi = cumsum(psi_dist./sum(psi_dist))';
+pistar_psi =(cumsum_pistar_psi-[0,cumsum_pistar_psi(1:end-1)])';
 
 % capital (endogenous state)
-pistar_k = zeros(1,n_a);
-pistar_k(1,1) = 1;
+pistar_k = [zeros(n_a-1,1);1];
 cumsum_pistar_k = cumsum(pistar_k);
 
 if (abs(1-round(sum(pistar_psi),2)) || abs(1-round(sum(pistar_psi),2))||abs(1-sum(pistar_k)) > 1e-5)
@@ -204,12 +203,13 @@ simoptions.endogenousexit=0;
 % Probability of being in the (s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
-pistar_psi_s=pistar_s.*(pistar_psi)';
-Params.upsilon=NaN(n_psi,n_s,n_a);
+pistar_psi_s=pistar_s'.*(pistar_psi)';
+Params.upsilon=NaN(n_a,n_s,n_psi);
  for n=1:n_a
-    Params.upsilon(:,:,n)=pistar_psi_s.*pistar_k(n);
+    Params.upsilon(n,:,:)=pistar_psi_s.*pistar_k(n);
  end
 
+ 
 disp('upsilon size')
 disp(size(Params.upsilon))
 
