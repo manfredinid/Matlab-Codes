@@ -95,7 +95,7 @@ z_grid=[s_grid; psi_grid];
 
 
 % transition matrix for the exogenous z and psi variables
-pi_z=kron( pi_s,eye(prod(n_psi)))';
+pi_z=kron( eye(prod(n_psi)),pi_s)';
 
 % Check transition matrix
 %for ii = 1: length(pi_z)
