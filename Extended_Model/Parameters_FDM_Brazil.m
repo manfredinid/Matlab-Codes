@@ -19,7 +19,7 @@ mcmomentsoptions.parallel=tauchenoptions.parallel;
 vfoptions.parallel=Parallel;
 
 simoptions.burnin=10^4;
-simoptions.simperiods=10^5; % if iterate=0 then simperiod=10^6 
+simoptions.simperiods=10^10; % if iterate=0 then simperiod=10^6 
 simoptions.iterate=1;
 simoptions.parallel=Parallel; 
 

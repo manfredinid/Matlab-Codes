@@ -7,6 +7,9 @@ close all;
 Parallel=2 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
 SkipInitialFinal= 1 % 1 to SKIP transition path
 
+simoptions.tolerance=10^(-20)
+vfoptions.tolerance=10^(-20)
+
 
 tic;
 %% Endogenous and Exogenous States
