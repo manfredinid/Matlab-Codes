@@ -5,7 +5,7 @@ clear all;
 close all;
 
 Parallel=2 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 1 % 1 to SKIP transition path
+SkipInitialFinal= 0 % 1 to SKIP transition path
 
 simoptions.tolerance=10^(-20)
 vfoptions.tolerance=10^(-20)
@@ -15,7 +15,7 @@ tic;
 %% Endogenous and Exogenous States
 n_s= 10; % number of firm-specific Productivity level
 n_psi = 3; % number of credit tax 
-n_a=25; % grid size for capital
+n_a=30; % grid size for capital
 
 %% Stacionary Equilibrium
 
@@ -60,8 +60,8 @@ Params.taurate_initial=0.2; % This is the rate for the tax.
 Params.subsidyrate_initial=0.2; % This is the rate for the subsidy.
 Params.gcost_initial=0.01;
 
-psi_grid_initial = linspace(0,1,n_psi)'; % Incumbest first draws
-psi_dist_initial =betarnd(.5,.4, 1, n_psi);
+psi_grid_initial = [-1; 0; 1]; % Incumbest first draws
+psi_dist_initial =[0; 0; 1]; 
 
 % FINAL
 Params.taurate_final=0.6; % This is the rate for the tax.
@@ -70,8 +70,8 @@ Params.gcost_final = 0.01;
 
 % psi_grid_final should be the same in the initial and final period
 % psi_dist_final should change based on the policy
-psi_grid_final = linspace(-0.5,1.5,n_psi)'; % Incumbest first draws
-psi_dist_final = betarnd(.5,.4, 1, n_psi);
+psi_grid_final = [-1; 0; 1]; % Incumbest first draws
+psi_dist_final = [0; 0; 1]; 
 
 % Why I did not use just 3 values in the psi_grid?
 
@@ -210,7 +210,7 @@ GeneralEqmEqns={GeneralEqmEqn_GoodsMarket2,GeneralEqmEqn_Entry2};
 transpathoptions.weightscheme=1
 transpathoptions.verbose=1
 
-[PricePath]=TransitionPath_Case1(PricePath0, PricePathNames,...
+PricePath=TransitionPath_Case1(PricePath0, PricePathNames,...
  ParamPath, ParamPathNames, T, V_final, StationaryDist_initial,...
   n_d, n_a, n_z, pi_z, d_grid,a_grid,z_grid, ReturnFn, FnsToEvaluate,...
    GeneralEqmEqns, Params, DiscountFactorParamNames,...
