@@ -5,7 +5,7 @@ clear all;
 close all;
 
 Parallel=1 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 1 % 1 to SKIP transition path
+SkipInitialFinal= 0 % 1 to SKIP transition path
 
 
 tic;
@@ -178,6 +178,12 @@ Params=Params_initial;
 transpathoptions.parallel=2;
 transpath_shootingalgo=0;
 transpathoptions.agententry=1;
+
+%% Return Function
+ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost)...
+FDM_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost);
+
+ReturnFnParamNames={ 'p','r', 'alpha','gamma', 'delta','taurate','subsidyrate', 'cf', 'gcost'};
 %%
 ParamPath=Params.taurate_final*ones(T,1);
 ParamPathNames={'tau'};
@@ -207,7 +213,8 @@ GeneralEqmEqns={GeneralEqmEqn_GoodsMarket2,GeneralEqmEqn_Entry2};
 transpathoptions.weightscheme=1
 transpathoptions.verbose=1
 
-PricePath=TransitionPath_Case1(PricePath0, PricePathNames,...
+
+[PricePath]=TransitionPath_Case1(PricePath0, PricePathNames,...
  ParamPath, ParamPathNames, T, V_final, StationaryDist_initial,...
   n_d, n_a, n_z, pi_z, d_grid,a_grid,z_grid, ReturnFn, FnsToEvaluate,...
    GeneralEqmEqns, Params, DiscountFactorParamNames,...
