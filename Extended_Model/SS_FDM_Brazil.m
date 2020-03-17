@@ -102,6 +102,10 @@ Output.KdivY=Output.K/Output.Y;
 Output.perN=AggVars(3)/StationaryDist.mass;
 Output.perK=AggVars(1)/StationaryDist.mass;
 
+
+Non_producing=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(3,:,:,:),1)<=0))));
+Non_total=[Non_producing sum(Percentage_tax)+Non_producing];
+
 Establishments_sub=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(4,:,:,:),1)>0))));
 Establishments100_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(5,:,:,:),1)>0))));
 Establishments_none=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(6,:,:,:),1)>0))));
@@ -181,6 +185,8 @@ fprintf('Total Factor Productivity is TFP=%.4f \n', Output.TFP)
 fprintf('Total Subsided Output is Ysub=%.4f \n', AggVars(4))
 
 
-fprintf('Taxed Firms      No tax or subsidy   Subsidized Firms \n')
+fprintf('Taxed Firms      No tax or subsidy   Subsidized Firms\n')
 fprintf('%9.2f  %12.2f  %19.2f  \n',Percentage_tax )
 
+fprintf('Firms without production        Total  \n' )
+fprintf('%9.2f  %25.2f  \n', Non_total)
