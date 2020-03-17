@@ -29,7 +29,7 @@ Params.subsidyrate=0.01; % This is the rate for the subsidy.
 %psi_grid = linspace(-1,1,n_psi)'; % Incumbest first draws
 %psi_dist =betarnd(.5,.4, 1, n_psi); % Entrants probability distribution
 psi_grid = [-1; 0; 1]; % Incumbest first draws
-psi_dist = [1; 0; 0]; % Entrants probability distribution
+psi_dist = [0.5; 0; 0.5]; % Entrants probability distribution
 % Why I did not use just 3 values in the psi_grid?
 % Because this way I have more control over the probability distribution of psi
 % Maybe a 3 variables grid was best - it was not

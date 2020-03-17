@@ -65,7 +65,12 @@ FnsToEvaluateFn_none=  @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,...
     ((((1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))...
     )*z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma); 
 
-FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output,FnsToEvaluateFn_nbar,FnsToEvaluateFn_subsidy,FnsToEvaluateFn_tax,FnsToEvaluateFn_none};
+FnsToEvaluateParamNames(7).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+FnsToEvaluateFn_taxsubnone=  @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,...
+    r,p,taurate,subsidyrate) (z2_val<0)*2 + (z2_val==0)*3+(z2_val>0)*4; 
+
+FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output,FnsToEvaluateFn_nbar,...
+    FnsToEvaluateFn_subsidy,FnsToEvaluateFn_tax,FnsToEvaluateFn_none,FnsToEvaluateFn_taxsubnone};
 
 
 
@@ -103,13 +108,17 @@ Output.perN=AggVars(3)/StationaryDist.mass;
 Output.perK=AggVars(1)/StationaryDist.mass;
 
 
-Non_producing=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(3,:,:,:),1)<=0))));
-Non_total=[Non_producing sum(Percentage_tax)+Non_producing];
 
-Establishments_sub=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(4,:,:,:),1)>0))));
-Establishments100_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(5,:,:,:),1)>0))));
-Establishments_none=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(6,:,:,:),1)>0))));
+%%
+
+Establishments_sub=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(7,:,:,:),1)==4))));
+Establishments100_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(7,:,:,:),1)==2))));
+Establishments_none=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(7,:,:,:),1)==3))));
 Percentage_tax = [Establishments100_tax    Establishments_none    Establishments_sub] ;
+
+
+Non_producing=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(3,:,:,:),1)<=0))));
+Non_total=[Non_producing sum(Percentage_tax)];
 %%
 Output.TFP=(Output.Y/Output.N)./((Output.K/Output.N)^Params.alpha);
 
@@ -188,5 +197,5 @@ fprintf('Total Subsided Output is Ysub=%.4f \n', AggVars(4))
 fprintf('Taxed Firms      No tax or subsidy   Subsidized Firms\n')
 fprintf('%9.2f  %12.2f  %19.2f  \n',Percentage_tax )
 
-fprintf('Firms without production        Total  \n' )
+fprintf('Firms without production        Total(just for checking)  \n' )
 fprintf('%9.2f  %25.2f  \n', Non_total)
