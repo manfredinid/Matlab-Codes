@@ -22,7 +22,7 @@ fprintf(2,'\nStacionary Equilibrium\n')
 %Policy parameters
 Params.gcost=0.01;   
 % Distortions
-Params.taurate=0.01; % This is the rate for the tax.
+Params.taurate=0.1; % This is the rate for the tax.
 Params.subsidyrate=0.01; % This is the rate for the subsidy.
 
 % subsidy-tax distribution (new entrants)
