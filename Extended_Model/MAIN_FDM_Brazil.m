@@ -4,8 +4,8 @@
 clear all;
 close all;
 
-Parallel=1 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 1 % 1 to SKIP transition path
+Parallel=2 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
+SkipInitialFinal= 0 % 1 to SKIP transition path
 
 
 tic;
@@ -29,7 +29,7 @@ Params.subsidyrate=0.01; % This is the rate for the subsidy.
 %psi_grid = linspace(-1,1,n_psi)'; % Incumbest first draws
 %psi_dist =betarnd(.5,.4, 1, n_psi); % Entrants probability distribution
 psi_grid = [-1; 0; 1]; % Incumbest first draws
-psi_dist = [0; 1; 0]; % Entrants probability distribution
+psi_dist = [0.5; 0; 0.5]; % Entrants probability distribution
 % Why I did not use just 3 values in the psi_grid?
 % Because this way I have more control over the probability distribution of psi
 % Maybe a 3 variables grid was best - it was not
@@ -174,10 +174,8 @@ T=50 % number of time periods to transition path
 
 Params=Params_initial;
 
-
-transpathoptions.parallel=2;
 transpath_shootingalgo=0;
-transpathoptions.agententry=1;
+transpathoptions.exoticpreferences=1
 
 %% Return Function
 ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost)...
@@ -185,6 +183,14 @@ FDM_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,su
 
 ReturnFnParamNames={ 'p','r', 'alpha','gamma', 'delta','taurate','subsidyrate', 'cf', 'gcost'};
 %%
+FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
+FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate)...
+(((1-taurate*z2_val)*p*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+FnsToEvaluate={FnsToEvaluateFn_nbar};
+%%
+transpathoptions.parallel=2
+ transpathoptions.exoticpreferences=1
+
 ParamPath=Params.taurate_final*ones(T,1);
 ParamPathNames={'tau'};
 
@@ -208,18 +214,15 @@ GeneralEqmEqn_GoodsMarket2 = @(AggVars,GEprices) 1-AggVars;
 
 
 
-GeneralEqmEqns={GeneralEqmEqn_GoodsMarket2,GeneralEqmEqn_Entry2};   
-
-transpathoptions.weightscheme=1
-transpathoptions.verbose=1
+GeneralEqmEqns={GeneralEqmEqn_Entry2,GeneralEqmEqn_GoodsMarket2};   
 
 
-[PricePath]=TransitionPath_Case1(PricePath0, PricePathNames,...
- ParamPath, ParamPathNames, T, V_final, StationaryDist_initial,...
-  n_d, n_a, n_z, pi_z, d_grid,a_grid,z_grid, ReturnFn, FnsToEvaluate,...
+[PricePath]= TransitionPath_Case1(PricePath0, PricePathNames,...
+ ParamPath, ParamPathNames, T, V_final, StationaryDist_initial.pdf,...
+   n_d,n_a, n_z, pi_z,d_grid,a_grid,z_grid, ReturnFn, FnsToEvaluate,...
    GeneralEqmEqns, Params, DiscountFactorParamNames,...
     ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
-    transpathoptions, vfoptions, simoptions, EntryExitParamNames);
+    transpathoptions)%, vfoptions, simoptions, EntryExitParamNames);
 
 end
 
