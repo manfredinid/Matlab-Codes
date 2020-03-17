@@ -51,30 +51,19 @@ theta = (1-varpi)/varpi;
 model;
 
 
-# psi = (((1-varpi))/(varpi));
-
-# A = (ah^varpi)*(al^(1-varpi));
-
-# expH = alphaa*varpi;
-
-# expL = alphaa*(1-varpi);
-
-
 
 [name='Aggregate Output']
-y = A*(1-pi_g)*(1-pi_p)*(kh(-1)^expH)*((psi*kh(-1))^expL);
+y = (ah^varpi)*(al^(1-varpi))*(((kh(-1)*(1-pi_g))^alphaa*varpi)*(((((1-varpi))/(varpi))*kh(-1))*(1-pi_p))^alphaa*(1-varpi));
 
 
 [name='Euler Equation']
 
-c^(-sigmaa) = betaa*(c(+1)^(-sigmaa))*( (expH*(A*(1-pi_g)*(1-pi_p)*(kh^expH)*((psi*kh)^expL)))/(kh*(pi_p+pi_g)) + (expL*(A*(1-pi_g)*(1-pi_p)*(kh^expH)*((psi*kh)^expL)))/((pi_p+pi_g)*(psi*kh)) + (1-deltaa));
+c^(-sigmaa) = betaa*(c(+1)^(-sigmaa))*(varpi*alphaa*(y/kh)+(1-varpi)*alphaa*(y/kl)+(1-deltaa));
 
 
 [name='Budget Constrain']
 
-
-c= (A*(1-pi_g)*(1-pi_p)*(kh(-1)^expH)*((psi*kh(-1))^expL)) - (psi*kh - (1-deltaa)*(psi*kh(-1))) - (kh - (1-deltaa)*kh(-1));
-
+c= y - ((kh+kl) -(1-deltaa)*(kh+kl));
 
 [name='low-tech capital']
 kl = (((1-varpi))/(varpi))*kh;
@@ -94,9 +83,9 @@ steady_state_model;
 kh = (a*(((((1-varpi))/(varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa));
 
 
-y = a*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi))); // output
+y = ((ah^varpi)*(al^(1-varpi)))*(((kh*(1-pi_g))^alphaa*varpi)*(((((1-varpi))/(varpi))*kh)*(1-pi_p))^alphaa*(1-varpi)); // output
 
-c= (a*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi)))) - deltaa*((((1-varpi))/(varpi))*kh) - deltaa*kh; // consumption
+c= (a*((1-pi_g)^(1-varpi))*((1-pi_p)^(varpi))*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi)))) - deltaa*((((1-varpi))/(varpi))*kh) - deltaa*kh; // consumption
 
 kl = (((1-varpi))/(varpi))*kh;
 
@@ -118,23 +107,20 @@ pi_p = pi_p0;
 pi_g =pi_g0;
 
 
-kh = (a*(((((1-varpi))/(varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa));
+
+kh = (a*(((((1-varpi))/(varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa))/(alphaa*varpi)))^(1/(1-alphaa));
 
 
-y = a*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi))); // output
+y = ((ah^varpi)*(al^(1-varpi)))*(((kh*(1-pi_g))^alphaa*varpi)*(((((1-varpi))/(varpi))*kh)*(1-pi_p))^alphaa*(1-varpi)); // output
 
 c= (a*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi)))) - deltaa*((((1-varpi))/(varpi))*kh) - deltaa*kh; // consumption
 
-kl = (((1-varpi))/(varpi))*kh;
-
-
-k= kh + kl;
 
 i= y-c;
 
 end;
 //steady(solve_algo=4,maxit=100);
-check;
+//check;
 //Computes the eigenvalues of the model linearized around the values specified by the last initval, endval or steady statement. Generally, the eigenvalues are only meaningful if the linearization is done around a steady state of the model. It is a device for local analysis in the neighborhoodof this steady state (Dynare Manual).
 
 
@@ -146,17 +132,19 @@ endval;
 pi_p = pi_pF_obser;
 pi_g =pi_gF_obser;
 
-kh = log((a*(((((1-varpi))/(varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa)));
+pi_p = pi_pF_simul;
+pi_g =pi_gF_simul;
 
 
-y = log(a*(exp(kh)^(alphaa*varpi))*(((((1-varpi))/(varpi))*exp(kh))^(alphaa*(1-varpi)))); // output
-
-c= log((a*(exp(kh)^(alphaa*varpi))*(((((1-varpi))/(varpi))*exp(kh))^(alphaa*(1-varpi)))) - deltaa*((((1-varpi))/(varpi))*exp(kh)) - deltaa*exp(kh)); // consumption
-
-kl = log((((1-varpi))/(varpi))*exp(kh));
+kh = (a*(((((1-varpi))/(varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa))/(alphaa*varpi)))^(1/(1-alphaa));
 
 
-i= log(exp(y)-exp(c));
+y = ((ah^varpi)*(al^(1-varpi)))*(((kh*(1-pi_g))^alphaa*varpi)*(((((1-varpi))/(varpi))*kh)*(1-pi_p))^alphaa*(1-varpi)); // output
+
+c= (a*(kh^(alphaa*varpi))*(((((1-varpi))/(varpi))*kh)^(alphaa*(1-varpi)))) - deltaa*((((1-varpi))/(varpi))*kh) - deltaa*kh; // consumption
+
+
+i= y-c;
 
 end;
 //steady(solve_algo=4,maxit=300);

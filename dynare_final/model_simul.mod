@@ -145,19 +145,19 @@ endval;
 pi_p = pi_pF_simul;
 pi_g =pi_gF_simul;
 
-
-kh = log((a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa)));
-
-
-y = log(a*(exp(kh)^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh))^(alphaa*(1-varpi)))); // output
-
-c= log((a*(exp(kh)^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh))^(alphaa*(1-varpi)))) - pi_g*deltaa*(((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh)) - pi_p*deltaa*exp(kh)); // consumption
-
-kl = log(((pi_p*(1-varpi))/(pi_g*varpi))*exp(kh));
+kh = (a*((((pi_p*(1-varpi))/(pi_g*varpi)))^(alphaa*(1-varpi)))/(((1/betaa-1+deltaa)*(pi_p))/(alphaa*varpi)))^(1/(1-alphaa));
 
 
-i= log(exp(y)-exp(c));
+y = a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi))); // output
 
+c= (a*(kh^(alphaa*varpi))*((((pi_p*(1-varpi))/(pi_g*varpi))*kh)^(alphaa*(1-varpi)))) - pi_g*deltaa*(((pi_p*(1-varpi))/(pi_g*varpi))*kh) - pi_p*deltaa*kh; // consumption
+
+kl = ((pi_p*(1-varpi))/(pi_g*varpi))*kh;
+
+
+k= kh + kl;
+
+i= y-c;
 end;
 //steady(solve_algo=4,maxit=300);
 
