@@ -175,9 +175,17 @@ T=50 % number of time periods to transition path
 Params=Params_initial;
 
 transpath_shootingalgo=0;
-transpathoptions.exoticpreferences=1
+simoptions.agententryandexit=1;
+simoptions.endogenousexit=0;
+transpathoptions.agententryandexit=1;
+transpathoptions.parallel=2;
+transpathoptions.exoticpreferences=0;
+transpathoptions.weightscheme=1;
+transpathoptions.verbose=1
 
 %% Return Function
+DiscountFactorParamNames={'beta'};
+
 ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost)...
 FDM_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost);
 
@@ -188,8 +196,7 @@ FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taur
 (((1-taurate*z2_val)*p*z1_val*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
 FnsToEvaluate={FnsToEvaluateFn_nbar};
 %%
-transpathoptions.parallel=2
- transpathoptions.exoticpreferences=1
+
 
 ParamPath=Params.taurate_final*ones(T,1);
 ParamPathNames={'tau'};
@@ -212,18 +219,18 @@ GeneralEqmEqn_Entry2 = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce;
 GeneralEqmEqnParamNames(2).Names={};
 GeneralEqmEqn_GoodsMarket2 = @(AggVars,GEprices) 1-AggVars;
 
-
-
 GeneralEqmEqns={GeneralEqmEqn_Entry2,GeneralEqmEqn_GoodsMarket2};   
 
-
+%%
 [PricePath]= TransitionPath_Case1(PricePath0, PricePathNames,...
- ParamPath, ParamPathNames, T, V_final, StationaryDist_initial.pdf,...
+ ParamPath, ParamPathNames, T, V_final, StationaryDist_initial,...
    n_d,n_a, n_z, pi_z,d_grid,a_grid,z_grid, ReturnFn, FnsToEvaluate,...
    GeneralEqmEqns, Params, DiscountFactorParamNames,...
     ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
-    transpathoptions)%, vfoptions, simoptions, EntryExitParamNames);
+    transpathoptions, vfoptions, simoptions, EntryExitParamNames);
 
 end
+
+%%%%%% DiscountFactorParamNames should be of length one
 
 toc;
