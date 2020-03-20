@@ -16,14 +16,14 @@ n=40;
 save parameterfile  betaa varpi al ah sigmaa deltaa alphaa
 
 
-pi_p0=1.76;
-pi_g0=1.47;
+pi_p0=0.1;
+pi_g0=0.1;
 
-pi_pF_obser=1.4;
-pi_gF_obser=0.7;
+pi_pF_obser=0.1;
+pi_gF_obser=0.1;
 
 pi_pF_simul=0.8;
-pi_gF_simul=0.8;
+pi_gF_simul=-0.8;
 
 %%
 %pi_p0=1.027/1.008; %2011 2.7 p.m.
@@ -44,8 +44,8 @@ y_obser = y(1:n);
 i_obser = i(1:n);
 k_obser = k(1:n);
 c_obser = c(1:n);
-kl_obser = kl(1:n);
-kh_obser = kh(1:n);
+%kl_obser = kl(1:n);
+%kh_obser = kh(1:n);
 
 %% 
 %dynare model_simul
@@ -56,8 +56,8 @@ y_simul = y(1:n);
 i_simul = i(1:n);
 k_simul = k(1:n);
 c_simul = c(1:n);
-kl_simul = kl(1:n);
-kh_simul = kh(1:n);
+%kl_simul = kl(1:n);
+%kh_simul = kh(1:n);
 
 
 %% Graphs
@@ -117,23 +117,23 @@ title(['Capital Output Ratio (observed)'],'FontSize',8,'FontWeight','bold');
 legend('observed','alternative', 'Location', 'Best')
 
 
-subplot(2,1,1);
-plot(kl_obser);
-hold on
-plot(kl_simul,'r');
-set(gca,'Fontsize',8);
+%subplot(2,1,1);
+%plot(kl_obser);
+%hold on
+%plot(kl_simul,'r');
+%set(gca,'Fontsize',8);
 %xlim([2003 2017]);
-title(['low-tecnhology capital'],'FontSize',8,'FontWeight','bold');
-legend('observed','alternative', 'Location', 'Best')
-subplot(2,1,2);
-plot(kh_obser);
-hold on
-plot(kh_simul,'r');
-set(gca,'Fontsize',8);
+%title(['low-tecnhology capital'],'FontSize',8,'FontWeight','bold');
+%legend('observed','alternative', 'Location', 'Best')
+%subplot(2,1,2);
+%plot(kh_obser);
+%hold on
+%plot(kh_simul,'r');
+%set(gca,'Fontsize',8);
 %xlim([2003 2017]);
-title(['high-technology capital'],'FontSize',8,'FontWeight','bold');
-legend('observed','alternative', 'Location', 'Best')
-snapnow
+%title(['high-technology capital'],'FontSize',8,'FontWeight','bold');
+%legend('observed','alternative', 'Location', 'Best')
+%snapnow
 
 %% Selected Graphs
 

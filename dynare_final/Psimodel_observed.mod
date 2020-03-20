@@ -6,7 +6,7 @@
 */
 
 //% Variable names
-var c y k ;
+var c y k i;
 
 // list of exogenous variables 
 varexo pi_g pi_p;
@@ -58,28 +58,30 @@ y = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(k(-1)^(alphaa*varpi))*(k(-1
 
 [name='Euler Equation']
 
-c^(-sigmaa) = betaa*(c(+1)^(-sigmaa))*(alphaa*(y/k)+(1-deltaa));
+c^(-sigmaa) = betaa*((c(+1)^(-sigmaa))*(alphaa*(y(+1)/k)+(1-deltaa)));
 
 
 [name='Budget Constrain']
 
-c= y - ((k) -(1-deltaa)*k);
+y= c + ((k -(1-deltaa)*k(-1)));
 
+[name='Investment']
+i = y-c;
 
 end;
-
+ 
 %----------------------------------------------------------------
-% 4. steadexp(y) state
+% 4. steady state
 %----------------------------------------------------------------
 steady_state_model;
 
-k = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
+k = ((alphaa*((ah*(1-pi_p))^varpi*(al*(1-pi_g))^(1-varpi)))/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
 
-y = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa; // output
+y = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*k^alphaa; // output
 
-c= (((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa) - deltaa*(ah*(1-pi_p))^varpi*(al*(1-pi_g))^(1-varpi)*(alphaa/(1/betaa-(1-deltaa)))^(1/(1-alphaa)); // consumption
+c= y - deltaa*k;
 
-
+i = y-c;
 
 end;
 
@@ -90,12 +92,8 @@ end;
 %----------------------------------------------------------------
 initval;
 
-%pi_p = pi_p0;
-%pi_g =pi_g0;
-
-pi_p = 0.2;
-pi_g =0.2;
-
+pi_p = pi_p0;
+pi_g =pi_g0;
 
 k = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
 
@@ -103,10 +101,12 @@ y = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*
 
 c= (((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa) - deltaa*(ah*(1-pi_p))^varpi*(al*(1-pi_g))^(1-varpi)*(alphaa/(1/betaa-(1-deltaa)))^(1/(1-alphaa)); // consumption
 
+i = y-c;
 
 end;
+resid
 //steady(solve_algo=4,maxit=100);
-//check;
+check;
 //Computes the eigenvalues of the model linearized around the values specified by the last initval, endval or steady statement. Generally, the eigenvalues are only meaningful if the linearization is done around a steady state of the model. It is a device for local analysis in the neighborhoodof this steady state (Dynare Manual).
 
 
@@ -115,11 +115,9 @@ end;
 %----------------------------------------------------------------
 endval;
 
-%pi_p = pi_pF_obser;
-%pi_g =pi_gF_obser;
+pi_p = pi_pF_obser;
+pi_g =pi_gF_obser;
 
-pi_p = 0.4;
-pi_g =0.2;
 
 
 k = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
@@ -128,7 +126,7 @@ y = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*
 
 c= (((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa) - deltaa*(ah*(1-pi_p))^varpi*(al*(1-pi_g))^(1-varpi)*(alphaa/(1/betaa-(1-deltaa)))^(1/(1-alphaa)); // consumption
 
-
+i = y-c;
 
 end;
 //steady(solve_algo=4,maxit=300);
@@ -158,7 +156,7 @@ perfect_foresight_solver(maxit=20,no_homotopy);
 
 resid;
 
-///model_diagnostics(M_, options_, oo_)
+
 %----------------------------------------------------------------
 % 8. plots
 %----------------------------------------------------------------
