@@ -8,7 +8,7 @@ al =  1;
 ah =1.5;
 sigmaa = 0.63;
 deltaa = 0.04; 
-alphaa = 0.6;
+alphaa = 0.45;
 
 % periods in the plot
 n=40;
