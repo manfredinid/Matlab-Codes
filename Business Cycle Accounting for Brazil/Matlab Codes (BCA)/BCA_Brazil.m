@@ -1,4 +1,4 @@
-% This program performs a Business Cycle Accounting excercise for argentina
+% This program performs a Business Cycle Accounting excercise for Brazil
 clear all;
 close all;
 % Load Data
