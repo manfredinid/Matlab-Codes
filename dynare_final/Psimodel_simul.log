@@ -1,6 +1,6 @@
 Starting preprocessing of the model file ...
-WARNING: Psimodel_simul.mod:144.1-19: The 'simul' statement is deprecated. Please use 'perfect_foresight_setup' and 'perfect_foresight_solver' instead.
-Found 4 equation(s).
+WARNING: Psimodel_simul.mod:155.1-19: The 'simul' statement is deprecated. Please use 'perfect_foresight_setup' and 'perfect_foresight_solver' instead.
+Found 5 equation(s).
 Evaluating expressions...done
 Computing static model derivatives (order 1).
 Computing dynamic model derivatives (order 1).
@@ -25,11 +25,12 @@ The rank condition is verified.
 --------------------------------------------------------
 MODEL SIMULATION:
 
-Iter: 1,	 err. = 4.36894,	 time = 0.064
-Iter: 2,	 err. = 0.0364289,	 time = 0.015
-Iter: 3,	 err. = 3.99348e-06,	 time = 0.009
+Iter: 1,	 err. = 7.57921,	 time = 0.03
+Iter: 2,	 err. = 0.101513,	 time = 0.006
+Iter: 3,	 err. = 2.87052e-05,	 time = 0.004
+Iter: 4,	 err. = 3.18505e-09,	 time = 0.008
 
-Total time of simulation: 0.098.
+Total time of simulation: 0.063.
 --------------------------------------------------------
 
 Perfect foresight solution found.
@@ -38,11 +39,12 @@ Perfect foresight solution found.
 --------------------------------------------------------
 MODEL SIMULATION:
 
-Iter: 1,	 err. = 4.36894,	 time = 0.007
-Iter: 2,	 err. = 0.0364289,	 time = 0.008
-Iter: 3,	 err. = 3.99348e-06,	 time = 0.029
+Iter: 1,	 err. = 7.57921,	 time = 0.011
+Iter: 2,	 err. = 0.101513,	 time = 0.008
+Iter: 3,	 err. = 2.87052e-05,	 time = 0.006
+Iter: 4,	 err. = 3.18505e-09,	 time = 0.008
 
-Total time of simulation: 0.049.
+Total time of simulation: 0.043.
 --------------------------------------------------------
 
 Perfect foresight solution found.
@@ -57,6 +59,7 @@ Equation number 1 : 0 : Aggregate Output
 Equation number 2 : 0 : Euler Equation
 Equation number 3 : 0 : Budget Constrain
 Equation number 4 : 0 : Investment
+Equation number 5 : 0 : TFP
 
 
 Total computing time : 0h00m00s

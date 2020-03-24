@@ -18,9 +18,11 @@ function T = dynamic_g1_tt(T, y, x, params, steady_state, it_)
 %   T           [#temp variables by 1]       double  vector of temporary terms
 %
 
-assert(length(T) >= 7);
+assert(length(T) >= 9);
 
 T = Psimodel_observed.dynamic_resid_tt(T, y, x, params, steady_state, it_);
 
+T(8) = T(1)*(-params(3))*getPowerDeriv(params(3)*(1-x(it_, 1)),1-params(1),1);
+T(9) = T(2)*(-params(4))*getPowerDeriv(params(4)*(1-x(it_, 2)),params(1),1);
 
 end

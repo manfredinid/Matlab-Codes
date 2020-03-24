@@ -16,24 +16,24 @@ n=100;
 save parameterfile  betaa varpi al ah sigmaa deltaa alphaa
 
 
-pi_p0=0;
-pi_g0=0;
+psi_h0=0;
+psi_l0=0;
 
-pi_pF_obser=0.3;
-pi_gF_obser=-0.2;
+psi_hF_obser=0.1;
+psi_lF_obser=-0.1;
 
-pi_pF_simul=0.1;
-pi_gF_simul=0.1;
+psi_hF_simul=0.2;
+psi_lF_simul=-0.2;
 
 %%
-%pi_p0=1.027/1.008; %2011 2.7 p.m.
-%pi_g0=1; % 2011 0.8 p.m.
+%psi_h0=1.027/1.008; %2011 2.7 p.m.
+%psi_l0=1; % 2011 0.8 p.m.
 
-%pi_pF_obser=1.0356/1.008; %2013 2.36 p.m. % 2017 3.56
-%pi_gF_obser= 1; %2013 0.6 p.m.  % 2017 0.79
+%psi_hF_obser=1.0356/1.008; %2013 2.36 p.m. % 2017 3.56
+%psi_lF_obser= 1; %2013 0.6 p.m.  % 2017 0.79
  
-%pi_pF_simul=1;
-%pi_gF_simul=1;
+%psi_hF_simul=1;
+%psi_lF_simul=1;
 
 %%
 %dynare model_observed
@@ -44,6 +44,7 @@ y_obser = y(1:n);
 i_obser = i(1:n);
 k_obser = k(1:n);
 c_obser = c(1:n);
+TFP_obser = tfp(1:n);
 %kl_obser = kl(1:n);
 %kh_obser = kh(1:n);
 
@@ -56,6 +57,7 @@ y_simul = y(1:n);
 i_simul = i(1:n);
 k_simul = k(1:n);
 c_simul = c(1:n);
+TFP_simul = tfp(1:n);
 %kl_simul = kl(1:n);
 %kh_simul = kh(1:n);
 
@@ -86,12 +88,12 @@ legend('observed','alternative', 'Location', 'Best')
 
 
 subplot(2,2,3);
-plot(k_obser./k_obser(1));
+plot(TFP_obser./TFP_obser(1));
 hold on
-plot(k_simul./k_simul(1),'r');
+plot(TFP_simul./TFP_simul(1),'r');
 set(gca,'Fontsize',8);
 %xlim([2003 2017]);
-title(['Capital'],'FontSize',8,'FontWeight','bold');
+title(['TFP'],'FontSize',8,'FontWeight','bold');
 legend('observed','alternative', 'Location', 'Best')
 
 

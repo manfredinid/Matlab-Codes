@@ -18,7 +18,7 @@ function g1 = static_g1(T, y, x, params, T_flag)
 if T_flag
     T = Psimodel_observed.static_g1_tt(T, y, x, params);
 end
-g1 = zeros(4, 4);
+g1 = zeros(5, 5);
 g1(1,2)=1;
 g1(1,3)=(-(T(3)*T(1)*getPowerDeriv(y(3),params(1)*params(8),1)+T(2)*getPowerDeriv(y(3),(1-params(1))*params(8),1)));
 g1(2,1)=T(5)-params(2)*(params(8)*y(2)/y(3)+1-params(6))*T(5);
@@ -30,6 +30,7 @@ g1(3,3)=(-(1-(1-params(6))));
 g1(4,1)=1;
 g1(4,2)=(-1);
 g1(4,4)=1;
+g1(5,5)=1;
 if ~isreal(g1)
     g1 = real(g1)+2*imag(g1);
 end

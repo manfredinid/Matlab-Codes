@@ -6,10 +6,10 @@
 */
 
 //% Variable names
-var c y k i;
+var c y k i tfp;
 
 // list of exogenous variables 
-varexo pi_g pi_p;
+varexo psi_l psi_h;
 
 // list of parameters
 parameters varpi $\varpi$, 
@@ -51,7 +51,7 @@ theta = (1-varpi)/varpi;
 model;
 
 [name='Aggregate Output']
-y = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(k(-1)^(alphaa*varpi))*(k(-1)^(alphaa*(1-varpi)));
+y = ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(k(-1)^(alphaa*varpi))*(k(-1)^(alphaa*(1-varpi)));
 
 
 [name='Euler Equation']
@@ -65,19 +65,25 @@ y= c + ((k -(1-deltaa)*k(-1)));
 
 [name='Investment']
 i = y-c;
+
+[name='TFP']
+tfp= ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi));
 end;
 %----------------------------------------------------------------
 % 4. steadexp(y) state
 %----------------------------------------------------------------
 steady_state_model;
 
-k = ((alphaa*((ah*(1-pi_p))^varpi*(al*(1-pi_g))^(1-varpi)))/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
+k = ((alphaa*((ah*(1-psi_h))^varpi*(al*(1-psi_l))^(1-varpi)))/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
 
-y = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*k^alphaa; // output
+y = ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*k^alphaa; // output
 
 c= y - deltaa*k;
 
 i = y-c;
+
+tfp= ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi));
+
 end;
 
 
@@ -87,17 +93,19 @@ end;
 %----------------------------------------------------------------
 initval;
 
-pi_p = pi_p0;
-pi_g =pi_g0;
+psi_h = psi_h0;
+psi_l =psi_l0;
 
 
-k = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
+k = ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
 
-y = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa; // output
+y = ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa; // output
 
-c= (((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa) - deltaa*(ah*(1-pi_p))^varpi*(al*(1-pi_g))^(1-varpi)*(alphaa/(1/betaa-(1-deltaa)))^(1/(1-alphaa)); // consumption
+c= (((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa) - deltaa*(ah*(1-psi_h))^varpi*(al*(1-psi_l))^(1-varpi)*(alphaa/(1/betaa-(1-deltaa)))^(1/(1-alphaa)); // consumption
 
 i = y-c;
+
+tfp= ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi));
 end;
 //steady(solve_algo=4,maxit=100);
 check;
@@ -109,29 +117,32 @@ check;
 %----------------------------------------------------------------
 endval;
 
-pi_p = pi_pF_simul;
-pi_g =pi_gF_simul;
+psi_h = psi_hF_simul;
+psi_l =psi_lF_simul;
 
 
-k = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
+k = ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa));
 
-y = ((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa; // output
+y = ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa; // output
 
-c= (((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(((ah*(1-pi_p))^varpi)*((al*(1-pi_g))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa) - deltaa*(ah*(1-pi_p))^varpi*(al*(1-pi_g))^(1-varpi)*(alphaa/(1/betaa-(1-deltaa)))^(1/(1-alphaa)); // consumption
+c= (((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(alphaa/((1/betaa)-(1-deltaa)))^(1/(1-alphaa)))^alphaa) - deltaa*(ah*(1-psi_h))^varpi*(al*(1-psi_l))^(1-varpi)*(alphaa/(1/betaa-(1-deltaa)))^(1/(1-alphaa)); // consumption
 
 i = y-c;
+
+tfp= ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi));
+
 end;
 //steady(solve_algo=4,maxit=300);
 
 //figure; plot(log(linspace(exp(3.5),exp(4.12),100)))
 //shocks;
 
-//var pi_p;
+//var psi_h;
 //periods 1:50;
 //values (log(linspace(exp(1.12),exp(1.09),50)));
 
 
-//var pi_p;
+//var psi_h;
 //periods 1:180;
 //values (log(linspace(exp(3.6),exp(4.2),180)));
 //end;
@@ -158,8 +169,8 @@ resid;
 //rplot k;
 //rplot y;
 //rplot c;
-//rplot pi_g;
-//rplot pi_p;
+//rplot psi_l;
+//rplot psi_h;
 //rplot i;
 
 //dynasave(modelsimul);

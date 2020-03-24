@@ -22,12 +22,12 @@ function residual = dynamic_resid(T, y, x, params, steady_state, it_, T_flag)
 if T_flag
     T = Psimodel_observed.dynamic_resid_tt(T, y, x, params, steady_state, it_);
 end
-residual = zeros(4, 1);
+residual = zeros(5, 1);
 lhs = y(3);
 rhs = T(5)*T(6);
 residual(1) = lhs - rhs;
 lhs = y(2)^(-params(5));
-rhs = params(2)*T(7)*(params(8)*y(7)/y(4)+1-params(6));
+rhs = params(2)*T(7)*(params(8)*y(8)/y(4)+1-params(6));
 residual(2) = lhs - rhs;
 lhs = y(3);
 rhs = y(2)+y(4)-y(1)*(1-params(6));
@@ -35,5 +35,8 @@ residual(3) = lhs - rhs;
 lhs = y(5);
 rhs = y(3)-y(2);
 residual(4) = lhs - rhs;
+lhs = y(6);
+rhs = T(3);
+residual(5) = lhs - rhs;
 
 end

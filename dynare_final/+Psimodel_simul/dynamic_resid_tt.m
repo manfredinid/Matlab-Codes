@@ -26,6 +26,6 @@ T(3) = T(1)*T(2);
 T(4) = y(1)^(params(1)*params(8));
 T(5) = T(3)*T(4);
 T(6) = y(1)^((1-params(1))*params(8));
-T(7) = y(6)^(-params(5));
+T(7) = y(7)^(-params(5));
 
 end

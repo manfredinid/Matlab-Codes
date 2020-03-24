@@ -3,7 +3,7 @@ function [nzij_pred, nzij_current, nzij_fwrd] = dynamic_g1_nz()
   nzij_pred = zeros(2, 2, 'int32');
   nzij_pred(1,1)=1; nzij_pred(1,2)=3;
   nzij_pred(2,1)=3; nzij_pred(2,2)=3;
-  nzij_current = zeros(9, 2, 'int32');
+  nzij_current = zeros(10, 2, 'int32');
   nzij_current(1,1)=2; nzij_current(1,2)=1;
   nzij_current(2,1)=3; nzij_current(2,2)=1;
   nzij_current(3,1)=4; nzij_current(3,2)=1;
@@ -13,6 +13,7 @@ function [nzij_pred, nzij_current, nzij_fwrd] = dynamic_g1_nz()
   nzij_current(7,1)=2; nzij_current(7,2)=3;
   nzij_current(8,1)=3; nzij_current(8,2)=3;
   nzij_current(9,1)=4; nzij_current(9,2)=4;
+  nzij_current(10,1)=5; nzij_current(10,2)=5;
   nzij_fwrd = zeros(2, 2, 'int32');
   nzij_fwrd(1,1)=2; nzij_fwrd(1,2)=1;
   nzij_fwrd(2,1)=2; nzij_fwrd(2,2)=2;

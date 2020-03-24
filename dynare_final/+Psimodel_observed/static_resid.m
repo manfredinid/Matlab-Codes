@@ -18,7 +18,7 @@ function residual = static_resid(T, y, x, params, T_flag)
 if T_flag
     T = Psimodel_observed.static_resid_tt(T, y, x, params);
 end
-residual = zeros(4, 1);
+residual = zeros(5, 1);
 lhs = y(2);
 rhs = T(2)*T(3);
 residual(1) = lhs - rhs;
@@ -31,6 +31,9 @@ residual(3) = lhs - rhs;
 lhs = y(4);
 rhs = y(2)-y(1);
 residual(4) = lhs - rhs;
+lhs = y(5);
+rhs = T(1);
+residual(5) = lhs - rhs;
 if ~isreal(residual)
   residual = real(residual)+imag(residual).^2;
 end
