@@ -1,0 +1,63 @@
+Starting preprocessing of the model file ...
+WARNING: Psimodel_simul.mod:144.1-19: The 'simul' statement is deprecated. Please use 'perfect_foresight_setup' and 'perfect_foresight_solver' instead.
+Found 4 equation(s).
+Evaluating expressions...done
+Computing static model derivatives (order 1).
+Computing dynamic model derivatives (order 1).
+Processing outputs ...
+done
+Preprocessing completed.
+
+EIGENVALUES:
+         Modulus             Real        Imaginary
+
+          0.9136           0.9136                0
+           1.216            1.216                0
+             Inf              Inf                0
+
+
+There are 2 eigenvalue(s) larger than 1 in modulus 
+for 2 forward-looking variable(s)
+
+The rank condition is verified.
+
+
+--------------------------------------------------------
+MODEL SIMULATION:
+
+Iter: 1,	 err. = 4.36894,	 time = 0.064
+Iter: 2,	 err. = 0.0364289,	 time = 0.015
+Iter: 3,	 err. = 3.99348e-06,	 time = 0.009
+
+Total time of simulation: 0.098.
+--------------------------------------------------------
+
+Perfect foresight solution found.
+
+
+--------------------------------------------------------
+MODEL SIMULATION:
+
+Iter: 1,	 err. = 4.36894,	 time = 0.007
+Iter: 2,	 err. = 0.0364289,	 time = 0.008
+Iter: 3,	 err. = 3.99348e-06,	 time = 0.029
+
+Total time of simulation: 0.049.
+--------------------------------------------------------
+
+Perfect foresight solution found.
+
+
+
+
+
+Residuals of the static equations:
+
+Equation number 1 : 0 : Aggregate Output
+Equation number 2 : 0 : Euler Equation
+Equation number 3 : 0 : Budget Constrain
+Equation number 4 : 0 : Investment
+
+
+Total computing time : 0h00m00s
+Note: 1 warning(s) encountered in the preprocessor
