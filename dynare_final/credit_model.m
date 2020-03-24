@@ -5,25 +5,25 @@ close all;
 betaa =0.9;  
 varpi = 0.5;
 al =  1;
-ah =1.5;
-sigmaa = 0.63;
-deltaa = 0.04; 
-alphaa = 0.6;
+ah =3;
+sigmaa = 1;
+deltaa = 0.025; 
+alphaa = 0.45;
 
 % periods in the plot
-n=40;
+n=100;
 
 save parameterfile  betaa varpi al ah sigmaa deltaa alphaa
 
 
-pi_p0=0.1;
-pi_g0=0.1;
+pi_p0=0;
+pi_g0=0;
 
-pi_pF_obser=0.1;
-pi_gF_obser=0.1;
+pi_pF_obser=0.3;
+pi_gF_obser=-0.2;
 
-pi_pF_simul=0.8;
-pi_gF_simul=-0.8;
+pi_pF_simul=0.1;
+pi_gF_simul=0.1;
 
 %%
 %pi_p0=1.027/1.008; %2011 2.7 p.m.
@@ -66,9 +66,9 @@ figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|-.|--|:','DefaultLineLineWidth',0.8);
 subplot(2,2,1);
-plot(c_obser);
+plot(c_obser./c_obser(1));
 hold on
-plot(c_simul,'r');
+plot(c_simul./c_simul(1),'r');
 set(gca,'Fontsize',8);
 %xlim([2003 2017]);
 title(['Consumption'],'FontSize',8,'FontWeight','bold');
@@ -76,9 +76,9 @@ legend('observed','alternative', 'Location', 'Best')
 
 
 subplot(2,2,2);
-plot(i_obser);
+plot(i_obser./i_obser(1));
 hold on
-plot(i_simul,'r');
+plot(i_simul./i_simul(1),'r');
 set(gca,'Fontsize',8);
 %xlim([2003 2017]);
 title(['Investment'],'FontSize',8,'FontWeight','bold');
@@ -86,9 +86,9 @@ legend('observed','alternative', 'Location', 'Best')
 
 
 subplot(2,2,3);
-plot(k_obser);
+plot(k_obser./k_obser(1));
 hold on
-plot(k_simul,'r');
+plot(k_simul./k_simul(1),'r');
 set(gca,'Fontsize',8);
 %xlim([2003 2017]);
 title(['Capital'],'FontSize',8,'FontWeight','bold');
@@ -96,9 +96,9 @@ legend('observed','alternative', 'Location', 'Best')
 
 
 subplot(2,2,4);
-plot(y_obser);
+plot(y_obser./y_obser(1));
 hold on
-plot(y_simul,'r');
+plot(y_simul./y_simul(1),'r');
 set(gca,'Fontsize',8);
 %xlim([2003 2017]);
 title(['Output'],'FontSize',8,'FontWeight','bold');
