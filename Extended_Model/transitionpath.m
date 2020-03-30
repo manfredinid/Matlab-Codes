@@ -6,7 +6,7 @@ transpathoptions.agententryandexit=1;
 transpathoptions.parallel=2;
 transpathoptions.exoticpreferences=0;
 transpathoptions.weightscheme=1;
-transpathoptions.verbose=1
+
 
 %% Return Function
 DiscountFactorParamNames={'beta'};
@@ -36,13 +36,12 @@ PricePath0_p=[linspace(Params_initial.p, Params_final.p, floor(T/2))'; Params_fi
 PricePath0_Ne=[linspace(Params_initial.Ne, Params_final.Ne, floor(T/2))'; Params_final.Ne*ones(T-floor(T/2),1)]; % PricePath0 is matrix of size T-by-'number of prices'
 PricePath0=[PricePath0_p, PricePath0_Ne]; % PricePath0 is matrix of size T-by-'number of prices'
 PricePathNames={'p','Ne'};
-
+%%
 % Rewrite the General Eqm conditions as rules for updating the price
 transpathoptions.specialgeneqmcondn={'entry',0};
 
  % Alternative attempt, based on minimizing weighted sum of squares.
-    transpathoptions.GEnewprice=3;
-    transpathoptions.weightsforpath=ones(T,3); % Same size as PricePath
+    transpathoptions.weightsforpath=ones(T,2); % Same size as PricePath
 
 GeneralEqmEqnParamNames(1).Names={'beta','ce'};
 GeneralEqmEqn_Entry2 = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce;
@@ -50,7 +49,7 @@ GeneralEqmEqnParamNames(2).Names={};
 GeneralEqmEqn_GoodsMarket2 = @(AggVars,GEprices) 1-AggVars;
 
 GeneralEqmEqns={GeneralEqmEqn_Entry2,GeneralEqmEqn_GoodsMarket2};   
-
+%%
 [PricePath]= TransitionPath_Case1(PricePath0, PricePathNames,...
  ParamPath, ParamPathNames, T, V_final, StationaryDist_initial,...
    n_d,n_a, n_z, pi_z,d_grid,a_grid,z_grid, ReturnFn, FnsToEvaluate,...

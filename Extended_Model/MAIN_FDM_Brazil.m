@@ -178,6 +178,7 @@ ParamPath=Params.taurate_final*ones(T,1);
 ParamPathNames={'tau'};
 
 transpathoptions.verbose=1
+transpathoptions.GEnewprice=2
 transitionpath
 
 
