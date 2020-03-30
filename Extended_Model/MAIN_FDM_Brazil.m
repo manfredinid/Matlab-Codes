@@ -5,7 +5,7 @@ clear all;
 close all;
 
 Parallel=2 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 1 % 1 to SKIP transition path
+SkipInitialFinal= 0 % 1 to SKIP transition path
 
 
 tic;
@@ -177,6 +177,7 @@ Params=Params_initial;
 ParamPath=Params.taurate_final*ones(T,1);
 ParamPathNames={'tau'};
 
+transpathoptions.verbose=1
 transitionpath
 
 
