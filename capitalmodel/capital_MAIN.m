@@ -5,7 +5,7 @@ clear all;
 close all;
 
 Parallel=2 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 1 % 1 to SKIP transition path
+SkipInitialFinal= 0 % 1 to SKIP transition path
 
 
 tic;
@@ -136,7 +136,7 @@ Params.p=1; % output price
 Params.Ne=0.5; % total mass of new entrants
 
 % Parameters and initialization options
-Parameters_FDM_Brazil;
+capital_Parameters;
 
 % Find equilibrium prices
 heteroagentoptions.verbose=1;
