@@ -34,6 +34,7 @@ AggVars
 % We need to give an initial guess for the price path on interest rates
 PricePath0_p=[linspace(Params_initial.p, Params_final.p, floor(T/2))'; Params_final.p*ones(T-floor(T/2),1)]; % PricePath0 is matrix of size T-by-'number of prices'
 PricePath0_Ne=[linspace(Params_initial.Ne, Params_final.Ne, floor(T/2))'; Params_final.Ne*ones(T-floor(T/2),1)]; % PricePath0 is matrix of size T-by-'number of prices'
+PricePath0_r=[linspace(Params_initial.r, Params_final.r, floor(T/2))'; Params_final.r*ones(T-floor(T/2),1)]; % PricePath0 is matrix of size T-by-'number of prices'
 PricePath0=[PricePath0_p, PricePath0_Ne]; % PricePath0 is matrix of size T-by-'number of prices'
 PricePathNames={'p','Ne'};
 %%

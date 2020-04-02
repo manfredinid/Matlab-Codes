@@ -12,16 +12,13 @@ transpathoptions.weightscheme=1;
 DiscountFactorParamNames={'beta'};
 
 ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost)...
-FDM_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost);
+capital_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma, delta, taurate,subsidyrate, cf, gcost);
 
 ReturnFnParamNames={ 'p','r', 'alpha','gamma', 'delta','taurate','subsidyrate', 'cf', 'gcost'};
 %%
 FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
 FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,...
-    r,p,taurate,subsidyrate) p*(1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))...
-    )*z1_val*(aprime_val^alpha)*(...
-    ((((1-(taurate*(z2_val>=0)-subsidyrate*(z2_val<0))...
-    )*z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma);  
+    r,p,taurate,subsidyrate) p*z1_val*(aprime_val^alpha)*(nbar^gamma);  
 
 FnsToEvaluate={FnsToEvaluateFn_output}
 

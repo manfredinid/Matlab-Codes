@@ -5,7 +5,7 @@ clear all;
 close all;
 
 Parallel=2 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 0 % 1 to SKIP transition path
+SkipInitialFinal= 1 % 1 to SKIP transition path
 
 
 tic;
@@ -29,7 +29,7 @@ Params.subsidyrate=0.01; % This is the rate for the subsidy.
 %psi_grid = linspace(-1,1,n_psi)'; % Incumbest first draws
 %psi_dist =betarnd(.5,.4, 1, n_psi); % Entrants probability distribution
 psi_grid = [-1; 0; 1]; % Incumbest first draws
-psi_dist = [0.3; 0.2; 0.5]; % Entrants probability distribution
+psi_dist = [1; 0; 0]; % Entrants probability distribution
 % Why I did not use just 3 values in the psi_grid?
 % Because this way I have more control over the probability distribution of psi
 % Maybe a 3 variables grid was best - it was not
@@ -39,9 +39,9 @@ Params.p=1; % output pricecap
 Params.Ne=0.5; % total mass of new entrants
 %%
 % Parameters and initialization options
-Parameters_FDM_Brazil;
+capital_Parameters;
 % Stationary Equilibrium and Results
-SS_FDM_Brazil;
+capitalSS;
 
 
 %% Transition Path
@@ -89,7 +89,7 @@ Params.p=1; % output price
 Params.Ne=0.5; % total mass of new entrants
 
 % Parameters and initialization options
-Parameters_FDM_Brazil;
+capital_Parameters;
 
 % Find equilibrium prices
 heteroagentoptions.verbose=1;
@@ -179,7 +179,7 @@ ParamPathNames={'tau'};
 
 transpathoptions.verbose=1
 transpathoptions.GEnewprice=2
-transitionpath
+capital_transitionpath
 
 
 save ./SavedOutput/PricePath
