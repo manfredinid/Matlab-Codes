@@ -37,9 +37,9 @@ psi_lF_simul=-0.2;
 
 %%
 %dynare model_observed
-dynare Psimodel_observed
+dynare capitalpsi_obser
 
-load('Psimodel_observed_results.mat')
+load('capitalpsi_obser_results.mat')
 y_obser = y(1:n);
 i_obser = i(1:n);
 k_obser = k(1:n);
@@ -50,9 +50,9 @@ TFP_obser = tfp(1:n);
 
 %% 
 %dynare model_simul
-dynare Psimodel_simul
+dynare capitalpsi_simul
 
-load('Psimodel_simul_results.mat')
+load('capitalpsi_simul_results.mat')
 y_simul = y(1:n);
 i_simul = i(1:n);
 k_simul = k(1:n);

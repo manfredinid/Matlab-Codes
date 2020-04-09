@@ -59,7 +59,7 @@ FnsToEvaluateFn_taxsubnone=  @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,.
 
 FnsToEvaluateParamNames(8).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
 FnsToEvaluateFn_outputsub=  @(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,...
-    r,p,taurate,subsidyrate) (z2_val<0)*z1_val*(aprime_val^alpha)*...
+    r,p,taurate,subsidyrate) (z2_val<0)*p*z1_val*(aprime_val^alpha)*...
     (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)))^gamma;
 
 FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output,FnsToEvaluateFn_nbar,...
@@ -105,10 +105,10 @@ Output.perK=AggVars(1)/StationaryDist.mass;
 
 %%
 
-Establishments_sub=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(7,:,:,:),1)==4))));
-Establishments100_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(7,:,:,:),1)==2))));
+Establishments_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(7,:,:,:),1)==4))));
+Establishments_sub=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(7,:,:,:),1)==2))));
 Establishments_none=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(7,:,:,:),1)==3))));
-Percentage_tax = [Establishments100_tax    Establishments_none    Establishments_sub] ;
+Percentage_tax = [Establishments_tax    Establishments_none    Establishments_sub] ;
 
 
 Non_producing=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(3,:,:,:),1)<=0))));

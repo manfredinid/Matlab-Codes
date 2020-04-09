@@ -5,7 +5,7 @@ clear all;
 close all;
 
 Parallel=2 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-SkipInitialFinal= 0 % 1 to SKIP transition path
+SkipInitialFinal= 1 % 1 to SKIP transition path
 
 
 tic;
@@ -22,14 +22,14 @@ fprintf(2,'\nStacionary Equilibrium\n')
 %Policy parameters
 Params.gcost=0.01;   
 % Distortions
-Params.taurate=0.08; % This is the rate for the tax.
-Params.subsidyrate=0.01; % This is the rate for the subsidy.
+Params.taurate=0.14; % This is the rate for the tax.
+Params.subsidyrate=0.14; % This is the rate for the subsidy.
 
 % subsidy-tax distribution (new entrants)
 %psi_grid = linspace(-1,1,n_psi)'; % Incumbest first draws
 %psi_dist =betarnd(.5,.4, 1, n_psi); % Entrants probability distribution
 psi_grid = [-1; 0; 1]; % Incumbest first draws
-psi_dist = [1; 0; 0]; % Entrants probability distribution
+psi_dist = [0; 1; 0]; % Entrants probability distribution
 % Why I did not use just 3 values in the psi_grid?
 % Because this way I have more control over the probability distribution of psi
 % Maybe a 3 variables grid was best - it was not
@@ -58,7 +58,7 @@ Params.subsidyrate_initial=0.2; % This is the rate for the subsidy.
 Params.gcost_initial=0.01;
 
 psi_grid_initial = [-1; 0; 1]; % Incumbest first draws
-psi_dist_initial =[0.3; 0.2; 0.5]; 
+psi_dist_initial =[0; 0.5; 0.5]; 
 
 % FINAL
 Params.taurate_final=0.6; % This is the rate for the tax.

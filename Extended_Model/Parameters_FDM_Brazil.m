@@ -135,6 +135,8 @@ disp('vector(s) of exogenous state variable')
 disp(n_z)
 disp('vector(s) of decision variabes')
 disp(n_d)
+disp('Transition Matrix for Exogenous States')
+size(pi_z)
 
 %% Potential New Entrants Distribution over the states (s, psi, k)
 

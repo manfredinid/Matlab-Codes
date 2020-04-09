@@ -6,7 +6,7 @@
 */
 
 //% Variable names
-var c y k i tfp;
+var c y kh kl rh rl;
 
 // list of exogenous variables 
 varexo psi_l psi_h;
@@ -15,7 +15,6 @@ varexo psi_l psi_h;
 parameters varpi $\varpi$, 
            betaa $\betaa$,
            al $a_l$,
-
            ah $a_h$,
            sigmaa $\sigmaa$,
            deltaa $\deltaa$
@@ -40,9 +39,6 @@ parameters varpi $\varpi$,
  set_param_value('deltaa',deltaa)
  set_param_value('alphaa',alphaa)
 
-a = (ah^varpi)*(al^(1-varpi));
-theta = (1-varpi)/varpi;
-
 
 
 %----------------------------------------------------------------
@@ -53,7 +49,7 @@ model;
 
 
 [name='Aggregate Output']
-y = ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(k(-1)^(alphaa*varpi))*(k(-1)^(alphaa*(1-varpi)));
+y = (ah*kh^alphaa)^varpi*(al*kl^alphaa)^(1-varpi);
 
 
 [name='Euler Equation']
@@ -61,15 +57,12 @@ y = ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi))*(k(-1)^(alphaa*varpi))*(k(
 c^(-sigmaa) = betaa*((c(+1)^(-sigmaa))*(alphaa*(y(+1)/k)+(1-deltaa)));
 
 
-[name='Budget Constrain']
+kh
 
-y= c + ((k -(1-deltaa)*k(-1)));
+kl
 
-[name='Investment']
-i = y-c;
 
-[name='TFP']
-tfp= ((ah*(1-psi_h))^varpi)*((al*(1-psi_l))^(1-varpi));
+
 end;
  
 %----------------------------------------------------------------
