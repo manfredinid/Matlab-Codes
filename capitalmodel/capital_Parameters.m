@@ -36,10 +36,10 @@ Params.beta=0.9;% Discount rate
 Params.alpha=0.3;  % Capital share
 Params.gamma=0.5; % alpha + gamma must be ~= 1
 Params.delta=0.05; % Depreciation rate of physical capital
-Params.cf=1; % Fixed cost of production
+Params.cf=0; % Fixed cost of production
 
 % Entry and Exit
-Params.ce=1; % Fixed cost of entry 
+Params.ce=40; % Fixed cost of entry 
 Params.lambda=0.2; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
@@ -95,7 +95,7 @@ z_grid=[s_grid; psi_grid];
 
 
 % transition matrix for the exogenous z and psi variables
-pi_z=kron( eye(prod(n_psi)),pi_s)';
+pi_z=kron( eye(prod(n_psi)),pi_s);
 
 % Check transition matrix
 %for ii = 1: length(pi_z)
@@ -105,7 +105,7 @@ pi_z=kron( eye(prod(n_psi)),pi_s)';
 %   error('transition matrix sum is not one')
 %end
 %end
-pi_z=pi_z';
+
 
 %% Endogenous state variables
 
@@ -115,7 +115,7 @@ pi_z=pi_z';
 % steady-state capital without distotions
 %%%%% The grid is like the one in the Aiygari example
 k_ss = (Params.alpha/Params.r)^(1-Params.gamma/1-Params.gamma-Params.alpha)*...
-    (Params.gamma)^(Params.gamma/1-Params.alpha-Params.gamma);
+    (Params.gamma)^(Params.gamma/(1-Params.alpha-Params.gamma));
 nk1 = floor(n_a/3); nk2=floor(n_a/3); nk3=n_a-nk1-nk2;
 a_grid = sort([linspace(0,k_ss,nk1),linspace(k_ss+0.0001,3*k_ss,nk2),...
       linspace(3*k_ss+0.0001,15*k_ss,nk3)])';
@@ -150,8 +150,12 @@ cumsum_pistar_psi = cumsum(psi_dist./sum(psi_dist))';
 pistar_psi =(cumsum_pistar_psi-[0,cumsum_pistar_psi(1:end-1)])';
 
 % capital (endogenous state)
-pistar_k = [zeros(n_a-1,1);1];
-cumsum_pistar_k = cumsum(pistar_k);
+%pistar_k = [1;zeros(n_a-1,1)];
+%cumsum_pistar_k = cumsum(pistar_k);
+
+lognk = betarnd(1,0.5,1,n_a);
+cumsum_pistar_k = cumsum(lognk./sum(lognk));
+pistar_k=(cumsum_pistar_k-[0,cumsum_pistar_k(1:end-1)]);
 
 if (abs(1-round(sum(pistar_psi),2)) || abs(1-round(sum(pistar_psi),2))||abs(1-sum(pistar_k)) > 1e-5)
    error('Draws are NOT a PMD.')
@@ -198,7 +202,7 @@ surf(squeeze(Policy(1,:,1,:)))
 %% Aspects of the Endogenous entry
 % Exit is exogenous with probability lambda
 simoptions.agententryandexit=1;
-simoptions.endogenousexit=0;
+%simoptions.endogenousexit=0;
 
 % Probability of being in the (s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
@@ -227,10 +231,7 @@ surf(squeeze(StationaryDist.pdf(:,1,:)))
 
 
 
-%%
-
-
-%Use the toolkit to find the equilibrium price index
+%% Use the toolkit to find the equilibrium price index
 GEPriceParamNames={'p'};
 
 %FnsToEvaluateParamNames(1).Names={};
@@ -241,6 +242,8 @@ heteroagentoptions.specialgeneqmcondn={0,'entry'};
 FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
 FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate)...
 ((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+
+
 
 
 FnsToEvaluate={FnsToEvaluateFn_nbar};
@@ -254,10 +257,10 @@ AggVars
 %%
 GEPriceParamNames={'p', 'Ne'}; 
 GeneralEqmEqnParamNames(1).Names={};
-GeneralEqmEqn_GoodsMarket = @(AggVars,GEprices) 1-AggVars;
+GeneralEqmEqn_GoodsMarket = @(AggVars,p) 1-AggVars;
 
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
-GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
+GeneralEqmEqn_Entry = @(EValueFn,p,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
 
 GeneralEqmEqns={GeneralEqmEqn_GoodsMarket,GeneralEqmEqn_Entry};
 

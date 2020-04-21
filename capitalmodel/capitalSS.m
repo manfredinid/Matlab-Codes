@@ -4,11 +4,11 @@ heteroagentoptions.verbose=1;
 n_p=0;
 % uncomment after erase the 'to be erase' chunks
 % initial value function
-%if vfoptions.parallel==2
-%    V0=zeros([n_a,n_z,'gpuArray']);
-%else
-%    V0=zeros([n_a,n_z]);
-%end
+if vfoptions.parallel==2
+    V0=zeros([n_a,n_z],'gpuArray');
+else
+    V0=zeros([n_a,n_z]);
+end
 
 disp('Calculating price vector corresponding to the stationary eqm')
 [p_eqm,p_eqm_index,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(V0,...
@@ -194,6 +194,9 @@ fprintf('%9.2f  %12.2f  %19.2f  \n',Percentage_tax )
 fprintf('Firms without production        Total(just for checking)  \n' )
 fprintf('%9.2f  %25.2f  \n', Non_total)
 
-[AggVars(4)  AggVars(5)  AggVars(6)]
 
-Output.K/Output.Y
+%%
+figure;plot(s_grid,sum(sum(Params.upsilon,3),1))
+hold on
+plot(s_grid,sum(sum(StationaryDist.pdf,3),1), '-r')
+

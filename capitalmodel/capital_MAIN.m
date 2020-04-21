@@ -10,9 +10,9 @@ SkipInitialFinal= 1 % 1 to SKIP transition path
 
 tic;
 %% Endogenous and Exogenous States
-n_s= 10; % number of firm-specific Productivity level
+n_s= 20; % number of firm-specific Productivity level
 n_psi = 3; % number of credit tax 
-n_a=30; % grid size for capital
+n_a=10; % grid size for capital
 
 %% Stacionary Equilibrium
 
@@ -35,8 +35,8 @@ psi_dist = [0; 1; 0]; % Entrants probability distribution
 % Maybe a 3 variables grid was best - it was not
 
 % Initial guesses
-Params.p=1; % output pricecap
-Params.Ne=0.5; % total mass of new entrants
+Params.p=1; % output price
+Params.Ne=0.8; % total mass of new entrants
 %%
 % Parameters and initialization options
 capital_Parameters;
@@ -61,9 +61,9 @@ psi_grid_initial = [-1; 0; 1]; % Incumbest first draws
 psi_dist_initial =[0; 0.5; 0.5]; 
 
 % FINAL
-Params.taurate_final=0.6; % This is the rate for the tax.
-Params.subsidyrate_final=0.2; % This is the rate for the subsidy.
-Params.gcost_final = 0.01;
+Params.taurate_final=0.2; % This is the rate for the tax.
+Params.subsidyrate_final=0.6; % This is the rate for the subsidy.
+Params.gcost_final = 0.05;
 
 % psi_grid_final should be the same in the initial and final period
 % psi_dist_final should change based on the policy
@@ -133,7 +133,7 @@ psi_dist = psi_dist_final;
 
 % Initial guesses
 Params.p=1; % output price
-Params.Ne=0.5; % total mass of new entrants
+Params.Ne=0.8; % total mass of new entrants
 
 % Parameters and initialization options
 capital_Parameters;
