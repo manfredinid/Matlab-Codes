@@ -9,7 +9,6 @@ if (1-delta)*aprime_val>a_val
 end
 tau=taurate*(tau_val>0)-subsidyrate*(tau_val<0);
 
-% Physical capital:
 
 % Labour
 nbar=((s_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));

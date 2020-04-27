@@ -118,10 +118,7 @@ pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
 % credit tax (exogenous state)
 pistar_psi =psi_dist;
 
-% capital (endogenous state)
-pistar_a = [1; zeros(n_a-1,1)];
-
-if (abs(1-round(sum(pistar_psi),2)) || abs(1-round(sum(pistar_psi),2))||abs(1-sum(pistar_a)) > 1e-5)
+if (abs(1-round(sum(pistar_psi),2)) ||abs(1-sum(pistar_s)) > 1e-5)
    error('Draws are NOT a PMD.')
 end
 
@@ -129,17 +126,15 @@ end
 figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|-|--|:','DefaultLineLineWidth',1);
-subplot(3,1,1);
+subplot(2,1,1);
 plot(psi_grid,pistar_psi,'r')
 hold on;
 line([0,0], [0 1])
 title('Potential draws for psi')
-subplot(3,1,2);
+subplot(2,1,2);
 plot(s_grid,pistar_s,'r')
 title('Potential draws for s')
-subplot(3,1,3);
-plot(a_grid,pistar_a,'r')
-title('Potential draws for k')
+
 
 %% Return Function
 ReturnFn=@(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma,delta,taurate,subsidyrate, cf, gcost)...
@@ -157,16 +152,18 @@ end
     a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames,...
     ReturnFnParamNames, vfoptions);
 
+figure; surf(squeeze(Policy(1,:,:,2)))
+
 %% Aspects of the Endogenous entry
 % Exit is exogenous with probability lambda
 simoptions.agententryandexit=1;
-simoptions.endogenousexit=0;
+%simoptions.endogenousexit=0;
 
 % Probability of being in the (s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
-Params.upsilon = zeros(n_a,n_s,n_psi);
-Params.upsilon (1,:,:) = kron(pistar_s',(pistar_psi)');
+Params.upsilon = zeros([n_a, n_z]);
+Params.upsilon (n_a,:,:) = kron(pistar_s',(pistar_psi)');
 
 
 disp('upsilon size')
