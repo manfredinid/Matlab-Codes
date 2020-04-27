@@ -38,7 +38,7 @@ Params.rho=0.93; % Hopenhayn & Rogerson (1993)
 Params.sigma_logz=sqrt(0.53); % Hopenhayn & Rogerson (1993)
 Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
 Params.a=0.078; % Hopenhayn & Rogerson (1993) do not report, but Martin Flodén figures out the following (pg 5): http://martinfloden.net/files/macrolab.pdf
-n_z=20; % I here call z, what Hopenhayn & Rogerson (1993) call s. The choice of n_z=20 follows them.
+n_z=200; % I here call z, what Hopenhayn & Rogerson (1993) call s. The choice of n_z=20 follows them.
 Params.q=4; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
 [z_grid, pi_z]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_z,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
 z_grid=exp(z_grid);
@@ -54,6 +54,8 @@ while dist>10^(-9)
     pistar_z=(pi_z')*pistar_z;
     dist=max(abs(pistar_z-pistar_z_old));
 end
+
+pi_z = eye(n_z,n_z);
 
 %% Decision variables
 %There is no d variable
@@ -86,18 +88,12 @@ z_val*(z_val*p*alpha)^(alpha/(1-alpha));
 
 FnsToEvaluate={FnsToEvaluateFn_output};
 
-%%
-AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
-    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
-    d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
-
-AggVars
 
 %%
 
 
 GeneralEqmEqnParamNames(1).Names={'Dbar'};
-GeneralEqmEqn_GoodsMarket = @(AggVars,p,Dbar) AggVars/Dbar-p(1);
+GeneralEqmEqn_GoodsMarket = @(AggVars,p,Dbar) AggVars-Dbar/p(1);
 
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
 GeneralEqmEqn_Entry = @(EValueFn,p,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
@@ -188,8 +184,10 @@ hold on
 plot(z_grid,(ones(size(z_grid))*AggVars(3))/StationaryDist.mass)
 legend('Capital','Productivity','Output','Location', 'Best');
 
+% AggVars(1) is the same as StationaryDist.pdf.*StationaryDist.mass*shiftdim(ValuesOnGrid(1,1,:),1)
 
-z_grid = linspace(0,0.16,6)';
+z_grid = linspace(0,max(squeeze(ProbDensityFns(2,1,:))),6)';
+z_grid = linspace(0,0.02,6)';
 figure;
 %set(gcf,'Color',[1,1,1]);
 set(groot,'DefaultAxesColorOrder',[0 0 0],...

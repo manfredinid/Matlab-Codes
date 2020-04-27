@@ -10,7 +10,7 @@ SkipInitialFinal= 1 % 1 to SKIP transition path
 
 tic;
 %% Endogenous and Exogenous States
-n_s= 20; % number of firm-specific Productivity level
+n_s= 5; % number of firm-specific Productivity level
 n_psi = 3; % number of credit tax 
 n_a=10; % grid size for capital
 
@@ -184,7 +184,5 @@ capital_transitionpath
 
 save ./SavedOutput/PricePath
 end
-
-%%%%%% DiscountFactorParamNames should be of length one
 
 toc;

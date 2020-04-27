@@ -196,7 +196,5 @@ fprintf('%9.2f  %25.2f  \n', Non_total)
 
 
 %%
-figure;plot(s_grid,sum(sum(Params.upsilon,3),1))
-hold on
-plot(s_grid,sum(sum(StationaryDist.pdf,3),1), '-r')
+
 

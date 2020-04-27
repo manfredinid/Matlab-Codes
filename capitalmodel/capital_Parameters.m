@@ -1,12 +1,5 @@
 %% Credit Model with Firm Dynamics
 
-
-%clear all;
-%close all;
-% Second version
-
-%Parallel=0 % 2 for GPU, 1 for parallel CPU, 0 for single CPU.
-
 rng('default') % For reproducibility
 
 %% Toolkit options
@@ -19,7 +12,7 @@ mcmomentsoptions.parallel=tauchenoptions.parallel;
 vfoptions.parallel=Parallel;
 
 simoptions.burnin=10^4;
-simoptions.simperiods=10^10; % if iterate=0 then simperiod=10^6 
+simoptions.simperiods=10^6; % if iterate=0 then simperiod=10^6 
 simoptions.iterate=1;
 simoptions.parallel=Parallel; 
 
@@ -36,23 +29,20 @@ Params.beta=0.9;% Discount rate
 Params.alpha=0.3;  % Capital share
 Params.gamma=0.5; % alpha + gamma must be ~= 1
 Params.delta=0.05; % Depreciation rate of physical capital
-Params.cf=0; % Fixed cost of production
+Params.cf=1; % Fixed cost of production
 
 % Entry and Exit
-Params.ce=40; % Fixed cost of entry 
+Params.ce=4; % Fixed cost of entry 
 Params.lambda=0.2; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
 Params.oneminuslambda=1-Params.lambda; % Probability of survival
 
 % Distortions
-%Params.taurate=5; % This is the rate for the tax.
-%Params.subsidyrate=5; % This is the rate for the subsidy.
-%Params.gcost=0.01; % capital adjustment cost parameter
+% Select in the main file
 
 % Initial guesses
-%Params.p=1; % output price
-%Params.Ne=0.5; % total mass of new entrants
+% Select in the main file
 
 % Declare discount factors
 DiscountFactorParamNames={'beta','oneminuslambda'};
@@ -68,10 +58,6 @@ Params.r=Params.i+Params.delta; % net capital return
 
 %% Exogenous state variables
 
-%n_s= 20; % firm-specific Productivity level
-%n_psi = 5; % credit tax 
-
-
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 Params.rho=0.93; 
@@ -80,12 +66,12 @@ Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
 Params.a=0.098; 
 
 tauchenoptions.parallel=Parallel;
-Params.q=2; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
+Params.q=2; 
 [s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
 s_grid=exp(s_grid);
 
 % Tax credit
-%psi_grid = linspace(-1,1,n_psi)';
+% Select in the main file
 
 
 % Transition matrix 
@@ -97,28 +83,15 @@ z_grid=[s_grid; psi_grid];
 % transition matrix for the exogenous z and psi variables
 pi_z=kron( eye(prod(n_psi)),pi_s);
 
-% Check transition matrix
-%for ii = 1: length(pi_z)
-%A = round(sum(pi_z(:,ii)),5);
-%if A == 1
-%else
-%   error('transition matrix sum is not one')
-%end
-%end
-
 
 %% Endogenous state variables
 
 % grid for capital
-%n_a=50;
+% Select in the main file
 
 % steady-state capital without distotions
-%%%%% The grid is like the one in the Aiygari example
-k_ss = (Params.alpha/Params.r)^(1-Params.gamma/1-Params.gamma-Params.alpha)*...
-    (Params.gamma)^(Params.gamma/(1-Params.alpha-Params.gamma));
-nk1 = floor(n_a/3); nk2=floor(n_a/3); nk3=n_a-nk1-nk2;
-a_grid = sort([linspace(0,k_ss,nk1),linspace(k_ss+0.0001,3*k_ss,nk2),...
-      linspace(3*k_ss+0.0001,15*k_ss,nk3)])';
+  %a_grid = [0 logspace(-2,2,n_a-1)]';
+  a_grid  = [0 randi([0 10],1,n_a-1)]';
 
 %% Decision variables
 %There is no d variable
@@ -139,25 +112,19 @@ disp(n_d)
 %% Potential New Entrants Distribution over the states (s, psi, k)
 
 % productivity (exogenous state)
-
 logn = lognrnd(1,0.5,1,n_s);
 cumsum_pistar_s = cumsum(logn./sum(logn));
 pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
 
 % credit tax (exogenous state)
-%beta = betarnd(.5,.4, 1, n_psi);
-cumsum_pistar_psi = cumsum(psi_dist./sum(psi_dist))';
-pistar_psi =(cumsum_pistar_psi-[0,cumsum_pistar_psi(1:end-1)])';
+pistar_psi =psi_dist;
 
 % capital (endogenous state)
-%pistar_k = [1;zeros(n_a-1,1)];
-%cumsum_pistar_k = cumsum(pistar_k);
+pistar_a = [1 zeros(1,n_a-1)]';
 
-lognk = betarnd(1,0.5,1,n_a);
-cumsum_pistar_k = cumsum(lognk./sum(lognk));
-pistar_k=(cumsum_pistar_k-[0,cumsum_pistar_k(1:end-1)]);
+aa = [pistar_a a_grid]
 
-if (abs(1-round(sum(pistar_psi),2)) || abs(1-round(sum(pistar_psi),2))||abs(1-sum(pistar_k)) > 1e-5)
+if (abs(1-round(sum(pistar_psi),2)) || abs(1-round(sum(pistar_psi),2))||abs(1-sum(pistar_a)) > 1e-5)
    error('Draws are NOT a PMD.')
 end
 
@@ -166,15 +133,15 @@ figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|-|--|:','DefaultLineLineWidth',1);
 subplot(3,1,1);
-plot(psi_grid,cumsum_pistar_psi,'r')
+plot(psi_grid,pistar_psi,'r')
 hold on;
 line([0,0], [0 1])
 title('Potential draws for psi')
 subplot(3,1,2);
-plot(s_grid,cumsum_pistar_s,'r')
+plot(s_grid,pistar_s,'r')
 title('Potential draws for s')
 subplot(3,1,3);
-plot(a_grid,cumsum_pistar_k,'r')
+plot(a_grid,pistar_a,'r')
 title('Potential draws for k')
 
 %% Return Function
@@ -193,27 +160,18 @@ end
     a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames,...
     ReturnFnParamNames, vfoptions);
 
-figure;
-surf(squeeze(V(:,1,:)))
- 
-figure;
-surf(squeeze(Policy(1,:,1,:)))
-
 %% Aspects of the Endogenous entry
 % Exit is exogenous with probability lambda
 simoptions.agententryandexit=1;
-%simoptions.endogenousexit=0;
+simoptions.endogenousexit=0;
 
 % Probability of being in the (s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
-pistar_psi_s=pistar_s'.*(pistar_psi)';
-Params.upsilon=NaN(n_a,n_s,n_psi);
- for n=1:n_a
-    Params.upsilon(n,:,:)=pistar_psi_s.*pistar_k(n);
- end
+Params.upsilon = zeros(n_a,n_s,n_psi);
+Params.upsilon (1,:,:) = kron(pistar_s',(pistar_psi'));
 
- 
+
 disp('upsilon size')
 disp(size(Params.upsilon))
 
@@ -226,16 +184,14 @@ simoptions.parallel=Parallel
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
     simoptions,Params,EntryExitParamNames);
 
-figure;
-surf(squeeze(StationaryDist.pdf(:,1,:)))
-
+StationaryDist.mass
 
 
 %% Use the toolkit to find the equilibrium price index
 GEPriceParamNames={'p'};
 
-%FnsToEvaluateParamNames(1).Names={};
-%FnsToEvaluate={};
+FnsToEvaluateParamNames(1).Names={};
+FnsToEvaluate={};
 
 heteroagentoptions.specialgeneqmcondn={0,'entry'};
 
@@ -257,12 +213,12 @@ AggVars
 %%
 GEPriceParamNames={'p', 'Ne'}; 
 GeneralEqmEqnParamNames(1).Names={};
-GeneralEqmEqn_GoodsMarket = @(AggVars,p) 1-AggVars;
+GeneralEqmEqn_nbar = @(AggVars,p) 1-AggVars;
 
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
 GeneralEqmEqn_Entry = @(EValueFn,p,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
 
-GeneralEqmEqns={GeneralEqmEqn_GoodsMarket,GeneralEqmEqn_Entry};
+GeneralEqmEqns={GeneralEqmEqn_nbar,GeneralEqmEqn_Entry};
 
 %%
 
