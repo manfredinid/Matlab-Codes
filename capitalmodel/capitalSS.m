@@ -4,11 +4,11 @@ heteroagentoptions.verbose=1;
 n_p=0;
 % uncomment after erase the 'to be erase' chunks
 % initial value function
-if vfoptions.parallel==2
-    V0=zeros([n_a,n_z],'gpuArray');
-else
-    V0=zeros([n_a,n_z]);
-end
+%if vfoptions.parallel==2
+%    V0=zeros([n_a,n_z],'gpuArray');
+%else
+%    V0=zeros([n_a,n_z]);
+%end
 
 disp('Calculating price vector corresponding to the stationary eqm')
 [p_eqm,p_eqm_index,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(V0,...

@@ -29,11 +29,11 @@ Params.beta=0.9;% Discount rate
 Params.alpha=0.3;  % Capital share
 Params.gamma=0.5; % alpha + gamma must be ~= 1
 Params.delta=0.05; % Depreciation rate of physical capital
-Params.cf=1; % Fixed cost of production
+Params.cf=0.1; % Fixed cost of production
 
 % Entry and Exit
-Params.ce=4; % Fixed cost of entry 
-Params.lambda=0.2; % Probability of firm exit
+Params.ce=0.4; % Fixed cost of entry 
+Params.lambda=0.1; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
 Params.oneminuslambda=1-Params.lambda; % Probability of survival
@@ -90,8 +90,7 @@ pi_z=kron( eye(prod(n_psi)),pi_s);
 % Select in the main file
 
 % steady-state capital without distotions
-  %a_grid = [0 logspace(-2,2,n_a-1)]';
-  a_grid  = [0 randi([0 10],1,n_a-1)]';
+  a_grid = [0 logspace(-2,3,n_a-1)]';
 
 %% Decision variables
 %There is no d variable
@@ -120,9 +119,7 @@ pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
 pistar_psi =psi_dist;
 
 % capital (endogenous state)
-pistar_a = [1 zeros(1,n_a-1)]';
-
-aa = [pistar_a a_grid]
+pistar_a = [1; zeros(n_a-1,1)];
 
 if (abs(1-round(sum(pistar_psi),2)) || abs(1-round(sum(pistar_psi),2))||abs(1-sum(pistar_a)) > 1e-5)
    error('Draws are NOT a PMD.')
@@ -169,7 +166,7 @@ simoptions.endogenousexit=0;
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
 Params.upsilon = zeros(n_a,n_s,n_psi);
-Params.upsilon (1,:,:) = kron(pistar_s',(pistar_psi'));
+Params.upsilon (1,:,:) = kron(pistar_s',(pistar_psi)');
 
 
 disp('upsilon size')
@@ -197,7 +194,7 @@ heteroagentoptions.specialgeneqmcondn={0,'entry'};
 
 FnsToEvaluateParamNames(1).Names={'alpha','gamma','r','p','taurate','subsidyrate'};
 FnsToEvaluateFn_nbar =@(aprime_val,a_val,z1_val,z2_val,mass,alpha,gamma,r,p,taurate,subsidyrate)...
-((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+((z1_val*p*gamma))^(1/(1-gamma))*aprime_val^(alpha/(1-gamma));
 
 
 
