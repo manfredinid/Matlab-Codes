@@ -13,7 +13,7 @@ vfoptions.parallel=Parallel;
 
 simoptions.burnin=10^4;
 simoptions.simperiods=10^6; % if iterate=0 then simperiod=10^6 
-simoptions.iterate=1;
+simoptions.iterate=0;
 simoptions.parallel=Parallel; 
 
 simoptions.maxit=10^4;
@@ -153,6 +153,9 @@ end
     ReturnFnParamNames, vfoptions);
 
 figure; surf(squeeze(Policy(1,:,:,2)))
+xlabel('productivity')
+ylabel('capital')
+title('For psi=0')
 
 %% Aspects of the Endogenous entry
 % Exit is exogenous with probability lambda
@@ -163,7 +166,7 @@ simoptions.agententryandexit=1;
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
 Params.upsilon = zeros([n_a, n_z]);
-Params.upsilon (n_a,:,:) = kron(pistar_s',(pistar_psi)');
+Params.upsilon (1,:,:) = kron(pistar_s',(pistar_psi)');
 
 
 disp('upsilon size')
@@ -180,6 +183,8 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
 
 StationaryDist.mass
 
+% only k=0 has positive probabilities
+figure; surf(squeeze(StationaryDist.pdf(:,:,2)))
 
 %% Use the toolkit to find the equilibrium price index
 GEPriceParamNames={'p'};
@@ -203,6 +208,8 @@ AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
 
 AggVars
+Output.perK=AggVars/StationaryDist.mass;
+Output.perK
 
 %%
 GEPriceParamNames={'p', 'Ne'}; 

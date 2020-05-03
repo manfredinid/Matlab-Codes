@@ -23,6 +23,7 @@ Params.p=p_eqm.p;
 Params.Ne=p_eqm.Ne;
 [V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,[],a_grid,z_grid, pi_z,...
     ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames,vfoptions);
+figure; surf(squeeze(Policy(1,:,:,2)))
 
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
     simoptions, Params, EntryExitParamNames);
