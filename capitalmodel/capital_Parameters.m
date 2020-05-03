@@ -111,9 +111,17 @@ disp(n_d)
 %% Potential New Entrants Distribution over the states (s, psi, k)
 
 % productivity (exogenous state)
-logn = lognrnd(1,0.5,1,n_s);
-cumsum_pistar_s = cumsum(logn./sum(logn));
-pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
+%logn = lognrnd(1,0.5,1,n_s);
+%cumsum_pistar_s = cumsum(logn./sum(logn));
+%pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
+pistar_s=ones(size(s_grid))/n_s; % Initial guess
+dist=1;
+while dist>10^(-9)
+    pistar_s_old=pistar_s;
+    pistar_s=(pi_s')*pistar_s;
+    dist=max(abs(pistar_s-pistar_s_old));
+end
+
 
 % credit tax (exogenous state)
 pistar_psi =psi_dist;
@@ -165,8 +173,8 @@ simoptions.agententryandexit=1;
 % Probability of being in the (s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
-Params.upsilon = zeros([n_a, n_z]);
-Params.upsilon (1,:,:) = kron(pistar_s',(pistar_psi)');
+Params.upsilon = zeros([n_a, n_z],'gpuArray');
+Params.upsilon(1,:,:) = kron(pistar_s,(pistar_psi)');
 
 
 disp('upsilon size')
