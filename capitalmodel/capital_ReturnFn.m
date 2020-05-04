@@ -4,8 +4,9 @@ function F=capital_ReturnFn(aprime_val, a_val,s_val, tau_val, p,r, alpha,gamma, 
 F=-Inf;
 
 gnnlag=0; 
-if a_val>0 && (1-delta)*aprime_val>a_val
-    gnnlag=(gcost/2)*(((1-delta)*aprime_val-a_val)/a_val)^2; 
+%if a_val>0 && (1-delta)*aprime_val>a_val
+if (1-delta)*aprime_val>a_val
+    gnnlag=(gcost/2)*((1-delta)*aprime_val-a_val)^2; 
 end
 tau=taurate*(tau_val>0)-subsidyrate*(tau_val<0);
 
