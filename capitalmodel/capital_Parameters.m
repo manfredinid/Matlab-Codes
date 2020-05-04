@@ -1,5 +1,5 @@
 %% Credit Model with Firm Dynamics
-
+prod_as_AR=1;
 rng('default') % For reproducibility
 
 %% Toolkit options
@@ -66,9 +66,19 @@ Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
 Params.a=0.098; 
 
 tauchenoptions.parallel=Parallel;
+if prod_as_AR == 1
 Params.q=2; 
 [s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
 s_grid=exp(s_grid);
+end
+
+
+if prod_as_AR == 0
+    load ./FirmDistribution_Brazil2009_Final.txt
+    establishment_dist=FirmDistribution_Brazil2009_Final;
+    s_grid=exp(linspace(log(1),log(establishment_dist(end,1)^(1-Params.gamma-Params.alpha)),n_s));
+    pi_s = eye(prod(n_s));
+end
 
 % Tax credit
 % Select in the main file
@@ -77,8 +87,10 @@ s_grid=exp(s_grid);
 % Transition matrix 
 % Note: considering that productivity and taxes are independent 
 n_z=[n_s,length(psi_grid)];
-z_grid=[s_grid; psi_grid];
-
+if prod_as_AR == 0
+z_grid=[s_grid'; psi_grid];
+else z_grid=[s_grid; psi_grid];
+end
 
 % transition matrix for the exogenous z and psi variables
 pi_z=kron( eye(prod(n_psi)),pi_s);
@@ -111,9 +123,11 @@ disp(n_d)
 %% Potential New Entrants Distribution over the states (s, psi, k)
 
 % productivity (exogenous state)
+if prod_as_AR == 1
 %logn = lognrnd(1,0.5,1,n_s);
 %cumsum_pistar_s = cumsum(logn./sum(logn));
 %pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)]);
+
 pistar_s=ones(size(s_grid))/n_s; % Initial guess
 dist=1;
 while dist>10^(-9)
@@ -122,6 +136,19 @@ while dist>10^(-9)
     dist=max(abs(pistar_s-pistar_s_old));
 end
 
+end
+
+if prod_as_AR == 0
+    cumsum_pistar_s=interp1(establishment_dist(:,1),cumsum(establishment_dist(:,2)),s_grid.^(1/(1-Params.gamma-Params.alpha)));
+% The first few points of s_grid have to be extrapolated (as outside the
+% range of the actual data). Following line implements this, and similar
+% for the max value. I just divide equally across these first few (which is same as RR2008 do).
+temp=~isnan(cumsum_pistar_s);
+tempind=find(temp,1,'first');
+cumsum_pistar_s(1:tempind)=cumsum((1/tempind)*cumsum_pistar_s(tempind)*ones(1,tempind));
+cumsum_pistar_s(end)=1;
+pistar_s=(cumsum_pistar_s-[0,cumsum_pistar_s(1:end-1)])';
+end
 
 % credit tax (exogenous state)
 pistar_psi =psi_dist;
