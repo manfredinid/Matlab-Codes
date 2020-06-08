@@ -57,9 +57,6 @@ y = (ah*kh^alphaa)^varpi*(al*kl^alphaa)^(1-varpi);
 c^(-sigmaa) = betaa*((c(+1)^(-sigmaa))*(alphaa*(y(+1)/k)+(1-deltaa)));
 
 
-kh
-
-kl
 
 
 

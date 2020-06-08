@@ -1,0 +1,61 @@
+
+%% FIRM DYNAMICS MODEL WITH CREDIT MISALLOCATION
+% Model presented in he TBrazilian Slump and the Government-driven 
+% Credit Expansion (2020)
+
+%% Initial setups
+clear all;
+close all;
+Parallel=0; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+tic;
+
+%% Toolkit options 
+
+vfoptions.parallel=Parallel;
+simoptions.parallel=Parallel;
+heteroagentoptions.verbose=1;
+simoptions.agententryandexit=1;
+simoptions.endogenousexit=0;
+
+%% Parameters
+
+% Preferences 
+Params.beta=0.9;% Discount rate
+
+% Firm-level technology
+Params.alpha=0.3;  % Capital share
+Params.gamma=0.5; % alpha + gamma must be ~= 1
+Params.delta=0.05; % Depreciation rate of physical capital
+Params.cf=0.1; % Fixed cost of production
+
+% Adjustment cost of capital
+Params.adjustcostparam=0.01;
+
+% Entry and Exit
+Params.ce=0.4; % Fixed cost of entry 
+Params.lambda=0.1; % Probability of firm exit
+% lambda is the average observed exit percentage between 2007--2017 
+% (https://sidra.ibge.gov.br/Tabela/2718#resultado)
+Params.oneminuslambda=1-Params.lambda; % Probability of survival
+
+% Declare discount factors
+DiscountFactorParamNames={'beta','oneminuslambda'};
+% Declare percentage of entrants
+EntryExitParamNames.MassOfNewAgents={'Ne'};
+% Exogenous survival probability
+EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
+
+%% States
+
+% The model has three states, one endogenous state (capital), and tow
+% exogenous states (productivity and subsidies)
+
+%% Earmarked credit with embebed subsidies 
+% Exgoenous states
+
+Params.r_ear=0.02; % Interest rate on earmarked credit
+Params.g_ear=0.1; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
+
+
+%% Interest rates
+% the

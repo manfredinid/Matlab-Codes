@@ -11,19 +11,20 @@ n_p=0;
 %end
 
 disp('Calculating price vector corresponding to the stationary eqm')
-[p_eqm,p_eqm_index,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(V0,...
+[p_eqm,p_eqm_index,GeneralEqmCondn]=HeteroAgentStationaryEqm_Case1(...
     n_d, n_a, n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn,...
     FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames,...
     ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
     GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
+
 %% Value Function, Policy and Firm Distribution in GE
 
 disp('Calculating various equilibrium objects')
 Params.p=p_eqm.p;
 Params.Ne=p_eqm.Ne;
-[V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,[],a_grid,z_grid, pi_z,...
+[V,Policy]=ValueFnIter_Case1(n_d,n_a,n_z,[],a_grid,z_grid, pi_z,...
     ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames,vfoptions);
-figure; surf(squeeze(Policy(1,:,:,2)))
+figure(4); surf(squeeze(Policy(1,:,:,2)))
 
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
     simoptions, Params, EntryExitParamNames);
@@ -92,17 +93,17 @@ ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1_Mass(StationaryDist.pdf,...
 ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate,...
     Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid,...
     simoptions.parallel,simoptions,EntryExitParamNames);
+
 %% Agggregate Values
 Output.Y=AggVars(2);
 Output.N=AggVars(3);
 Output.K=AggVars(1);
 Output.KdivY=Output.K/Output.Y;
+
 %% Average values
 
 Output.perN=AggVars(3)/StationaryDist.mass;
 Output.perK=AggVars(1)/StationaryDist.mass;
-
-
 
 %%
 
@@ -114,6 +115,7 @@ Percentage_tax = [Establishments_tax    Establishments_none    Establishments_su
 
 Non_producing=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(3,:,:,:),1)<=0))));
 Non_total=[Non_producing sum(Percentage_tax)];
+
 %%
 Output.TFP=Output.Y/((Output.K^Params.alpha)*(Output.N^Params.gamma));
 
