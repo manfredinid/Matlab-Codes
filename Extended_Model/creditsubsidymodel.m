@@ -50,8 +50,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=200;
-n_a=100;
+n_s=10;
+n_a=10;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -251,13 +251,13 @@ K_hh=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy_rhh,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
     d_grid, a_grid, z_grid, [],simoptions,EntryExitParamNames);
 
+% STEP 3 - Now, set K_nfa=K_hh-K_total 
+K_nfa=K_hh-K_total;
 
 %% 
 %Set r_market back to it's actual value
 Params.r_market=Params.r_international;
 
-% 2C: Calculate K_nfe
-K_nfa=K_hh-K_total;
 
 %%
 
@@ -267,5 +267,161 @@ fprintf('Capital Market Outcomes: \n')
 fprintf('The interest rate for household is %8.2f, the international interest rate is r%8.2f, and the interest rate on earmarked credit is %8.2f \n', 100*Params.r_hh, 100*Params.r_international, 100*Params.r_ear)
 fprintf('Households hold capital of K_hh=%8.4f, while firms use capital of K_total=%8.4f; the difference is made up by net-foreign capital of K_nfa=%8.4f \n',K_hh, K_total, K_nfa)
 fprintf('\n')
+
+%%
+
+figure(2)
+plot(a_grid, cumsum(sum(StationaryDist.pdf(:,:,1),2)))
+hold on
+plot(a_grid, cumsum(sum(StationaryDist.pdf(:,:,2),2)),'.')
+hold off
+legend('Non-earmarked','Earmarked')
+% Also looks a bit stupid with these params and grid, but earmarked are
+% ending up with higher capital so that is promising start! :)
+
+% Check the average productivity of the earmarked firms 
+AvgProdOfNonEarmarked=sum(s_grid'.*sum(StationaryDist.pdf(:,:,1),1))
+AvgProdOfEarmarked=sum(s_grid'.*sum(StationaryDist.pdf(:,:,2),1))
+
+%%
+
+% CAPITAL
+FnsToEvaluateParamNames(1).Names={};
+FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass)...
+    aprime_val; 
+
+%OUTPUT
+FnsToEvaluateParamNames(2).Names={'p', 'w','alpha','gamma'};
+FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+    p*z1_val*(aprime_val^alpha)*...
+    (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma);  
+
+%LABOR
+FnsToEvaluateParamNames(3).Names={'p', 'w','alpha','gamma'};
+FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+    ((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+
+% OUTPUT WITH SUBSIDY
+FnsToEvaluateParamNames(4).Names={'p', 'w','alpha','gamma'};
+FnsToEvaluateFn_subsidy = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+    (z2_val==1)*p*z1_val*(aprime_val^alpha)*...
+    (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma);
+
+% OUTPUT WITHOUT SUBSIDY
+FnsToEvaluateParamNames(5).Names={'p', 'w','alpha','gamma'};
+FnsToEvaluateFn_tax = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+    (z2_val==0)*p*z1_val*(aprime_val^alpha)*...
+    (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma);
+
+% JUST TO CHECK N FIRMS
+FnsToEvaluateParamNames(6).Names={'p', 'w','alpha','gamma'};
+FnsToEvaluateFn_num = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+    (z2_val==0)*2 + (z2_val==1)*3;
+
+FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output,...
+    FnsToEvaluateFn_nbar,FnsToEvaluateFn_subsidy,FnsToEvaluateFn_tax,...
+    FnsToEvaluateFn_num};
+
+AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
+    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
+    d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+
+ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1_Mass(StationaryDist.pdf,...
+    StationaryDist.mass, Policy, FnsToEvaluate, Params,...
+    FnsToEvaluateParamNames,EntryExitParamNames, n_d, n_a, n_z,...
+    [], a_grid, z_grid, simoptions.parallel,simoptions);
+
+%% Agggregate Values
+Output.Y=AggVars(2);
+Output.N=AggVars(3);
+Output.K=AggVars(1);
+Output.KdivY=Output.K/Output.Y;
+Output.TFP=(Output.Y/Output.N)./((Output.K/Output.N)^Params.alpha);
+%% Average values
+
+Output.perN=AggVars(3)/StationaryDist.mass;
+Output.perK=AggVars(1)/StationaryDist.mass;
+
+firms_sub=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(6,:,:,:),1)==3))));
+firms_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(6,:,:,:),1)==2))));
+
+Percentage_tax = [firms_tax  firms_sub] ;
+
+%%
+
+nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
+normalize_employment=min(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
+nbarValues=nbarValues./normalize_employment;
+
+
+Partion1Indicator=logical(nbarValues<5);
+Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
+Partion3Indicator=logical(nbarValues>=50);
+
+if ((sum(sum(sum(Partion1Indicator+Partion2Indicator+Partion3Indicator)))) - prod(n_z)*(n_a) > 1e-3)
+    error('error')
+end
+
+ShareOfEstablishments(1)=100*sum(sum(sum(StationaryDist.pdf(Partion1Indicator))));
+ShareOfEstablishments(2)=100*sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
+ShareOfEstablishments(3)=100*sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
+ShareOfEstablishments(4)=100*sum(sum(sum(StationaryDist.pdf)));
+
+Output_pdf=shiftdim(ProbDensityFns(2,:,:,:),1);
+ShareOfOutput(1)=100*sum(sum(sum(Output_pdf(Partion1Indicator))));
+ShareOfOutput(2)=100*sum(sum(sum(Output_pdf(Partion2Indicator))));
+ShareOfOutput(3)=100*sum(sum(sum(Output_pdf(Partion3Indicator))));
+ShareOfOutput(4)=100*sum(sum(sum(Output_pdf)));
+
+Labour_pdf=shiftdim(ProbDensityFns(3,:,:,:),1);
+ShareOfLabour(1)=100*sum(sum(sum(Labour_pdf(Partion1Indicator))));
+ShareOfLabour(2)=100*sum(sum(sum(Labour_pdf(Partion2Indicator))));
+ShareOfLabour(3)=100*sum(sum(sum(Labour_pdf(Partion3Indicator))));
+ShareOfLabour(4)=100*sum(sum(sum(Labour_pdf)));
+
+Capital_pdf=shiftdim(ProbDensityFns(1,:,:,:),1);
+ShareOfCapital(1)=100*sum(sum(sum(Capital_pdf(Partion1Indicator))));
+ShareOfCapital(2)=100*sum(sum(sum(Capital_pdf(Partion2Indicator))));
+ShareOfCapital(3)=100*sum(sum(sum(Capital_pdf(Partion3Indicator))));
+ShareOfCapital(4)=100*sum(sum(sum(Capital_pdf)));
+
+AverageEmployment(1)=100*sum(sum(sum(nbarValues(Partion1Indicator).*...
+StationaryDist.pdf(Partion1Indicator))))/sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)));
+AverageEmployment(2)=100*sum(sum(sum(nbarValues(Partion2Indicator).*...
+StationaryDist.pdf(Partion2Indicator))))/sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)));
+AverageEmployment(3)=100*sum(sum(sum(nbarValues(Partion3Indicator).*...
+StationaryDist.pdf(Partion3Indicator))))/sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)));
+AverageEmployment(4)=100*sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)))/sum(sum(sum(nbarValues.*...
+StationaryDist.pdf)));
+
+fprintf('Distribution statistics of benchmark economy  \n');
+fprintf('                               <5     5 to 49     >=50    total\n');
+fprintf('Share of establishments  %8.2f  %8.2f  %8.2f  %8.2f  \n', ShareOfEstablishments);
+fprintf('Share of output          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfOutput);
+fprintf('Share of labor          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfLabour);
+fprintf('Share of capital         %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfCapital);
+fprintf('Share of employment      %8.2f  %8.2f  %8.2f  %8.2f\n', AverageEmployment);
+
+%% Display some output about the solution
+
+fprintf('The equilibrium output price is p=%.4f \n', Params.p)
+fprintf('The equilibrium value for the mass of entrants is Ne=%.4f \n', Params.Ne)
+
+fprintf('Total Output is Y=%.4f \n', Output.Y)
+fprintf('Labor is n=%.4f \n', Output.N)
+fprintf('Capital is k=%.4f \n', Output.K)
+fprintf('Total Factor Productivity is TFP=%.4f \n', Output.TFP)
+fprintf('Total Subsided Output is Ysub=%.4f \n', AggVars(4))
+
+
+fprintf('Taxed Firms      No tax or subsidy   Subsidized Firms\n')
+fprintf('%9.2f  %12.2f  %19.2f  \n',Percentage_tax )
+
+fprintf('   Total(just for checking)  \n' )
+fprintf('%9.2f    \n', sum(Percentage_tax))
 
 toc;
