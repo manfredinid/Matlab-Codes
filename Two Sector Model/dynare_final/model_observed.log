@@ -1,0 +1,65 @@
+Starting Dynare (version 4.5.7).
+Starting preprocessing of the model file ...
+Found 6 equation(s).
+Evaluating expressions...done
+Computing static model derivatives:
+ - order 1
+Computing dynamic model derivatives:
+ - order 1
+Processing outputs ...
+done
+Preprocessing completed.
+
+EIGENVALUES:
+         Modulus             Real        Imaginary
+
+          0.9148           0.9148                0
+           1.215            1.215                0
+
+
+There are 1 eigenvalue(s) larger than 1 in modulus 
+for 1 forward-looking variable(s)
+
+The rank condition is verified.
+
+
+--------------------------------------------------------
+MODEL SIMULATION:
+
+Iter: 1,	 err. = 0.295, 	 time = 0.023
+Iter: 2,	 err. = 9.8052e-05, 	 time = 0.005
+Iter: 3,	 err. = 1.1308e-10, 	 time = 0.006
+
+Total time of simulation: 0.05
+--------------------------------------------------------
+
+Perfect foresight solution found.
+
+
+--------------------------------------------------------
+MODEL SIMULATION:
+
+Iter: 1,	 err. = 0.295, 	 time = 0.005
+Iter: 2,	 err. = 9.8052e-05, 	 time = 0.007
+Iter: 3,	 err. = 1.1308e-10, 	 time = 0.004
+
+Total time of simulation: 0.022
+--------------------------------------------------------
+
+Perfect foresight solution found.
+
+
+
+
+
+Residuals of the static equations:
+
+Equation number 1 : 0 : Aggregate Output
+Equation number 2 : 0 : Euler Equation
+Equation number 3 : 0 : Budget Constrain
+Equation number 4 : 0 : low-tech capital
+Equation number 5 : 0 : total capital
+Equation number 6 : 0 : investment
+
+
+Total computing time : 0h00m01s
