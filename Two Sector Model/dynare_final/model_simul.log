@@ -26,11 +26,11 @@ The rank condition is verified.
 --------------------------------------------------------
 MODEL SIMULATION:
 
-Iter: 1,	 err. = 0.65924, 	 time = 0.025
-Iter: 2,	 err. = 0.0004896, 	 time = 0.003
-Iter: 3,	 err. = 2.8569e-09, 	 time = 0.003
+Iter: 1,	 err. = 0.49568, 	 time = 0.02
+Iter: 2,	 err. = 0.00013704, 	 time = 0.003
+Iter: 3,	 err. = 1.1016e-10, 	 time = 0.003
 
-Total time of simulation: 0.037
+Total time of simulation: 0.03
 --------------------------------------------------------
 
 Perfect foresight solution found.
@@ -39,9 +39,9 @@ Perfect foresight solution found.
 --------------------------------------------------------
 MODEL SIMULATION:
 
-Iter: 1,	 err. = 0.65924, 	 time = 0.004
-Iter: 2,	 err. = 0.0004896, 	 time = 0.004
-Iter: 3,	 err. = 2.8569e-09, 	 time = 0.005
+Iter: 1,	 err. = 0.49568, 	 time = 0.005
+Iter: 2,	 err. = 0.00013704, 	 time = 0.005
+Iter: 3,	 err. = 1.1016e-10, 	 time = 0.004
 
 Total time of simulation: 0.018
 --------------------------------------------------------

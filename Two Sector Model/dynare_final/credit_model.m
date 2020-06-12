@@ -4,8 +4,8 @@ close all;
 
 betaa =0.9;  
 varpi = 0.5;
-al =  1;
-ah =1.5;
+al = 1;
+ah =2.75;
 sigmaa = 0.63;
 deltaa = 0.04; 
 alphaa = 0.6;
@@ -26,14 +26,24 @@ save parameterfile  betaa varpi al ah sigmaa deltaa alphaa
 %pi_gF_simul=0.8;
 
 %%
-pi_p0=1.027/1.008; %2011 2.7 p.m.
-pi_g0=1; % 2011 0.8 p.m.
+%pi_p0=1.027/1.008; %2011 2.7 p.m.
+%pi_g0=1; % 2011 0.8 p.m.
 
-pi_pF_obser=1.0356/1.008; %2013 2.36 p.m. % 2017 3.56
-pi_gF_obser= 1; %2013 0.6 p.m.  % 2017 0.79
+%pi_pF_obser=1.0356/1.008; %2013 2.36 p.m. % 2017 3.56
+%pi_gF_obser= 1; %2013 0.6 p.m.  % 2017 0.79
  
-pi_pF_simul=1;
-pi_gF_simul=1;
+%pi_pF_simul=1;
+%pi_gF_simul=1;
+
+
+pi_p0=(1+0.2455)^(1/4); %2011 2.7 p.m.
+pi_g0=(1+0.1225)^(1/4); % 2011 0.8 p.m.
+
+pi_pF_obser=(1+0.2657)^(1/4); %2013 2.36 p.m. % 2017 3.56
+pi_gF_obser= (1+0.1350)^(1/4); %2013 0.6 p.m.  % 2017 0.79
+ 
+pi_pF_simul=(1+0.184)^(1/4);%(1.135+1.2657)/2;
+pi_gF_simul=(1+0.184)^(1/4);%(1.135+1.2657)/2;
 
 %%
 dynare model_observed
