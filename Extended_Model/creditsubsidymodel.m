@@ -26,14 +26,14 @@ Params.beta=0.9;% Discount rate
 Params.alpha=0.3;  % Capital share
 Params.gamma=0.5; % alpha + gamma must be ~= 1
 Params.delta=0.05; % Depreciation rate of physical capital
-Params.cf=0.1; % Fixed cost of production
+Params.cf=0; % Fixed cost of production
 
 % Adjustment cost of capital
 Params.adjustcostparam=0.01;
 
 % Entry and Exit
-Params.ce=0.4; % Fixed cost of entry 
-Params.lambda=0.1; % Probability of firm exit
+Params.ce=1; % Fixed cost of entry 
+Params.lambda=0.17; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
 Params.oneminuslambda=1-Params.lambda; % Probability of survival
@@ -58,18 +58,20 @@ n_a=10;
 % Exgoenous states
 
 Params.r_ear=0.02; % Interest rate on earmarked credit
-Params.g_ear=0.1; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
+Params.g_ear=0.3; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 
 %% Productivity (s)
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
-Params.rho=0.93; 
-Params.sigma_logz=sqrt(0.53); 
+Params.rho=0.9; 
+Params.sigma_logz=sqrt(0.11); 
 Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
-Params.a=0.098; 
+Params.a=0.08; 
 
 tauchenoptions.parallel=Parallel;
 Params.q=2; 
+%  q is max number of std devs from mean
+% max in s_grid has to be log(2.75)=1.0116
 [s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
 s_grid=exp(s_grid);
 
@@ -326,11 +328,15 @@ AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
     d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
 
-ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1_Mass(StationaryDist.pdf,...
-    StationaryDist.mass, Policy, FnsToEvaluate, Params,...
-    FnsToEvaluateParamNames,EntryExitParamNames, n_d, n_a, n_z,...
-    [], a_grid, z_grid, simoptions.parallel,simoptions);
+ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1(StationaryDist,...
+    Policy, FnsToEvaluate, Params,...
+    FnsToEvaluateParamNames, n_d, n_a, n_z,...
+    [], a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
 
+
+ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate,...
+    Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid,...
+    simoptions.parallel,simoptions,EntryExitParamNames);
 %% Agggregate Values
 Output.Y=AggVars(2);
 Output.N=AggVars(3);
@@ -417,11 +423,14 @@ fprintf('Capital is k=%.4f \n', Output.K)
 fprintf('Total Factor Productivity is TFP=%.4f \n', Output.TFP)
 fprintf('Total Subsided Output is Ysub=%.4f \n', AggVars(4))
 
-
-fprintf('Taxed Firms      No tax or subsidy   Subsidized Firms\n')
-fprintf('%9.2f  %12.2f  %19.2f  \n',Percentage_tax )
+fprintf('Percentage of firms with\n')
+fprintf('Market Rate     Subsidized Rate\n')
+fprintf('%9.2f  %12.2f   \n',Percentage_tax )
 
 fprintf('   Total(just for checking)  \n' )
 fprintf('%9.2f    \n', sum(Percentage_tax))
+
+%%
+Params.Ne/StationaryDist.mass
 
 toc;
