@@ -20,12 +20,12 @@ simoptions.endogenousexit=0;
 %% Parameters
 
 % Preferences 
-Params.beta=0.9;% Discount rate
+Params.beta=0.9798;% Discount rate
 
 % Firm-level technology
-Params.alpha=0.3;  % Capital share
-Params.gamma=0.5; % alpha + gamma must be ~= 1
-Params.delta=0.05; % Depreciation rate of physical capital
+Params.alpha=0.399;  % Capital share
+Params.gamma=0.491; % alpha + gamma must be ~= 1
+Params.delta=0.025; % Depreciation rate of physical capital
 Params.cf=0; % Fixed cost of production
 
 % Adjustment cost of capital
@@ -33,7 +33,7 @@ Params.adjustcostparam=0.01;
 
 % Entry and Exit
 Params.ce=1; % Fixed cost of entry 
-Params.lambda=0.17; % Probability of firm exit
+Params.lambda= 0.1859; % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
 Params.oneminuslambda=1-Params.lambda; % Probability of survival
@@ -41,6 +41,7 @@ Params.oneminuslambda=1-Params.lambda; % Probability of survival
 % Declare discount factors
 DiscountFactorParamNames={'beta','oneminuslambda'};
 % Declare percentage of entrants
+
 EntryExitParamNames.MassOfNewAgents={'Ne'};
 % Exogenous survival probability
 EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
@@ -50,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=10;
-n_a=20;
+n_s=30;
+n_a=40;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -64,12 +65,12 @@ n_a=20;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 Params.rho=0.9; 
-Params.sigma_logz=sqrt(0.11); 
+Params.sigma_logz=0.15; 
 Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
-Params.a=0.08; 
+Params.a=0.04; 
 
 tauchenoptions.parallel=Parallel;
-Params.q=2; 
+Params.q=3; 
 %  q is max number of std devs from mean
 % max in s_grid has to be log(2.75)=1.0116
 [s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
@@ -94,7 +95,8 @@ pi_z=kron(pi_psi,pi_s);
 % grid for capital
 
 % steady-state capital without distotions
-a_grid = [0 logspace(-2,3,n_a-1)]';
+a_grid = [0 logspace(0.0001,6.28,n_a-1)]'; %era -1
+%a_grid = linspace(0,14,n_a)';
 
 %% Decision variables
 %There is no d variable
@@ -114,7 +116,7 @@ n_d=0;
 Params.rhhminusdelta=1/Params.beta-1; 
 Params.r_hh=Params.rhhminusdelta+Params.delta; 
 %% 2.International interest rate
-Params.r_international=0.15;
+%Params.r_international=0.15;
 
 %% 3.Market interest rate
 Params.r_market=Params.r_international;
@@ -373,24 +375,16 @@ FnsToEvaluateParamNames(10).Names={'p', 'w','alpha','gamma'};
 FnsToEvaluateFn_num = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
     (z2_val==0)*2 + (z2_val==1)*3;
 
-%% TFP 
-FnsToEvaluateParamNames(11).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_TFP = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-    z1_val;
-FnsToEvaluateParamNames(12).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_SUBTFP = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-    (z2_val==1)*z1_val;
-FnsToEvaluateParamNames(13).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_TAXTFP = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-    (z2_val==0)*z1_val;
 
+FnsToEvaluateParamNames(11).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
+FnsToEvaluateFn_cost = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
+    (r_market-r_ear)*aprime_val;
 
 
 FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output, FnsToEvaluateFn_nbar,...
        FnsToEvaluateFn_SUBkbar, FnsToEvaluateFn_SUBoutput, FnsToEvaluateFn_SUBnbar,...
     FnsToEvaluateFn_TAXkbar, FnsToEvaluateFn_TAXoutput, FnsToEvaluateFn_TAXnbar,...
-    FnsToEvaluateFn_num,...
-    FnsToEvaluateFn_TFP,FnsToEvaluateFn_SUBTFP,FnsToEvaluateFn_TAXTFP};
+    FnsToEvaluateFn_num,FnsToEvaluateFn_cost};
 
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
@@ -445,12 +439,13 @@ Percentage_tax = [firms_tax  firms_sub] ;
 
 nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
 normalize_employment=min(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
-nbarValues=nbarValues./normalize_employment;
+nbarValues=nbarValues./(normalize_employment);
 
 
-Partion1Indicator=logical(nbarValues<5);
-Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
+Partion1Indicator=logical(nbarValues<10);
+Partion2Indicator=logical((nbarValues>=10).*(nbarValues<50));
 Partion3Indicator=logical(nbarValues>=50);
+
 
 if ((sum(sum(sum(Partion1Indicator+Partion2Indicator+Partion3Indicator)))) - prod(n_z)*(n_a) > 1e-3)
     error('error')
@@ -473,6 +468,7 @@ ShareOfLabour(2)=100*sum(sum(sum(Labour_pdf(Partion2Indicator))));
 ShareOfLabour(3)=100*sum(sum(sum(Labour_pdf(Partion3Indicator))));
 ShareOfLabour(4)=100*sum(sum(sum(Labour_pdf)));
 
+
 Capital_pdf=shiftdim(ProbDensityFns(1,:,:,:),1);
 ShareOfCapital(1)=100*sum(sum(sum(Capital_pdf(Partion1Indicator))));
 ShareOfCapital(2)=100*sum(sum(sum(Capital_pdf(Partion2Indicator))));
@@ -492,8 +488,9 @@ AverageEmployment(4)=100*sum(sum(sum(nbarValues.*...
 StationaryDist.pdf)))/sum(sum(sum(nbarValues.*...
 StationaryDist.pdf)));
 
+
 %fprintf('Distribution statistics of benchmark economy  \n');
-%fprintf('                               <5     5 to 49     >=50    total\n');
+%fprintf('                               <5     5 to 49     >=50   total\n');
 %fprintf('Share of establishments  %8.2f  %8.2f  %8.2f  %8.2f  \n', ShareOfEstablishments);
 %fprintf('Share of output          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfOutput);
 %fprintf('Share of labor          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfLabour);
@@ -531,5 +528,6 @@ StationaryDist.pdf)));
 %plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,1)),1)),'b')
 %hold on;
 %plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,2)),1)),':')
+
 
 %toc;
