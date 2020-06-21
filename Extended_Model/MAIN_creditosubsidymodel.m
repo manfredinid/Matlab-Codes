@@ -5,7 +5,9 @@
 %% Initial setups
 clear all;
 close all;
-Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+
+warning off parallel:gpu:device:DeviceLibsNeedsRecompiling
+Parallel=2; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 tic;
 
 %% Earmarked credit with embebed subsidies (psi)
