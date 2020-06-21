@@ -35,6 +35,8 @@ Params.r_ear=A.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = A.Params.r_international;
 
+
+fprintf(2,'\nModel A  \n');
 creditsubsidymodel;
 
 % Agggregate Values
@@ -77,6 +79,8 @@ Params.r_ear=B.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=B.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = B.Params.r_international;
 
+
+fprintf(2,'\nModel B  \n');
 creditsubsidymodel;
 
 
@@ -114,7 +118,7 @@ B.AverageEmployment=AverageEmployment;
 B.Percentage_tax=Percentage_tax;
 B.K_nfa=K_nfa;
 
-%% Model A
+%% Model C
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
 
@@ -122,6 +126,8 @@ Params.r_ear=C.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=C.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = C.Params.r_international;
 
+
+fprintf(2,'\nModel C  \n');
 creditsubsidymodel;
 
 
