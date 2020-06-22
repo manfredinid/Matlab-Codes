@@ -9,6 +9,60 @@ Computing dynamic model derivatives:
 Processing outputs ...
 done
 Preprocessing completed.
+<<<<<<< .mine
+
+EIGENVALUES:
+         Modulus             Real        Imaginary
+
+          0.9723           0.9723                0
+            1.05             1.05                0
+
+
+There are 1 eigenvalue(s) larger than 1 in modulus 
+for 1 forward-looking variable(s)
+
+The rank condition is verified.
+
+
+--------------------------------------------------------
+MODEL SIMULATION:
+
+Iter: 1,	 err. = 0.11728, 	 time = 0.017
+Iter: 2,	 err. = 1.3826e-06, 	 time = 0.004
+
+Total time of simulation: 0.022
+--------------------------------------------------------
+
+Perfect foresight solution found.
+
+
+--------------------------------------------------------
+MODEL SIMULATION:
+
+Iter: 1,	 err. = 0.11728, 	 time = 0.003
+Iter: 2,	 err. = 1.3826e-06, 	 time = 0.004
+
+Total time of simulation: 0.008
+--------------------------------------------------------
+
+Perfect foresight solution found.
+
+
+
+
+
+Residuals of the static equations:
+
+Equation number 1 : 0 : Aggregate Output
+Equation number 2 : 0 : Euler Equation
+Equation number 3 : 0 : Budget Constrain
+Equation number 4 : 0 : low-tech capital
+Equation number 5 : 0 : total capital
+Equation number 6 : 0 : investment
+
+
+Total computing time : 0h00m00s
+=======
 
 EIGENVALUES:
          Modulus             Real        Imaginary
@@ -63,3 +117,4 @@ Equation number 6 : 0 : investment
 
 
 Total computing time : 0h00m00s
+>>>>>>> .r181
