@@ -7,7 +7,7 @@ clear all;
 close all;
 
 warning off parallel:gpu:device:DeviceLibsNeedsRecompiling
-Parallel=2; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+Parallel=0; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 tic;
 
 %% Earmarked credit with embebed subsidies (psi)
