@@ -14,20 +14,20 @@ tic;
 % Exgoenous states
 
 % Model A
-A.Params.r_ear=0.0517; % Interest rate on earmarked credit
+A.Params.r_ear=(1+0.12)^(1/4)-1; % Interest rate on earmarked credit
 A.Params.g_ear=0.429;
-A.Params.r_international= 0.0287;
+A.Params.r_international= (1+0.2142)^(1/4)-1;
 
 
 % Model B
-B.Params.r_ear=0.0633; % Interest rate on earmarked credit
-B.Params.g_ear=0.503;
-B.Params.r_international = 0.0310;
+B.Params.r_ear= (1+0.11)^(1/4)-1; % Interest rate on earmarked credit
+B.Params.g_ear=0.530;
+B.Params.r_international =(1+0.2216)^(1/4) ;
 
 % Model C
-C.Params.r_ear=(1+0.13)^(1/4)-1; % Interest rate on earmarked credit
+C.Params.r_ear=0; % Interest rate on earmarked credit
 C.Params.g_ear=0;
-C.Params.r_international = (1+0.13)^(1/4)-1;
+C.Params.r_international = (1+0.15)^(1/4)-1;
 
 %% Model A
 % Earmarked credit with embebed subsidies (psi)
@@ -168,18 +168,18 @@ C.K_nfa=K_nfa;
 
 %%
 
-fprintf('                      Model A      Model B\n');
-fprintf('r earmarked         %8.2f  %8.2f \n',[ A.Params.r_ear B.Params.r_ear C.Params.r_ear])
-fprintf('r Market            %8.2f  %8.2f \n',[ A.Params.r_international B.Params.r_international C.Params.r_international])
-fprintf('Subzided Firms      %8.2f  %8.2f \n',[ A.Params.g_ear B.Params.g_ear C.Params.g_ear])
+fprintf('                      Model A    Model B   Model C\n');
+fprintf('r earmarked         %8.3f  %8.3f %8.3f\n',[ A.Params.r_ear B.Params.r_ear C.Params.r_ear])
+fprintf('r Market            %8.3f  %8.3f %8.3f\n',[ A.Params.r_international B.Params.r_international C.Params.r_international])
+fprintf('Subzided Firms      %8.3f  %8.3f %8.3f\n',[ A.Params.g_ear B.Params.g_ear C.Params.g_ear])
 
-fprintf('                      Model A      Model B\n');
-fprintf('Total Output        %8.2f  %8.2f \n', [A.Output.Y B.Output.Y C.Output.Y])
-fprintf('Labor               %8.2f  %8.2f \n', [A.Output.N B.Output.N C.Output.N])
-fprintf('Capital             %8.2f  %8.2f \n', [A.Output.K B.Output.K C.Output.K])
-fprintf('TFP                 %8.2f  %8.2f \n',[ A.Output.TFP B.Output.TFP C.Output.TFP])
-fprintf('Net Foreign Assets  %8.2f  %8.2f \n',[ A.K_nfa B.K_nfa C.K_nfa])
-fprintf('Subsidy Cost        %8.2f  %8.2f \n',[ A.cost B.cost C.cost])
+fprintf('                      Model A    Model B   Model C\n');
+fprintf('Total Output        %8.3f  %8.3f  %8.3f\n', [A.Output.Y B.Output.Y C.Output.Y])
+fprintf('Labor               %8.3f  %8.3f  %8.3f\n', [A.Output.N B.Output.N C.Output.N])
+fprintf('Capital             %8.3f  %8.3f  %8.3f\n', [A.Output.K B.Output.K C.Output.K])
+fprintf('TFP                 %8.3f  %8.3f  %8.3f\n',[ A.Output.TFP B.Output.TFP C.Output.TFP])
+fprintf('Net Foreign Assets  %8.3f  %8.3f  %8.3f\n',[ A.K_nfa B.K_nfa C.K_nfa])
+fprintf('Subsidy Cost        %8.3f  %8.3f  %8.3f\n',[ A.cost B.cost C.cost])
 
 
 %%
@@ -187,54 +187,54 @@ fprintf('Subsidy Cost        %8.2f  %8.2f \n',[ A.cost B.cost C.cost])
 fprintf(2,'\nModel A  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
 fprintf('                              <10     10 to 49   >=50   total\n');
-fprintf('Share of establishments  %8.2f  %8.2f  %8.2f   %8.2f\n', A.ShareOfEstablishments);
-fprintf('Share of output          %8.2f  %8.2f  %8.2f   %8.2f\n', A.ShareOfOutput);
-fprintf('Share of labor           %8.2f  %8.2f  %8.2f   %8.2f\n', A.ShareOfLabour);
-fprintf('Share of capital         %8.2f  %8.2f  %8.2f   %8.2f\n', A.ShareOfCapital);
-fprintf('Share of employment      %8.2f  %8.2f  %8.2f   %8.2f\n', A.AverageEmployment);
+fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfEstablishments);
+fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutput);
+fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfLabour);
+fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
+fprintf('Share of employment      %8.3f  %8.3f  %8.3f   %8.3f\n', A.AverageEmployment);
 
 
 fprintf(2,'\nModel B  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
 fprintf('                             <10      10 to 49   >=50    total\n');
-fprintf('Share of establishments  %8.2f  %8.2f  %8.2f   %8.2f\n', B.ShareOfEstablishments);
-fprintf('Share of output          %8.2f  %8.2f  %8.2f   %8.2f\n', B.ShareOfOutput);
-fprintf('Share of labor           %8.2f  %8.2f  %8.2f   %8.2f\n', B.ShareOfLabour);
-fprintf('Share of capital         %8.2f  %8.2f  %8.2f   %8.2f\n', B.ShareOfCapital);
-fprintf('Share of employment      %8.2f  %8.2f  %8.2f   %8.2f\n', B.AverageEmployment);
+fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfEstablishments);
+fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfOutput);
+fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfLabour);
+fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfCapital);
+fprintf('Share of employment      %8.3f  %8.3f  %8.3f   %8.3f\n', B.AverageEmployment);
 
 fprintf(2,'\nModel C  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
 fprintf('                             <10      10 to 49   >=50    total\n');
-fprintf('Share of establishments  %8.2f  %8.2f  %8.2f   %8.2f\n', C.ShareOfEstablishments);
-fprintf('Share of output          %8.2f  %8.2f  %8.2f   %8.2f\n', C.ShareOfOutput);
-fprintf('Share of labor           %8.2f  %8.2f  %8.2f   %8.2f\n', C.ShareOfLabour);
-fprintf('Share of capital         %8.2f  %8.2f  %8.2f   %8.2f\n', C.ShareOfCapital);
-fprintf('Share of employment      %8.2f  %8.2f  %8.2f   %8.2f\n', C.AverageEmployment);
+fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfEstablishments);
+fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfOutput);
+fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfLabour);
+fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfCapital);
+fprintf('Share of employment      %8.3f  %8.3f  %8.3f   %8.3f\n', C.AverageEmployment);
 %%
 
 fprintf(2,'\nModel A  \n');
 fprintf('                     Total  with r_ear   with r_market\n');
-fprintf('TFP %22.2f  %8.2f  %8.2f    \n',[A.Output.TFP A.SUB.Output.TFP A.TAX.Output.TFP]);
-fprintf('Aggregate output  %8.2f  %8.2f  %8.2f \n', [A.Output.Y A.SUB.Output.Y A.TAX.Output.Y]);
-fprintf('Aggregate labor   %8.2f  %8.2f  %8.2f \n', [A.Output.N A.SUB.Output.N A.TAX.Output.N]);
-fprintf('Aggregate capital %8.2f  %8.2f  %8.2f \n ', [A.Output.K A.SUB.Output.K A.TAX.Output.K]);
+fprintf('TFP               %8.3f  %8.3f  %8.3f    \n',[A.Output.TFP A.SUB.Output.TFP A.TAX.Output.TFP]);
+fprintf('Aggregate output  %8.3f  %8.3f  %8.3f \n', [A.Output.Y A.SUB.Output.Y A.TAX.Output.Y]);
+fprintf('Aggregate labor   %8.3f  %8.3f  %8.3f \n', [A.Output.N A.SUB.Output.N A.TAX.Output.N]);
+fprintf('Aggregate capital %8.3f  %8.3f  %8.3f \n ', [A.Output.K A.SUB.Output.K A.TAX.Output.K]);
 
 
 
 fprintf(2,'\nModel B \n');
 fprintf('                     Total  with r_ear   with r_market\n');
-fprintf('TFP %22.2f  %8.2f  %8.2f    \n',[B.Output.TFP B.SUB.Output.TFP B.TAX.Output.TFP]);
-fprintf('Aggregate output  %8.2f  %8.2f  %8.2f \n', [B.Output.Y B.SUB.Output.Y B.TAX.Output.Y]);
-fprintf('Aggregate labor   %8.2f  %8.2f  %8.2f \n', [B.Output.N B.SUB.Output.N B.TAX.Output.N]);
-fprintf('Aggregate capital %8.2f  %8.2f  %8.2f \n ', [B.Output.K B.SUB.Output.K B.TAX.Output.K]);
+fprintf('TFP               %8.3f  %8.3f  %8.3f    \n',[B.Output.TFP B.SUB.Output.TFP B.TAX.Output.TFP]);
+fprintf('Aggregate output  %8.3f  %8.3f  %8.3f \n', [B.Output.Y B.SUB.Output.Y B.TAX.Output.Y]);
+fprintf('Aggregate labor   %8.3f  %8.3f  %8.3f \n', [B.Output.N B.SUB.Output.N B.TAX.Output.N]);
+fprintf('Aggregate capital %8.3f  %8.3f  %8.3f \n ', [B.Output.K B.SUB.Output.K B.TAX.Output.K]);
 
 fprintf(2,'\nModel C \n');
 fprintf('                     Total  with r_ear   with r_market\n');
-fprintf('TFP %22.2f  %8.2f  %8.2f    \n',[C.Output.TFP C.SUB.Output.TFP C.TAX.Output.TFP]);
-fprintf('Aggregate output  %8.2f  %8.2f  %8.2f \n', [C.Output.Y C.SUB.Output.Y C.TAX.Output.Y]);
-fprintf('Aggregate labor   %8.2f  %8.2f  %8.2f \n', [C.Output.N C.SUB.Output.N C.TAX.Output.N]);
-fprintf('Aggregate capital %8.2f  %8.2f  %8.2f \n ', [C.Output.K C.SUB.Output.K C.TAX.Output.K]);
+fprintf('TFP               %8.3f  %8.3f  %8.3f    \n',[C.Output.TFP C.SUB.Output.TFP C.TAX.Output.TFP]);
+fprintf('Aggregate output  %8.3f  %8.3f  %8.3f \n', [C.Output.Y C.SUB.Output.Y C.TAX.Output.Y]);
+fprintf('Aggregate labor   %8.3f  %8.3f  %8.3f \n', [C.Output.N C.SUB.Output.N C.TAX.Output.N]);
+fprintf('Aggregate capital %8.3f  %8.3f  %8.3f \n ', [C.Output.K C.SUB.Output.K C.TAX.Output.K]);
 %%
 %figure;
 %plot(s_grid,teste1,'r' )
