@@ -15,13 +15,13 @@ tic;
 
 % Model A
 A.Params.r_ear=(1+0.12)^(1/4)-1; % Interest rate on earmarked credit
-A.Params.g_ear=0.429;
+A.Params.g_ear=0.4336;
 A.Params.r_international= (1+0.2142)^(1/4)-1;
 
 
 % Model B
 B.Params.r_ear= (1+0.11)^(1/4)-1; % Interest rate on earmarked credit
-B.Params.g_ear=0.530;
+B.Params.g_ear=0.5031;
 B.Params.r_international =(1+0.2216)^(1/4) ;
 
 % Model C
