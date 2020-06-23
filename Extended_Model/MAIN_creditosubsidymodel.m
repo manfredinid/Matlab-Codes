@@ -6,7 +6,6 @@
 clear all;
 close all;
 
-warning off parallel:gpu:device:DeviceLibsNeedsRecompiling
 Parallel=0; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 tic;
 
@@ -22,7 +21,7 @@ A.Params.r_international= (1+0.2142)^(1/4)-1;
 % Model B
 B.Params.r_ear= (1+0.11)^(1/4)-1; % Interest rate on earmarked credit
 B.Params.g_ear=0.5031;
-B.Params.r_international =(1+0.2216)^(1/4) ;
+B.Params.r_international =(1+0.2216)^(1/4)-1 ;
 
 % Model C
 C.Params.r_ear=0; % Interest rate on earmarked credit
@@ -168,10 +167,13 @@ C.K_nfa=K_nfa;
 
 %%
 
+fprintf(' n_a  %8.3f \n', n_a);
+fprintf(' n_s  %8.3f \n', n_s);
+
 fprintf('                      Model A    Model B   Model C\n');
 fprintf('r earmarked         %8.3f  %8.3f %8.3f\n',[ A.Params.r_ear B.Params.r_ear C.Params.r_ear])
 fprintf('r Market            %8.3f  %8.3f %8.3f\n',[ A.Params.r_international B.Params.r_international C.Params.r_international])
-fprintf('Subzided Firms      %8.3f  %8.3f %8.3f\n',[ A.Params.g_ear B.Params.g_ear C.Params.g_ear])
+fprintf('Subsidized Firms      %8.3f  %8.3f %8.3f\n',[ A.Params.g_ear B.Params.g_ear C.Params.g_ear])
 
 fprintf('                      Model A    Model B   Model C\n');
 fprintf('Total Output        %8.3f  %8.3f  %8.3f\n', [A.Output.Y B.Output.Y C.Output.Y])
@@ -186,12 +188,12 @@ fprintf('Subsidy Cost        %8.3f  %8.3f  %8.3f\n',[ A.cost B.cost C.cost])
 
 fprintf(2,'\nModel A  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
-fprintf('                              <10     10 to 49   >=50   total\n');
+fprintf('                              <5     5 to 49   >=50   total\n');
 fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfEstablishments);
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
-fprintf('Share of employment      %8.3f  %8.3f  %8.3f   %8.3f\n', A.AverageEmployment);
+
 
 
 fprintf(2,'\nModel B  \n');
@@ -201,7 +203,7 @@ fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfEstab
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfCapital);
-fprintf('Share of employment      %8.3f  %8.3f  %8.3f   %8.3f\n', B.AverageEmployment);
+
 
 fprintf(2,'\nModel C  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
@@ -210,7 +212,7 @@ fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfEstab
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfCapital);
-fprintf('Share of employment      %8.3f  %8.3f  %8.3f   %8.3f\n', C.AverageEmployment);
+
 %%
 
 fprintf(2,'\nModel A  \n');

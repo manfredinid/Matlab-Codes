@@ -51,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=10;
-n_a=10;
+n_s=50;
+n_a=50;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -96,7 +96,7 @@ pi_z=kron(pi_psi,pi_s);
 
 % steady-state capital without distotions
 a_grid = [0 logspace(0.0001,6.28,n_a-1)]'; %era -1
-%a_grid = linspace(0,14,n_a)';
+
 
 %% Decision variables
 %There is no d variable
@@ -378,7 +378,7 @@ FnsToEvaluateFn_num = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,g
 
 FnsToEvaluateParamNames(11).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
 FnsToEvaluateFn_cost = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
-    (r_market-r_ear)*aprime_val;
+    (z2_val==1)*(r_market-r_ear)*aprime_val;
 
 
 FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output, FnsToEvaluateFn_nbar,...
@@ -442,8 +442,8 @@ normalize_employment=min(nonzeros(nbarValues)); % Normalize so that smallest occ
 nbarValues=nbarValues./(normalize_employment);
 
 
-Partion1Indicator=logical(nbarValues<10);
-Partion2Indicator=logical((nbarValues>=10).*(nbarValues<50));
+Partion1Indicator=logical(nbarValues<5);
+Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
 Partion3Indicator=logical(nbarValues>=50);
 
 
