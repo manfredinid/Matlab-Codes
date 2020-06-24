@@ -6,7 +6,7 @@
 clear all;
 close all;
 
-Parallel=0; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 tic;
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -198,7 +198,7 @@ fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapit
 
 fprintf(2,'\nModel B  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
-fprintf('                             <10      10 to 49   >=50    total\n');
+fprintf('                             <5      5 to 49   >=50    total\n');
 fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfEstablishments);
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfLabour);
@@ -207,7 +207,7 @@ fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfCapit
 
 fprintf(2,'\nModel C  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
-fprintf('                             <10      10 to 49   >=50    total\n');
+fprintf('                             <5      5 to 49   >=50     total\n');
 fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfEstablishments);
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfLabour);

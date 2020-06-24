@@ -29,7 +29,7 @@ Params.delta=0.025; % Depreciation rate of physical capital
 Params.cf=0; % Fixed cost of production
 
 % Adjustment cost of capital
-Params.adjustcostparam=0.01;
+Params.adjustcostparam=3.219/4;
 
 % Entry and Exit
 Params.ce=1; % Fixed cost of entry 
@@ -128,8 +128,11 @@ Params.Ne=0.5; % total mass of new entrants
 %% Potential New Entrants Distribution over the states (k,z)
 
 pistar_s=ones(size(s_grid))/n_s; % Initial guess
-for ii=1:10^3 % a while-loop is better practice, but this is easy and I am lazy atm
+dist=1;
+while dist>10^(-7)
+    pistar_s_old=pistar_s;
     pistar_s=(pi_s)'*pistar_s;
+    dist=max(abs(pistar_s-pistar_s_old));
 end
 
 %% Aspects of the Endogenous entry
