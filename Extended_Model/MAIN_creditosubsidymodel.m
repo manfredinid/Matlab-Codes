@@ -5,9 +5,10 @@
 %% Initial setups
 clear all; clear mex; clear functions;clear java;
 close all;
+clearvars -global
 
-Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
-%vfoptions.lowmemory=1;
+Parallel=2; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+vfoptions.lowmemory=1;
 tic;
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -36,7 +37,7 @@ C.Params.r_international = (1+0.15)^(1/4)-1;
 Params.r_ear=A.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = A.Params.r_international;
-
+%%
 
 fprintf(2,'\nModel A  \n');
 creditsubsidymodel;
