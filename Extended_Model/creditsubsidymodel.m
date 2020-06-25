@@ -29,7 +29,7 @@ Params.delta=0.025; % Depreciation rate of physical capital
 Params.cf=0.1; % Fixed cost of production
 
 % Adjustment cost of capital
-Params.adjustcostparam=3.219/4;
+Params.adjustcostparam=3.219;
 
 % Entry and Exit
 Params.ce=1; % Fixed cost of entry 
