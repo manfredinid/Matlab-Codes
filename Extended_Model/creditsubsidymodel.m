@@ -51,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=80;
-n_a=20;
+n_s=90;
+n_a=80;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -123,8 +123,8 @@ Params.r_market=Params.r_international;
 
 %% Initial guesses and normalization
 Params.w=1; % Normalization
-Params.p=1; % output price
-Params.Ne=0.5; % total mass of new entrants
+Params.p=0.3549; % output price
+Params.Ne=0.6774; % total mass of new entrants
 %% Potential New Entrants Distribution over the states (k,z)
 
 pistar_s=ones(size(s_grid))/n_s; % Initial guess
