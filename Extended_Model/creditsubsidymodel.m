@@ -29,7 +29,7 @@ Params.delta=0.025; % Depreciation rate of physical capital
 Params.cf=0.1; % Fixed cost of production
 
 % Adjustment cost of capital
-Params.adjustcostparam=3.219;
+Params.adjustcostparam = 3.219;
 
 % Entry and Exit
 Params.ce=1; % Fixed cost of entry 
@@ -51,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=85;
-n_a=80;
+n_s=10;
+n_a=10;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -65,12 +65,12 @@ n_a=80;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 Params.rho=0.9; 
-Params.sigma_logz=0.15; 
+Params.sigma_logz=0.13; 
 Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
 Params.a=0.04; 
 
 tauchenoptions.parallel=Parallel;
-Params.q=3; 
+Params.q=5; 
 %  q is max number of std devs from mean
 % max in s_grid has to be log(2.75)=1.0116
 [s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
@@ -95,7 +95,7 @@ pi_z=kron(pi_psi,pi_s);
 % grid for capital
 
 % steady-state capital without distotions
-a_grid = [0 logspace(0.0001,6.28,n_a-1)]'; %era -1
+a_grid = [0 logspace(0.0001,6.28,n_a-1)]'; 
 
 
 %% Decision variables
@@ -165,8 +165,8 @@ disp('sum of upsilon')
 disp(sum(Params.upsilon(:)))
 
 %% Return Function
-ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma, cf, adjustcostparam) ExistingFirm_ReturnFn(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma, cf, adjustcostparam);
-ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma', 'cf', 'adjustcostparam'}; %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
+ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, cf, adjustcostparam) ExistingFirm_ReturnFn(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, cf, adjustcostparam);
+ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta', 'cf', 'adjustcostparam'}; %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
 %% General Equilibrium Equations
 %Now define the functions for the General Equilibrium conditions

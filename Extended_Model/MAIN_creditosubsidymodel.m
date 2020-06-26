@@ -7,8 +7,8 @@ clear all; clear mex; clear functions;clear java;
 close all;
 clearvars -global
 
-Parallel=2; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
-vfoptions.lowmemory=1;
+Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+%vfoptions.lowmemory=1;
 tic;
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -196,7 +196,7 @@ fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutpu
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
 
-
+%%
 
 fprintf(2,'\nModel B  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
