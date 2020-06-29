@@ -26,7 +26,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.1; % Fixed cost of production
+Params.cf=0.08; % Fixed cost of production
 
 % Adjustment cost of capital
 Params.adjustcostparam = 3.219;
@@ -51,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=100;
-n_a=100;
+n_s=50;
+n_a=50;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)

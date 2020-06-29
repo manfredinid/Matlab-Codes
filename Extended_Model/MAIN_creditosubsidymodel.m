@@ -7,7 +7,7 @@ clear all; clear mex; clear functions;clear java;
 close all;
 clearvars -global
 
-Parallel=2; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 %vfoptions.lowmemory=1;
 tic;
 
@@ -218,27 +218,27 @@ fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfCapit
 %%
 
 fprintf(2,'\nModel A  \n');
-fprintf('                     Total  with r_ear   with r_market\n');
-fprintf('TFP               %8.3f  %8.3f  %8.3f    \n',[A.Output.TFP A.SUB.Output.TFP A.TAX.Output.TFP]);
-fprintf('Aggregate output  %8.3f  %8.3f  %8.3f \n', [A.Output.Y A.SUB.Output.Y A.TAX.Output.Y]);
-fprintf('Aggregate labor   %8.3f  %8.3f  %8.3f \n', [A.Output.N A.SUB.Output.N A.TAX.Output.N]);
-fprintf('Aggregate capital %8.3f  %8.3f  %8.3f \n ', [A.Output.K A.SUB.Output.K A.TAX.Output.K]);
+fprintf('                  with r_ear  with r_market  Total\n');
+fprintf('TFP               %8.3f    %8.3f    %8.3f    \n',[A.SUB.Output.TFP A.TAX.Output.TFP A.Output.TFP ]);
+fprintf('Aggregate output  %8.3f    %8.3f    %8.3f \n', [ A.SUB.Output.Y A.TAX.Output.Y A.Output.Y]);
+fprintf('Aggregate labor   %8.3f    %8.3f    %8.3f \n', [ A.SUB.Output.N A.TAX.Output.N A.Output.N]);
+fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [ A.SUB.Output.K A.TAX.Output.K A.Output.K]);
 
 
 
 fprintf(2,'\nModel B \n');
-fprintf('                     Total  with r_ear   with r_market\n');
-fprintf('TFP               %8.3f  %8.3f  %8.3f    \n',[B.Output.TFP B.SUB.Output.TFP B.TAX.Output.TFP]);
-fprintf('Aggregate output  %8.3f  %8.3f  %8.3f \n', [B.Output.Y B.SUB.Output.Y B.TAX.Output.Y]);
-fprintf('Aggregate labor   %8.3f  %8.3f  %8.3f \n', [B.Output.N B.SUB.Output.N B.TAX.Output.N]);
-fprintf('Aggregate capital %8.3f  %8.3f  %8.3f \n ', [B.Output.K B.SUB.Output.K B.TAX.Output.K]);
+fprintf('                  with r_ear  with r_market  Total\n');
+fprintf('TFP               %8.3f    %8.3f    %8.3f    \n',[ B.SUB.Output.TFP B.TAX.Output.TFP B.Output.TFP]);
+fprintf('Aggregate output  %8.3f    %8.3f    %8.3f \n', [ B.SUB.Output.Y B.TAX.Output.Y B.Output.Y]);
+fprintf('Aggregate labor   %8.3f    %8.3f    %8.3f \n', [ B.SUB.Output.N B.TAX.Output.N B.Output.N]);
+fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [ B.SUB.Output.K B.TAX.Output.K B.Output.K]);
 
 fprintf(2,'\nModel C \n');
-fprintf('                     Total  with r_ear   with r_market\n');
-fprintf('TFP               %8.3f  %8.3f  %8.3f    \n',[C.Output.TFP C.SUB.Output.TFP C.TAX.Output.TFP]);
-fprintf('Aggregate output  %8.3f  %8.3f  %8.3f \n', [C.Output.Y C.SUB.Output.Y C.TAX.Output.Y]);
-fprintf('Aggregate labor   %8.3f  %8.3f  %8.3f \n', [C.Output.N C.SUB.Output.N C.TAX.Output.N]);
-fprintf('Aggregate capital %8.3f  %8.3f  %8.3f \n ', [C.Output.K C.SUB.Output.K C.TAX.Output.K]);
+fprintf('                  with r_ear  with r_market  Total\n');
+fprintf('TFP               %8.3f    %8.3f    %8.3f    \n',[ C.SUB.Output.TFP C.TAX.Output.TFP C.Output.TFP]);
+fprintf('Aggregate output  %8.3f    %8.3f    %8.3f \n', [ C.SUB.Output.Y C.TAX.Output.Y C.Output.Y]);
+fprintf('Aggregate labor   %8.3f    %8.3f    %8.3f \n', [C.SUB.Output.N C.TAX.Output.N  C.Output.N]);
+fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [C.SUB.Output.K C.TAX.Output.K  C.Output.K]);
 %%
 %figure;
 %plot(s_grid,teste1,'r' )

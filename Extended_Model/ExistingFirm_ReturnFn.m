@@ -4,7 +4,7 @@ F=-Inf;
 
 adjcost=0;
 if k_val>0 && kprime_val>k_val
-    adjcost=(adjustcostparam/2)*((kprime_val-k_val)/k_val-delta)^2; % Note that adjcost>=0, it is 'minus a negative number'
+    adjcost=(adjustcostparam/2)*(((kprime_val-k_val)/k_val)-delta)^2; % Note that adjcost>=0, it is 'minus a negative number'
 end
 
 % Interest rate depends on earmarked vs non-earmarked credit firm
