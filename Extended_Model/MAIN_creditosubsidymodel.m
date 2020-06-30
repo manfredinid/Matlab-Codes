@@ -202,7 +202,7 @@ fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfEstab
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
-fprintf('Mean of TFP              %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfTFP);
+
 
 %%
 
@@ -213,7 +213,7 @@ fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfEstab
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfCapital);
-fprintf('Mean  of TFP             %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfTFP);
+
 
 
 fprintf(2,'\nModel C  \n');
@@ -223,7 +223,7 @@ fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfEstab
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfCapital);
-fprintf('Mean  of TFP             %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfTFP);
+
 
 %%
 
@@ -250,10 +250,14 @@ fprintf('Aggregate output  %8.3f    %8.3f    %8.3f \n', [ C.SUB.Output.Y C.TAX.O
 fprintf('Aggregate labor   %8.3f    %8.3f    %8.3f \n', [C.SUB.Output.N C.TAX.Output.N  C.Output.N]);
 fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [C.SUB.Output.K C.TAX.Output.K  C.Output.K]);
 %%
-fprintf('                  with r_ear  with r_market  \n');
-fprintf('Model A              %8.3f    %8.3f    \n',[ A.TFP_ear A.TFP_nonear])
-fprintf('Model B              %8.3f    %8.3f    \n',[ B.TFP_ear B.TFP_nonear])
-fprintf('Model C              %8.3f    %8.3f    \n',[ C.TFP_ear C.TFP_nonear])
+fprintf('Average TFP  \n');
+fprintf('                  <5         5 to 49      >=50       total \n');
+fprintf('Model A       %8.3f     %8.3f    %8.3f   %8.3f \n',[A.ShareOfTFP])
+fprintf('Model B       %8.3f     %8.3f    %8.3f   %8.3f\n',[B.ShareOfTFP])
+fprintf('Model C       %8.3f     %8.3f    %8.3f   %8.3f\n',[C.ShareOfTFP])
+
+
+
 %figure;
 %plot(s_grid,teste1,'r' )
 %hold on;

@@ -506,9 +506,9 @@ ShareOfTFP(3)=sum(TFP_pdf(Partion3Indicator).*(StationaryDist.pdf(Partion3Indica
 ShareOfTFP(4)=sum(sum(sum(TFP_pdf.*(shiftdim(ProbDensityFns(12,:,:,:),1)))));
 
 
-TFP_ear = sum(sum(TFP_pdf(:,:,2).*StationaryDist.pdf(:,:,2)/(sum(sum(StationaryDist.pdf(:,:,2))))));
+TFP_ear = sum(sum(TFP_pdf(:,:,2).*(StationaryDist.pdf(:,:,2)/(sum(sum(StationaryDist.pdf(:,:,2)))))));
 
-TFP_nonear = sum(sum(TFP_pdf(:,:,1).*StationaryDist.pdf(:,:,1)/(sum(sum(StationaryDist.pdf(:,:,1))))));
+TFP_nonear = sum(sum(TFP_pdf(:,:,1).*(StationaryDist.pdf(:,:,1)/(sum(sum(StationaryDist.pdf(:,:,1)))))));
 
 %fprintf('Distribution statistics of benchmark economy  \n');
 %fprintf('                               <5     5 to 49     >=50   total\n');
