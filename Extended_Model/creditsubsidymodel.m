@@ -51,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=25;
-n_a=20;
+n_s=85;
+n_a=80;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)

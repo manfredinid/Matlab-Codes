@@ -7,7 +7,7 @@ clear all; clear mex; clear functions;clear java;
 close all;
 clearvars -global
 
-Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+Parallel=2; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 %vfoptions.lowmemory=1;
 tic;
 
