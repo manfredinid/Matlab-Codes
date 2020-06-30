@@ -69,10 +69,12 @@ A.ShareOfOutput=ShareOfOutput;
 A.ShareOfLabour=ShareOfLabour;
 A.ShareOfCapital=ShareOfCapital;
 A.AverageEmployment=AverageEmployment;
-
+A.ShareOfTFP=ShareOfTFP;
 
 A.Percentage_tax=Percentage_tax;
 A.K_nfa=K_nfa;
+A.TFP_ear =TFP_ear;
+A.TFP_nonear =TFP_nonear;
 
 %% Model B 
 % Earmarked credit with embebed subsidies (psi)
@@ -116,10 +118,12 @@ B.ShareOfOutput=ShareOfOutput;
 B.ShareOfLabour=ShareOfLabour;
 B.ShareOfCapital=ShareOfCapital;
 B.AverageEmployment=AverageEmployment;
-
+B.ShareOfTFP=ShareOfTFP;
 
 B.Percentage_tax=Percentage_tax;
 B.K_nfa=K_nfa;
+B.TFP_ear =TFP_ear;
+B.TFP_nonear =TFP_nonear;
 
 %% Model C
 % Earmarked credit with embebed subsidies (psi)
@@ -161,10 +165,13 @@ C.ShareOfOutput=ShareOfOutput;
 C.ShareOfLabour=ShareOfLabour;
 C.ShareOfCapital=ShareOfCapital;
 C.AverageEmployment=AverageEmployment;
-
+C.ShareOfTFP=ShareOfTFP;
 
 C.Percentage_tax=Percentage_tax;
 C.K_nfa=K_nfa;
+C.TFP_ear =TFP_ear;
+C.TFP_nonear =TFP_nonear;
+
 
 
 %%
@@ -195,6 +202,7 @@ fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfEstab
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
+fprintf('Mean of TFP              %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfTFP);
 
 %%
 
@@ -205,6 +213,7 @@ fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfEstab
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfCapital);
+fprintf('Mean  of TFP             %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfTFP);
 
 
 fprintf(2,'\nModel C  \n');
@@ -214,6 +223,7 @@ fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfEstab
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfCapital);
+fprintf('Mean  of TFP             %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfTFP);
 
 %%
 
@@ -240,6 +250,10 @@ fprintf('Aggregate output  %8.3f    %8.3f    %8.3f \n', [ C.SUB.Output.Y C.TAX.O
 fprintf('Aggregate labor   %8.3f    %8.3f    %8.3f \n', [C.SUB.Output.N C.TAX.Output.N  C.Output.N]);
 fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [C.SUB.Output.K C.TAX.Output.K  C.Output.K]);
 %%
+fprintf('                  with r_ear  with r_market  \n');
+fprintf('Model A              %8.3f    %8.3f    \n',[ A.TFP_ear A.TFP_nonear])
+fprintf('Model B              %8.3f    %8.3f    \n',[ B.TFP_ear B.TFP_nonear])
+fprintf('Model C              %8.3f    %8.3f    \n',[ C.TFP_ear C.TFP_nonear])
 %figure;
 %plot(s_grid,teste1,'r' )
 %hold on;
@@ -253,7 +267,6 @@ fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [C.SUB.Output.K C.TAX.O
 
 %LABOR
 %figure; plot((squeeze(sum(ProbDensityFns(3,:,:,:)))))
-
 
 
 toc;

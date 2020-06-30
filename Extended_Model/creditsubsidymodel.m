@@ -51,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=50;
-n_a=50;
+n_s=25;
+n_a=20;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -378,16 +378,22 @@ FnsToEvaluateParamNames(10).Names={'p', 'w','alpha','gamma'};
 FnsToEvaluateFn_num = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
     (z2_val==0)*2 + (z2_val==1)*3;
 
-
+% Subsity costs
 FnsToEvaluateParamNames(11).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
 FnsToEvaluateFn_cost = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
     (z2_val==1)*(r_market-r_ear)*aprime_val;
+
+% TFP 
+FnsToEvaluateParamNames(12).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
+FnsToEvaluateFn_tfp = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
+    z1_val;
+
 
 
 FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output, FnsToEvaluateFn_nbar,...
        FnsToEvaluateFn_SUBkbar, FnsToEvaluateFn_SUBoutput, FnsToEvaluateFn_SUBnbar,...
     FnsToEvaluateFn_TAXkbar, FnsToEvaluateFn_TAXoutput, FnsToEvaluateFn_TAXnbar,...
-    FnsToEvaluateFn_num,FnsToEvaluateFn_cost};
+    FnsToEvaluateFn_num,FnsToEvaluateFn_cost, FnsToEvaluateFn_tfp};
 
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
@@ -491,6 +497,18 @@ AverageEmployment(4)=100*sum(sum(sum(nbarValues.*...
 StationaryDist.pdf)))/sum(sum(sum(nbarValues.*...
 StationaryDist.pdf)));
 
+
+TFP_pdf=shiftdim(ValuesOnGrid(12,:,:,:),1);
+ShareOfTFP(1)=sum(TFP_pdf(Partion1Indicator).*(StationaryDist.pdf(Partion1Indicator)/(sum(sum(StationaryDist.pdf(Partion1Indicator))))));
+ShareOfTFP(2)=sum(TFP_pdf(Partion2Indicator).*(StationaryDist.pdf(Partion2Indicator)/(sum(sum(StationaryDist.pdf(Partion2Indicator))))));
+ShareOfTFP(3)=sum(TFP_pdf(Partion3Indicator).*(StationaryDist.pdf(Partion3Indicator)/(sum(sum(StationaryDist.pdf(Partion3Indicator))))));
+%ShareOfTFP(4)=sum(sum(sum(TFP_pdf.*StationaryDist.pdf)));
+ShareOfTFP(4)=sum(sum(sum(TFP_pdf.*(shiftdim(ProbDensityFns(12,:,:,:),1)))));
+
+
+TFP_ear = sum(sum(TFP_pdf(:,:,2).*StationaryDist.pdf(:,:,2)/(sum(sum(StationaryDist.pdf(:,:,2))))));
+
+TFP_nonear = sum(sum(TFP_pdf(:,:,1).*StationaryDist.pdf(:,:,1)/(sum(sum(StationaryDist.pdf(:,:,1))))));
 
 %fprintf('Distribution statistics of benchmark economy  \n');
 %fprintf('                               <5     5 to 49     >=50   total\n');
