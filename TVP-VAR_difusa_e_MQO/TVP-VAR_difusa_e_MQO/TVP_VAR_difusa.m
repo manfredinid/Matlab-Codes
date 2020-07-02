@@ -1,6 +1,6 @@
 
-%%TVP-VAR Heteroded·stico (baseado no codigo do Koop)
-%Variveis: Taxa de VariÁ„o do PIB e FBCF (% PIB) sobre o PIB e variaÁ„o do PIB
+%%TVP-VAR Heteroded√°stico (baseado no codigo do Koop)
+%Variveis: Taxa de Vari√ß√£o do PIB e FBCF (% PIB) sobre o PIB e varia√ß√£o do PIB
 %Codigo para o artigo da disciplina de Econometria II PPGEco/UFSC 2017
 %Denise Manfredini
 
@@ -18,7 +18,7 @@ load yearlab1.dat
 Y = ydata1;
 
 
-% Dimensıes de X e Y
+% Dimens√µes de X e Y
 t=size(Y,1); % t is the time-series observations of Y
 M=size(Y,2); % M is the dimensionality of Y
 
@@ -30,7 +30,7 @@ numa = M*(M-1)/2; % Number of lower triangular elements of A_t (other than 0's a
 ylag = mlag2(Y,p); % Y is [T x M]. ylag is [T x (Mp)]
 ylag = ylag(p+1:t,:);
 
-K = M + p*(M^2); % K È o n˙mero de elementos no vetor de estados
+K = M + p*(M^2); % K √© o n√∫mero de elementos no vetor de estados
 % Cria a matriz Z_t.
 Z = zeros((t-p)*M,K);
 for i = 1:t-p
@@ -47,7 +47,7 @@ end
 y = Y(p+1:t,:)';
 yearlab = yearlab1(p+1:t);
 
-% Tamanho da sÈrie temporal
+% Tamanho da s√©rie temporal
 t=size(y,2);  
 
 %----------------------------PRELIMINARES---------------------------------
@@ -57,11 +57,11 @@ nburn = round(0.20*nrep);   % burn-in
 it_print = 1000;
 
 % Escolha dos anos da FIR
-FIR1 = 1976;
-FIR2 = 1996;
-FIR3 = 2015;
+FIR1 = 2003.00;
+FIR2 = 2009.00;
+FIR3 = 2015.00;
 
-%========= PRIORS N√O INFORMATIVA:
+%========= PRIORS N√ÉO INFORMATIVA:
 
  A_OLS = zeros(numa,1);
  B_OLS = zeros(K,1);
@@ -69,7 +69,7 @@ FIR3 = 2015;
  VB_OLS = eye(K);
  sigma_OLS = [-9; 0; 0]; %ones tinha dados certo
 
-% Hiperpar‚metros k
+% Hiperpar√¢metros k
 k_Q = 0.1;
 k_S = 0.1;
 k_W = 0.1;
@@ -110,7 +110,7 @@ for ii = 2:M
     ind = ind + ii;
 end
 
-%========= MARIZES DE INICIALIZA«√O:
+%========= MARIZES DE INICIALIZA√á√ÉO:
 
 consQ = 0.0001;
 consS = 0.0001;
@@ -162,13 +162,13 @@ if istore == 1;
 end
 
 
-%====================================== INÕCIO DO AMOSTRADOR SAMPLING ========================================
+%====================================== IN√çCIO DO AMOSTRADOR SAMPLING ========================================
 %==============================================================================================
 tic; % This is just a timer
 disp('Number of iterations');
 
 
-for irep = 1:nrep + nburn    % InÌcio do Gibbs
+for irep = 1:nrep + nburn    % In√≠cio do Gibbs
   
     if mod(irep,it_print) == 0
         disp(irep);toc;
@@ -191,7 +191,7 @@ for irep = 1:nrep + nburn    % InÌcio do Gibbs
     
     
     %------------------------------------------------------------------------------------------
-    %   STEP III: Amostra a matriz de covari‚ncia do VAR log-SIGMA(t)
+    %   STEP III: Amostra a matriz de covari√¢ncia do VAR log-SIGMA(t)
     %------------------------------------------------------------------------------------------
     
     draw_sigma
@@ -210,7 +210,7 @@ for irep = 1:nrep + nburn    % InÌcio do Gibbs
         Htsd((i-1)*M+1:i*M,:) = Hsd;  % Cholesky DE H(t)
     end
     
-    %----------------------------IMPULSO RESPOSTAS E RESULTADOS P”S DESCARTE-----------------
+    %----------------------------IMPULSO RESPOSTAS E RESULTADOS P√ìS DESCARTE-----------------
     if irep > nburn;      
         
         Bt_save(:,:,nrep) = Btdraw;
@@ -225,7 +225,7 @@ for irep = 1:nrep + nburn    % InÌcio do Gibbs
         end
         Smean = Smean + Sdraw;    % covariance matrix S of A(t)
         Wmean = Wmean + Wdraw;    % covariance matrix W of SIGMA(t)
-        % CorrelaÁıes e vari‚ncias variantes no tempo
+        % Correla√ß√µes e vari√¢ncias variantes no tempo
         stemp6 = zeros(M,1);
         stemp5 = [];
         stemp7 = [];
@@ -243,8 +243,8 @@ for irep = 1:nrep + nburn    % InÌcio do Gibbs
             stemp5 = [stemp5 ; stemp6']; 
             stemp7 = [stemp7 ; stemp7a']; 
         end
-        sigmean = sigmean + stemp5; % diagonal da matriz de covari‚ncia do VAR
-        cormean =cormean + stemp7;  % elementos fora da diagonal dos elementos da matriz de covari‚ncia do VAR
+        sigmean = sigmean + stemp5; % diagonal da matriz de covari√¢ncia do VAR
+        cormean =cormean + stemp7;  % elementos fora da diagonal dos elementos da matriz de covari√¢ncia do VAR
         sig2mo = sig2mo + stemp5.^2;
         cor2mo = cor2mo + stemp7.^2;
          
@@ -274,5 +274,5 @@ cormean = cormean./nrep;
 sig2mo = sig2mo./nrep;
 cor2mo = cor2mo./nrep;
 
-%Gr·ficos
+%Gr√°ficos
 graph_TVP;
