@@ -15,8 +15,9 @@ rand('twister',sum(100*clock));
 load ydata1.dat
 load yearlab1.dat
 
+% you have to x13 the series
 Y = ydata1;
-
+yearlab =datenum(2003,1:208,1)';
 
 % Dimensões de X e Y
 t=size(Y,1); % t is the time-series observations of Y
@@ -52,9 +53,9 @@ t=size(y,2);
 
 %----------------------------PRELIMINARES---------------------------------
 % Preliminares para o Gibbs
-nrep = 10000;  % Amostragens
+nrep = 1000;  % Amostragens
 nburn = round(0.20*nrep);   % burn-in
-it_print = 1000;
+it_print = round(0.05*nrep);
 
 % Escolha dos anos da FIR
 FIR1 = 2003.00;
@@ -162,7 +163,7 @@ if istore == 1;
 end
 
 
-%====================================== INÍCIO DO AMOSTRADOR SAMPLING ========================================
+%====================================== IN�?CIO DO AMOSTRADOR SAMPLING ========================================
 %==============================================================================================
 tic; % This is just a timer
 disp('Number of iterations');

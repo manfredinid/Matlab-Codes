@@ -10,19 +10,19 @@ subplot(3,1,1)
 plot(yearlab1,Y(:,1),'-','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Produtividade Total dos Fatores ')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,2)
 plot(yearlab1,Y(:,2),'-','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Importações (%PIB)')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,3)
 plot(yearlab1,Y(:,3),'-','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Formação Bruta de Capital Fixo (%PIB)')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 
 
@@ -37,19 +37,19 @@ subplot(3,1,1)
 plot(yearlab,sigmean(:,1),':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Produtividade Total dos Fatores ')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,2)
 plot(yearlab,sigmean(:,2),':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Importações (%PIB)')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,3)
 plot(yearlab,sigmean(:,3),':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Formação Bruta de Capital Fixo (%PIB)')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 %% Cálculo das Funções Impulso Resposta
 % Os anos das Funções estão no script FIR
@@ -73,7 +73,7 @@ if istore == 1
     plot(1:nhor,squeeze(imp81XY(2,1,:)))
     hold on
     plot(1:nhor,squeeze(imp96XY(2,1,:)))
-    legend('1976','1996','2015');
+    legend('2003','2009','2015');
 set(gca,'Fontsize',8);
  xlim([1 nhor]);
 title(['Resposta da Produtividade Total dos Fatores'],'FontSize',8,'FontWeight','bold');
@@ -99,7 +99,7 @@ title(['Resposta ds Importações (%PIB)'],'FontSize',8,'FontWeight','bold');
     hold on
     plot(1:nhor,squeeze(imp96XY(2,3,:)))
     xlim([1 nhor])
-    legend('1976','1996','2015')
+    legend('2003','2009','2015')
 
 
 %% Intervalos de Confiança para o Parâmetros
@@ -202,7 +202,7 @@ hold on
 plot(yearlab,a2,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Produtividade na Produtividade ')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,2)
 plot(yearlab,Bt_postmean(3,:),'-','LineWidth',1);
@@ -210,7 +210,7 @@ hold on
 plot(yearlab,a3,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Importação na Produtividade')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,3)
 plot(yearlab,Bt_postmean(4,:),'-','LineWidth',1);
@@ -218,7 +218,7 @@ hold on
 plot(yearlab,a4,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito do Investimento na Produtividade')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 % Segunda Equação 
      figure;
@@ -230,7 +230,7 @@ hold on
 plot(yearlab,a6,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Produtividade nas Importações ')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,2)
 plot(yearlab,Bt_postmean(7,:),'-','LineWidth',1);
@@ -238,7 +238,7 @@ hold on
 plot(yearlab,a7,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Importação nas Importações')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,3)
 plot(yearlab,Bt_postmean(8,:),'-','LineWidth',1);
@@ -246,7 +246,7 @@ hold on
 plot(yearlab,a8,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito do Investimento nas Importações')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 
   
@@ -260,7 +260,7 @@ hold on
 plot(yearlab,a10,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Produtividade no Investimento')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,2)
 plot(yearlab,Bt_postmean(11,:),'-','LineWidth',1);
@@ -268,7 +268,7 @@ hold on
 plot(yearlab,a11,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Importação no Investimento')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 subplot(3,1,3)
 plot(yearlab,Bt_postmean(12,:),'-','LineWidth',1);
@@ -276,7 +276,7 @@ hold on
 plot(yearlab,a12,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito do Investimento no Investimento')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 
 
@@ -313,7 +313,7 @@ hold off
 alpha(.3)
 set(gca,'Fontsize',8);
 title('Efeito das Importações na Produtividade ')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 % Terceira Equação -- Terceiro Coficiente  
 subplot(2,1,2)
@@ -328,7 +328,7 @@ hold off
 alpha(.3)
 set(gca,'Fontsize',8);
 title('Efeito do Investimento na Produtividade')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
  figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
@@ -347,7 +347,7 @@ hold off
 alpha(.3)
 set(gca,'Fontsize',8);
 title('Efeito do Investimento nas Importações ')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 % Terceira Equação -- Terceiro Coficiente  
 subplot(2,1,2)
@@ -362,7 +362,7 @@ hold off
 alpha(.3)
 set(gca,'Fontsize',8);
 title('Efeito da Produtividade no Investimento')
-xlim([1960 2017])
+xlim([2003.00 2020.02])
 
 
 end;
