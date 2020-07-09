@@ -135,7 +135,7 @@ Params.r_international = C.Params.r_international;
 
 
 fprintf(2,'\nModel C  \n');
-creditsubsidymodel;;
+creditsubsidymodel;
 
 
 % Agggregate Values

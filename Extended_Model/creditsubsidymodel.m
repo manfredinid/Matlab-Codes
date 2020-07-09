@@ -26,13 +26,13 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.08; % Fixed cost of production
+Params.cf=0.0005; % Fixed cost of production
 
 % Adjustment cost of capital
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=1; % Fixed cost of entry 
+Params.ce=1.5; % Fixed cost of entry 
 Params.lambda= 1-(1-0.1859)^(1/4); % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
@@ -51,7 +51,7 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=5;
+n_s=30;
 n_a=200;
 % n_psi is two since psi \in {0,1}
 
@@ -123,8 +123,8 @@ Params.r_market=Params.r_international;
 
 %% Initial guesses and normalization
 Params.w=1; % Normalization
-Params.p=0.3549; % output price
-Params.Ne=0.6774; % total mass of new entrants
+Params.p=0.355; % output price
+Params.Ne=0.66; % total mass of new entrants
 %% Potential New Entrants Distribution over the states (k,z)
 
 pistar_s=ones(size(s_grid))/n_s; % Initial guess

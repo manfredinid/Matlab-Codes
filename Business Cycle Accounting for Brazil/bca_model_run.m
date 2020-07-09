@@ -13,7 +13,7 @@
 
 
 %Order of approximation desired 
-approx = 2;
+approx = 1;
 
 %Obtain numerical derivatives of f
 num_eval
