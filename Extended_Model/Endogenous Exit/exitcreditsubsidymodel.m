@@ -13,10 +13,10 @@
 
 vfoptions.parallel=Parallel;
 simoptions.parallel=Parallel;
-%heteroagentoptions.verbose=1;
+heteroagentoptions.verbose=1;
 simoptions.agententryandexit=1;
-%simoptions.endogenousexit=1;
-%vfoptions.endogenousexit=1;
+simoptions.endogenousexit=1;
+vfoptions.endogenousexit=1;
 
 %% Parameters
 
@@ -27,7 +27,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0; % Fixed cost of production
+Params.cf=0.055; % Fixed cost of production
 
 
 Params.w=1; % Normalization
@@ -36,11 +36,11 @@ Params.p=0.3549; % output price
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=150; % Fixed cost of entry 
-Params.lambda= 1-(1-0.1859)^(1/4); % Probability of firm exit
+Params.ce=5; % Fixed cost of entry 
+%Params.lambda= 1-(1-0.1859)^(1/4); % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
-Params.oneminuslambda=1-Params.lambda; % Probability of survival
+%Params.oneminuslambda=1-Params.lambda; % Probability of survival
 
 % Declare discount factors
 %DiscountFactorParamNames={'beta'};
@@ -55,8 +55,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=5;
-n_a=205;
+n_s=10;
+n_a=20;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -146,16 +146,27 @@ vfoptions.endogenousexit=1;
 
 
 %% Return Function
-ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, cf, adjustcostparam) ExistingFirm_ReturnFn(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, cf, adjustcostparam);
-ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta', 'cf', 'adjustcostparam'}; %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
+ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
+    alpha,gamma,delta, cf, adjustcostparam) ExistingFirm_ReturnFn(kprime_val,...
+    k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, cf, adjustcostparam);
+ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
+    'cf', 'adjustcostparam'}; %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
-vfoptions.ReturnToExitFn=@(a_val, z_val,cf) 0; 
-vfoptions.ReturnToExitFnParamNames={};
+vfoptions.ReturnToExitFn=@(k_val,s_val, psi_val, p,w,r_market,...
+    r_ear, alpha,gamma,delta, cf)-cf; 
+vfoptions.ReturnToExitFnParamNames={'p','w','r_market','r_ear', 'alpha',...
+    'gamma','delta', 'cf'};
+
+[V,Policy,ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
+
 
 %%
 
 % Probability of being in the (k, s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
+
+EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
+Params.oneminuslambda=1-ExitPolicy;
 
 % Conditional entry will allow for different productivity cutoffs for 
 %new entrants depending on earmarked-vs-nonearmarked.
@@ -180,34 +191,47 @@ disp(sum(Params.upsilon(:)))
 
 %% General Equilibrium Equations
 %Now define the functions for the General Equilibrium conditions
-
+GEPriceParamNames={'p','Ne'}; 
 FnsToEvaluateParamNames(1).Names={};
 FnsToEvaluate={};
 
-
-%Note: length(AggVars) is as for FnsToEvaluate and length(p) is length(n_p)
-heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
 
 % A 'condlentry' general equilibrium condition will take values of greater
 % than zero for firms that decide to enter, less than zero for first that
 % decide not to enter (or more accurately, after entry decision they draw
 % their state, and then decide to cancel/abort their entry).
 
-GEPriceParamNames={'p','Ne'}; 
+
     
 % % Conditional entry condition   (entry - 1st step)
-GeneralEqmEqnParamNames(1).Names={'beta'};
-GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
+%GeneralEqmEqnParamNames(1).Names={'beta'};
+%GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
 
 %  Free entry conditions  (entry - 2nd step)
-GeneralEqmEqnParamNames(2).Names={'beta','ce'};
-GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce;
+%GeneralEqmEqnParamNames(2).Names={'beta','ce'};
+%GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce;
 
+heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
+
+GEPriceParamNames={'p'}; 
+GeneralEqmEqnParamNames(1).Names={'beta'};
+GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
+GeneralEqmEqnParamNames(2).Names={'beta','ce'};
+GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
 GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry};
+
+GEPriceParamNames={'p','Ne'};
+ FnsToEvaluateParamNames(1).Names={'p', 'w','alpha','gamma'};
+ FnsToEvaluateFn_nbar =  @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+    ((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+ %GeneralEqmEqnParamNames(3).Names={};
+%GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
+%FnsToEvaluate={FnsToEvaluateFn_nbar};
+ heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
+  GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry}; 
 
 %% Find equilibrium prices
 
-heteroagentoptions.verbose=1;
 n_p=0;
 disp('Calculating price vector corresponding to the stationary eqm')
 % NOTE: EntryExitParamNames has to be passed as an additional input 
@@ -216,17 +240,17 @@ disp('Calculating price vector corresponding to the stationary eqm')
     (n_d, n_a, n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn,...
     FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames,...
     ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
-    GEPriceParamNames,heteroagentoptions, simoptions, [],...
+    GEPriceParamNames,heteroagentoptions, simoptions, vfoptions,...
     EntryExitParamNames);
 
 Params.p=p_eqm.p;
 Params.Ne=p_eqm.Ne;
 
 %% Value Function, Policy and Firm Distribution in GE
-[V,Policy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z,...
+[V,Policy,ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z,...
     ReturnFn, Params, DiscountFactorParamNames,ReturnFnParamNames, vfoptions);
-%Params.oneminuslambda=1-ExitPolicy;
-StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
+Params.oneminuslambda=1-ExitPolicy;
+StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, [],...
     Params, EntryExitParamNames);
 
 %% Solve the partial equilibrium problem of capital market clearance.
