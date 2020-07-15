@@ -27,7 +27,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=10; % Fixed cost of production
+Params.cf=1; % Fixed cost of production
 
 
 Params.w=1; % Normalization
@@ -36,15 +36,15 @@ Params.p=0.3549; % output price
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=25; % Fixed cost of entry 
+Params.ce=250; % Fixed cost of entry 
 
 %% States
 
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=10;
-n_a=100;
+n_s=5;
+n_a=10;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -160,7 +160,7 @@ Params.oneminuslambda=1-ExitPolicy;
 EntryExitParamNames.CondlEntryDecisions={'ebar'};
 % Takes value of one for enter, zero for not-enter. This is just an initial
 %guess as the actual decisions are determined as part of general equilibrium.
-Params.ebar=ones([n_a,n_z]); 
+Params.ebar=zeros([n_a,n_z]); 
 
 EntryExitParamNames.MassOfNewAgents={'Ne'};
 
@@ -595,6 +595,9 @@ TFP_nonear = sum(sum(TFP_pdf(:,:,1).*(StationaryDist.pdf(:,:,1)/(sum(sum(Station
 %plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,1)),1)),'b')
 %hold on;
 %plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,2)),1)),':')
+
+lambda = sum(sum(sum(Params.oneminuslambda(:,:,:)==1)))/sum(sum(sum(Params.oneminuslambda(:,:,:)>=0)));
+probenter = sum(sum(sum(Params.ebar(:,:,:)==1)))/sum(sum(sum(Params.ebar(:,:,:)>=0)));
 
 
 %toc;

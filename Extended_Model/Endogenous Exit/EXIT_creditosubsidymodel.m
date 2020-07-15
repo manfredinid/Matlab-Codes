@@ -76,6 +76,8 @@ A.K_nfa=K_nfa;
 A.TFP_ear =AggVars(13);
 A.TFP_nonear =AggVars(14);
 A.ebar=Params.ebar;
+A.lambda=lambda;
+A.probenter=probenter;
 %% Model B 
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -125,6 +127,8 @@ B.K_nfa=K_nfa;
 B.TFP_ear =AggVars(13);
 B.TFP_nonear =AggVars(14);
 B.ebar=Params.ebar;
+B.lambda=lambda;
+B.probenter=probenter;
 %% Model C
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -173,7 +177,8 @@ C.TFP_ear =AggVars(13);
 C.TFP_nonear =AggVars(14);
 C.ebar=Params.ebar;
 
-
+C.lambda=lambda;
+C.probenter=probenter;
 %%
 
 fprintf(' n_a  %8.3f \n', n_a);
@@ -267,7 +272,9 @@ fprintf('Model C       %8.3f     %8.3f  \n',[C.TFP_nonear C.TFP_ear])
 
 
 
-
+fprintf('                      Model A    Model B   Model C\n');
+fprintf('Prob Stay       %8.3f  %8.3f %8.3f\n',[ A.lambda B.lambda C.lambda])
+fprintf('Prob Enter        %8.3f  %8.3f %8.3f\n',[ A.probenter B.probenter C.probenter])
 
 %figure;
 %plot(s_grid,teste1,'r' )
