@@ -73,7 +73,8 @@ A.ShareOfTFP=ShareOfTFP;
 
 A.Percentage_tax=Percentage_tax;
 A.K_nfa=K_nfa;
-
+A.TFP_ear =AggVars(13);
+A.TFP_nonear =AggVars(14);
 A.ebar=Params.ebar;
 %% Model B 
 % Earmarked credit with embebed subsidies (psi)
@@ -121,7 +122,8 @@ B.ShareOfTFP=ShareOfTFP;
 
 B.Percentage_tax=Percentage_tax;
 B.K_nfa=K_nfa;
-
+B.TFP_ear =AggVars(13);
+B.TFP_nonear =AggVars(14);
 B.ebar=Params.ebar;
 %% Model C
 % Earmarked credit with embebed subsidies (psi)
@@ -167,7 +169,8 @@ C.ShareOfTFP=ShareOfTFP;
 
 C.Percentage_tax=Percentage_tax;
 C.K_nfa=K_nfa;
-
+C.TFP_ear =AggVars(13);
+C.TFP_nonear =AggVars(14);
 C.ebar=Params.ebar;
 
 
@@ -248,10 +251,19 @@ fprintf('Aggregate labor   %8.3f    %8.3f    %8.3f \n', [C.SUB.Output.N C.TAX.Ou
 fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [C.SUB.Output.K C.TAX.Output.K  C.Output.K]);
 %%
 fprintf('Average TFP  \n');
+fprintf('Average TFP  \n');
 fprintf('                  <5         5 to 49      >=50       total \n');
 fprintf('Model A       %8.3f     %8.3f    %8.3f   %8.3f \n',[A.ShareOfTFP])
 fprintf('Model B       %8.3f     %8.3f    %8.3f   %8.3f\n',[B.ShareOfTFP])
 fprintf('Model C       %8.3f     %8.3f    %8.3f   %8.3f\n',[C.ShareOfTFP])
+
+%%
+fprintf('Average TFP  \n');
+fprintf('                  non-earmaked         earmakerd \n');
+fprintf('Model A       %8.3f     %8.3f  \n',[A.TFP_nonear A.TFP_ear])
+fprintf('Model B       %8.3f     %8.3f  \n',[B.TFP_nonear B.TFP_ear])
+fprintf('Model C       %8.3f     %8.3f  \n',[C.TFP_nonear C.TFP_ear])
+
 
 
 
