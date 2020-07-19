@@ -26,7 +26,7 @@ B.Params.g_ear=0.5031;
 B.Params.r_international =(1+0.2216)^(1/4)-1 ;
 
 % Model C
-C.Params.r_ear=0; % Interest rate on earmarked credit
+C.Params.r_ear=(1+0.15)^(1/4)-1; % Interest rate on earmarked credit
 C.Params.g_ear=0;
 C.Params.r_international = (1+0.15)^(1/4)-1;
 
@@ -37,11 +37,14 @@ C.Params.r_international = (1+0.15)^(1/4)-1;
 Params.r_ear=A.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = A.Params.r_international;
-%%
+%% Initial Guesses
+%Params.p = 0.527;
+Params.Ne=0.51; % total mass of new entrants
 
+%%
 fprintf(2,'\nModel A  \n');
 exitcreditsubsidymodel;
-
+%%
 % Agggregate Values
 A.Output.Y=AggVars(2);
 A.Output.N=AggVars(3);
@@ -63,6 +66,7 @@ A.SUB.Output.N=AggVars(6);
 A.SUB.Output.K=AggVars(4);
 A.SUB.Output.KdivY=A.SUB.Output.K/A.SUB.Output.Y;
 A.SUB.Output.TFP=(A.SUB.Output.Y/((A.SUB.Output.K^ Params.alpha)*(A.SUB.Output.N^ Params.gamma)));
+A.MinOfTFP=MinOfTFP;
 
 A.ShareOfEstablishments=ShareOfEstablishments;
 A.ShareOfOutput=ShareOfOutput;
@@ -78,6 +82,7 @@ A.TFP_nonear =AggVars(14);
 A.ebar=Params.ebar;
 A.lambda=lambda;
 A.probenter=probenter;
+A.ProbnbarValues=ProbnbarValues;
 %% Model B 
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -121,6 +126,13 @@ B.ShareOfLabour=ShareOfLabour;
 B.ShareOfCapital=ShareOfCapital;
 B.AverageEmployment=AverageEmployment;
 B.ShareOfTFP=ShareOfTFP;
+B.MinOfTFP=MinOfTFP;
+
+B.SUBShareOfEstablishments=SUBShareOfEstablishments;
+B.SUBShareOfOutput=SUBShareOfOutput;
+B.SUBShareOfLabour=SUBShareOfLabour;
+B.SUBShareOfCapital=SUBShareOfCapital;
+
 
 B.Percentage_tax=Percentage_tax;
 B.K_nfa=K_nfa;
@@ -129,6 +141,7 @@ B.TFP_nonear =AggVars(14);
 B.ebar=Params.ebar;
 B.lambda=lambda;
 B.probenter=probenter;
+B.ProbnbarValues=ProbnbarValues;
 %% Model C
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -170,6 +183,12 @@ C.ShareOfLabour=ShareOfLabour;
 C.ShareOfCapital=ShareOfCapital;
 C.AverageEmployment=AverageEmployment;
 C.ShareOfTFP=ShareOfTFP;
+C.MinOfTFP=MinOfTFP;
+
+C.SUBShareOfEstablishments=SUBShareOfEstablishments;
+C.SUBShareOfOutput=SUBShareOfOutput;
+C.SUBShareOfLabour=SUBShareOfLabour;
+C.SUBShareOfCapital=SUBShareOfCapital;
 
 C.Percentage_tax=Percentage_tax;
 C.K_nfa=K_nfa;
@@ -179,9 +198,11 @@ C.ebar=Params.ebar;
 
 C.lambda=lambda;
 C.probenter=probenter;
+C.ProbnbarValues=ProbnbarValues;
 %%
 
 fprintf(' n_a  %8.3f \n', n_a);
+
 fprintf(' n_s  %8.3f \n', n_s);
 
 fprintf('                      Model A    Model B   Model C\n');
@@ -220,6 +241,8 @@ fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfLabou
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', B.ShareOfCapital);
 
 
+%%
+
 
 fprintf(2,'\nModel C  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
@@ -229,7 +252,15 @@ fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfOutpu
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfCapital);
 
+%%
 
+fprintf(2,'\nModel B Subsidized\n');
+fprintf('Distribution statistics of benchmark economy  \n');
+fprintf('                             <5      5 to 49   >=50    total\n');
+fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', B.SUBShareOfEstablishments);
+fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', B.SUBShareOfOutput);
+fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', B.SUBShareOfLabour);
+fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', B.SUBShareOfCapital);
 %%
 
 fprintf(2,'\nModel A  \n');
@@ -255,7 +286,7 @@ fprintf('Aggregate output  %8.3f    %8.3f    %8.3f \n', [ C.SUB.Output.Y C.TAX.O
 fprintf('Aggregate labor   %8.3f    %8.3f    %8.3f \n', [C.SUB.Output.N C.TAX.Output.N  C.Output.N]);
 fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [C.SUB.Output.K C.TAX.Output.K  C.Output.K]);
 %%
-fprintf('Average TFP  \n');
+
 fprintf('Average TFP  \n');
 fprintf('                  <5         5 to 49      >=50       total \n');
 fprintf('Model A       %8.3f     %8.3f    %8.3f   %8.3f \n',[A.ShareOfTFP])
@@ -263,32 +294,34 @@ fprintf('Model B       %8.3f     %8.3f    %8.3f   %8.3f\n',[B.ShareOfTFP])
 fprintf('Model C       %8.3f     %8.3f    %8.3f   %8.3f\n',[C.ShareOfTFP])
 
 %%
-fprintf('Average TFP  \n');
-fprintf('                  non-earmaked         earmakerd \n');
-fprintf('Model A       %8.3f     %8.3f  \n',[A.TFP_nonear A.TFP_ear])
-fprintf('Model B       %8.3f     %8.3f  \n',[B.TFP_nonear B.TFP_ear])
-fprintf('Model C       %8.3f     %8.3f  \n',[C.TFP_nonear C.TFP_ear])
 
-
-
-
-fprintf('                      Model A    Model B   Model C\n');
-fprintf('Prob Stay       %8.3f  %8.3f %8.3f\n',[ A.lambda B.lambda C.lambda])
+fprintf('Min TFP  \n');
+fprintf('                  <5         5 to 49      >=50       total \n');
+fprintf('Model A       %8.3f     %8.3f    %8.3f   %8.3f \n',[A.MinOfTFP])
+fprintf('Model B       %8.3f     %8.3f    %8.3f   %8.3f\n',[B.MinOfTFP])
+fprintf('Model C       %8.3f     %8.3f    %8.3f   %8.3f\n',[C.MinOfTFP])
+%%
+fprintf('                    Model A    Model B   Model C\n');
+fprintf('Prob Stay         %8.3f  %8.3f %8.3f\n',[ A.lambda B.lambda C.lambda])
 fprintf('Prob Enter        %8.3f  %8.3f %8.3f\n',[ A.probenter B.probenter C.probenter])
-
-%figure;
-%plot(s_grid,teste1,'r' )
-%hold on;
-%plot(s_grid,teste2,'b' )
-
-% CAPITAL
-%figure; plot((squeeze(sum(ProbDensityFns(1,:,:,:)))))
-
-%OUTPUT
-%figure; plot((squeeze(sum(ProbDensityFns(2,:,:,:)))))
-
-%LABOR
-%figure; plot((squeeze(sum(ProbDensityFns(3,:,:,:)))))
+%%
+figure;
+%subplot(1,2,1)
+plot(s_grid,A.ProbnbarValues);
+%xlim([0.9 2.5])
+%title('non-earmarked')
+%xlabel('productivity')
+%ylabel('employees')
+%subplot(1,2,2)
+hold on;
+plot(s_grid,B.ProbnbarValues);
+hold on;
+plot(s_grid,C.ProbnbarValues);
+xlim([0.9 2.5])
+%title('earmarked')
+xlabel('productivity')
+ylabel('employees')
+legend('Initial','Observed', 'Alternative')
 
 
 toc;

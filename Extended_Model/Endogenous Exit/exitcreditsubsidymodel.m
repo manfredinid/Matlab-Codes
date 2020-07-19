@@ -27,8 +27,8 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=1; % Fixed cost of production
-
+Params.cf=3; % Fixed cost of production
+%3.5
 
 Params.w=1; % Normalization
 Params.p=0.3549; % output price
@@ -36,15 +36,15 @@ Params.p=0.3549; % output price
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=250; % Fixed cost of entry 
-
+Params.ce=5*Params.cf; % Fixed cost of entry 
+%4
 %% States
 
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=5;
-n_a=10;
+n_s=20;
+n_a=205;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -113,9 +113,8 @@ Params.r_hh=Params.rhhminusdelta+Params.delta;
 %% 3.Market interest rate
 Params.r_market=Params.r_international;
 
-%% Initial guesses and normalization
 
-Params.Ne=0.6774; % total mass of new entrants
+
 %% Potential New Entrants Distribution over the states (k,z)
 
 pistar_s=ones(size(s_grid))/n_s; % Initial guess
@@ -174,8 +173,8 @@ Params.upsilon(1,:,:) = kron(pistar_s,[1-Params.g_ear, Params.g_ear]);
 % Some checks
 disp('upsilon size')
 disp(size(Params.upsilon))
-disp('sum of upsilon')
-disp(sum(Params.upsilon(:)))
+disp('nansum of upsilon')
+disp(nansum(Params.upsilon(:)))
 
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
     Params, EntryExitParamNames);
@@ -314,20 +313,20 @@ fprintf('\n')
 %%
 
 %figure(2)
-%plot(a_grid, cumsum(sum(StationaryDist.pdf(:,:,1),2)))
+%plot(a_grid, cumnansum(nansum(StationaryDist.pdf(:,:,1),2)))
 %hold on
-%plot(a_grid, cumsum(sum(StationaryDist.pdf(:,:,2),2)),'.')
+%plot(a_grid, cumnansum(nansum(StationaryDist.pdf(:,:,2),2)),'.')
 %hold off
 %legend('Non-earmarked','Earmarked')
 % Also looks a bit stupid with these params and grid, but earmarked are
 % ending up with higher capital so that is promising start! :)
 
-%ear =  cumsum(sum(StationaryDist.pdf(:,:,2),2));
-%nonear =  cumsum(sum(StationaryDist.pdf(:,:,1),2));
+%ear =  cumnansum(nansum(StationaryDist.pdf(:,:,2),2));
+%nonear =  cumnansum(nansum(StationaryDist.pdf(:,:,1),2));
 
 % Check the average productivity of the earmarked firms 
-%AvgProdOfNonEarmarked=sum(s_grid'.*(sum(StationaryDist.pdf(:,:,1),1)))
-%AvgProdOfEarmarked=sum(s_grid'.*(sum(StationaryDist.pdf(:,:,2),1)))
+%AvgProdOfNonEarmarked=nansum(s_grid'.*(nansum(StationaryDist.pdf(:,:,1),1)))
+%AvgProdOfEarmarked=nansum(s_grid'.*(nansum(StationaryDist.pdf(:,:,2),1)))
 
 %AvgProdOfNonEarmarked*nonear(end)+ AvgProdOfEarmarked*ear(end)
 
@@ -335,9 +334,9 @@ fprintf('\n')
 %set(gcf,'Color',[1,1,1]);
 %set(groot,'DefaultAxesColorOrder',[0 0 0],...
 %      'DefaultAxesLineStyleOrder','-.|-|--|:')
-%plot(a_grid,cumsum(sum(StationaryDist.pdf(:,:,2),2))./ear(end),':','LineWidth',1)
+%plot(a_grid,cumnansum(nansum(StationaryDist.pdf(:,:,2),2))./ear(end),':','LineWidth',1)
 %hold on;
-%plot(a_grid,cumsum(sum(StationaryDist.pdf(:,:,1),2))./nonear(end),'-','LineWidth',1)
+%plot(a_grid,cumnansum(nansum(StationaryDist.pdf(:,:,1),2))./nonear(end),'-','LineWidth',1)
 %legend('Earmarked','Non-Earmarked', 'Location', 'Best');
 
 
@@ -346,9 +345,9 @@ fprintf('\n')
 %set(gcf,'Color',[1,1,1]);
 %set(groot,'DefaultAxesColorOrder',[0 0 0],...
 %      'DefaultAxesLineStyleOrder','-.|-|--|:')
-%plot(s_grid,sum(StationaryDist.pdf(:,:,2),1),':','LineWidth',1)
+%plot(s_grid,nansum(StationaryDist.pdf(:,:,2),1),':','LineWidth',1)
 %hold on;
-%plot(s_grid,sum(StationaryDist.pdf(:,:,1),1),'-','LineWidth',1)
+%plot(s_grid,nansum(StationaryDist.pdf(:,:,1),1),'-','LineWidth',1)
 %xlim([min(s_grid) max(s_grid)])
 %legend('Earmarked','Non-Earmarked', 'Location', 'Best');
 %% 
@@ -385,7 +384,7 @@ FnsToEvaluateFn_SUBoutput = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,a
 %LABOR WITH SUBSIDY
 FnsToEvaluateParamNames(6).Names={'p', 'w','alpha','gamma'};
 FnsToEvaluateFn_SUBnbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-    (z2_val==1)*((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+    (z2_val==1).*(((z1_val*p*gamma)^(1/(1-gamma))) *(aprime_val^(alpha/(1-gamma))));
 
 
 %% TAX
@@ -399,13 +398,13 @@ FnsToEvaluateFn_TAXkbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alp
 % OUTPUT WITHOUT SUBSIDY
 FnsToEvaluateParamNames(8).Names={'p', 'w','alpha','gamma'};
 FnsToEvaluateFn_TAXoutput = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-    (z2_val==0)*z1_val*(aprime_val^alpha)*...
-    (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma);
+    (z2_val==0)*(z1_val*(aprime_val^alpha)*...
+    (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma));
 
 %LABOR WITHOUT SUBSIDY
 FnsToEvaluateParamNames(9).Names={'p', 'w','alpha','gamma'};
 FnsToEvaluateFn_TAXnbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-    (z2_val==0)*((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+    (z2_val==0).*(((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)));
 
 %% Check
 
@@ -485,10 +484,10 @@ ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate
 Output.perN=AggVars(3)/StationaryDist.mass;
 Output.perK=AggVars(1)/StationaryDist.mass;
 
-firms_sub=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(10,:,:,:),1)==3))));
-firms_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(10,:,:,:),1)==2))));
+firms_sub=100*nansum(nansum(nansum(StationaryDist.pdf(shiftdim(ValuesOnGrid(10,:,:,:),1)==3))));
+firms_tax=100*nansum(nansum(nansum(StationaryDist.pdf(shiftdim(ValuesOnGrid(10,:,:,:),1)==2))));
 
-Percentage_tax = [firms_tax  firms_sub] ;
+Percentage_tax = [firms_tax  firms_sub  100-firms_tax+firms_sub ] ;
 
 %%
 
@@ -496,66 +495,134 @@ nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
 normalize_employment=min(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
 nbarValues=nbarValues./(normalize_employment);
 
+ProbnbarValues=nansum(nansum(shiftdim(ValuesOnGrid(12,:,:,:),1).*...
+shiftdim(ProbDensityFns(12,:,:,:),1),3));
 
+% SUB
+SUBnbarValues=shiftdim(ValuesOnGrid(6,:,:,:),1);
+SUBnbarValues=SUBnbarValues./(normalize_employment);
+%SUBnbarValues=SUBnbarValues.*...
+%shiftdim(ProbDensityFns(6,:,:,:),1);
+
+% non sub
+NONnbarValues=shiftdim(ValuesOnGrid(9,:,:,:),1);
+NONnbarValues=NONnbarValues./(normalize_employment);
+%NONnbarValues=NONnbarValues.*...
+%shiftdim(ProbDensityFns(9,:,:,:),1);
+%%
+figure;
+%subplot(1,2,1)
+plot(s_grid,mean(mean(SUBnbarValues(:,:,:),3)));
+%xlim([0.9 2.5])
+%title('non-earmarked')
+%xlabel('productivity')
+%ylabel('employees')
+%subplot(1,2,2)
+hold on;
+plot(s_grid,mean(mean(NONnbarValues(:,:,:),3)),'-r');
+%xlim([0.9 2.5])
+%title('earmarked')
+xlabel('productivity')
+ylabel('employees')
+legend('earmarked','non-earmarked')
+%%
 Partion1Indicator=logical(nbarValues<5);
 Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
 Partion3Indicator=logical(nbarValues>=50);
 
 
-if ((sum(sum(sum(Partion1Indicator+Partion2Indicator+Partion3Indicator)))) - prod(n_z)*(n_a) > 1e-3)
+if ((nansum(nansum(nansum(Partion1Indicator+Partion2Indicator+Partion3Indicator)))) - prod(n_z)*(n_a) > 1e-3)
     error('error')
 end
 
-ShareOfEstablishments(1)=100*sum(sum(sum(StationaryDist.pdf(Partion1Indicator))));
-ShareOfEstablishments(2)=100*sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
-ShareOfEstablishments(3)=100*sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
-ShareOfEstablishments(4)=100*sum(sum(sum(StationaryDist.pdf)));
+ShareOfEstablishments(1)=100*nansum(nansum(nansum(StationaryDist.pdf(Partion1Indicator))));
+ShareOfEstablishments(2)=100*nansum(nansum(nansum(StationaryDist.pdf(Partion2Indicator))));
+ShareOfEstablishments(3)=100*nansum(nansum(nansum(StationaryDist.pdf(Partion3Indicator))));
+ShareOfEstablishments(4)=100*nansum(nansum(nansum(StationaryDist.pdf)));
 
 Output_pdf=shiftdim(ProbDensityFns(2,:,:,:),1);
-ShareOfOutput(1)=100*sum(sum(sum(Output_pdf(Partion1Indicator))));
-ShareOfOutput(2)=100*sum(sum(sum(Output_pdf(Partion2Indicator))));
-ShareOfOutput(3)=100*sum(sum(sum(Output_pdf(Partion3Indicator))));
-ShareOfOutput(4)=100*sum(sum(sum(Output_pdf)));
+ShareOfOutput(1)=100*nansum(nansum(nansum(Output_pdf(Partion1Indicator))));
+ShareOfOutput(2)=100*nansum(nansum(nansum(Output_pdf(Partion2Indicator))));
+ShareOfOutput(3)=100*nansum(nansum(nansum(Output_pdf(Partion3Indicator))));
+ShareOfOutput(4)=100*nansum(nansum(nansum(Output_pdf)));
 
 Labour_pdf=shiftdim(ProbDensityFns(3,:,:,:),1);
-ShareOfLabour(1)=100*sum(sum(sum(Labour_pdf(Partion1Indicator))));
-ShareOfLabour(2)=100*sum(sum(sum(Labour_pdf(Partion2Indicator))));
-ShareOfLabour(3)=100*sum(sum(sum(Labour_pdf(Partion3Indicator))));
-ShareOfLabour(4)=100*sum(sum(sum(Labour_pdf)));
+ShareOfLabour(1)=100*nansum(nansum(nansum(Labour_pdf(Partion1Indicator))));
+ShareOfLabour(2)=100*nansum(nansum(nansum(Labour_pdf(Partion2Indicator))));
+ShareOfLabour(3)=100*nansum(nansum(nansum(Labour_pdf(Partion3Indicator))));
+ShareOfLabour(4)=100*nansum(nansum(nansum(Labour_pdf)));
 
 
 Capital_pdf=shiftdim(ProbDensityFns(1,:,:,:),1);
-ShareOfCapital(1)=100*sum(sum(sum(Capital_pdf(Partion1Indicator))));
-ShareOfCapital(2)=100*sum(sum(sum(Capital_pdf(Partion2Indicator))));
-ShareOfCapital(3)=100*sum(sum(sum(Capital_pdf(Partion3Indicator))));
-ShareOfCapital(4)=100*sum(sum(sum(Capital_pdf)));
+ShareOfCapital(1)=100*nansum(nansum(nansum(Capital_pdf(Partion1Indicator))));
+ShareOfCapital(2)=100*nansum(nansum(nansum(Capital_pdf(Partion2Indicator))));
+ShareOfCapital(3)=100*nansum(nansum(nansum(Capital_pdf(Partion3Indicator))));
+ShareOfCapital(4)=100*nansum(nansum(nansum(Capital_pdf)));
 
-AverageEmployment(1)=100*sum(sum(sum(nbarValues(Partion1Indicator).*...
-StationaryDist.pdf(Partion1Indicator))))/sum(sum(sum(nbarValues.*...
+AverageEmployment(1)=100*nansum(nansum(nansum(nbarValues(Partion1Indicator).*...
+StationaryDist.pdf(Partion1Indicator))))/nansum(nansum(nansum(nbarValues.*...
 StationaryDist.pdf)));
-AverageEmployment(2)=100*sum(sum(sum(nbarValues(Partion2Indicator).*...
-StationaryDist.pdf(Partion2Indicator))))/sum(sum(sum(nbarValues.*...
+AverageEmployment(2)=100*nansum(nansum(nansum(nbarValues(Partion2Indicator).*...
+StationaryDist.pdf(Partion2Indicator))))/nansum(nansum(nansum(nbarValues.*...
 StationaryDist.pdf)));
-AverageEmployment(3)=100*sum(sum(sum(nbarValues(Partion3Indicator).*...
-StationaryDist.pdf(Partion3Indicator))))/sum(sum(sum(nbarValues.*...
+AverageEmployment(3)=100*nansum(nansum(nansum(nbarValues(Partion3Indicator).*...
+StationaryDist.pdf(Partion3Indicator))))/nansum(nansum(nansum(nbarValues.*...
 StationaryDist.pdf)));
-AverageEmployment(4)=100*sum(sum(sum(nbarValues.*...
-StationaryDist.pdf)))/sum(sum(sum(nbarValues.*...
+AverageEmployment(4)=100*nansum(nansum(nansum(nbarValues.*...
+StationaryDist.pdf)))/nansum(nansum(nansum(nbarValues.*...
 StationaryDist.pdf)));
+%%
 
-
+%%
 TFP_pdf=shiftdim(ValuesOnGrid(12,:,:,:),1);
-ShareOfTFP(1)=sum(TFP_pdf(Partion1Indicator).*(StationaryDist.pdf(Partion1Indicator)/(sum(sum(StationaryDist.pdf(Partion1Indicator))))));
-ShareOfTFP(2)=sum(TFP_pdf(Partion2Indicator).*(StationaryDist.pdf(Partion2Indicator)/(sum(sum(StationaryDist.pdf(Partion2Indicator))))));
-ShareOfTFP(3)=sum(TFP_pdf(Partion3Indicator).*(StationaryDist.pdf(Partion3Indicator)/(sum(sum(StationaryDist.pdf(Partion3Indicator))))));
-%ShareOfTFP(4)=sum(sum(sum(TFP_pdf.*StationaryDist.pdf)));
-ShareOfTFP(4)=sum(sum(sum(TFP_pdf.*(shiftdim(ProbDensityFns(12,:,:,:),1)))));
+ShareOfTFP(1)=nansum(TFP_pdf(Partion1Indicator).*(StationaryDist.pdf(Partion1Indicator)/(nansum(nansum(StationaryDist.pdf(Partion1Indicator))))));
+ShareOfTFP(2)=nansum(TFP_pdf(Partion2Indicator).*(StationaryDist.pdf(Partion2Indicator)/(nansum(nansum(StationaryDist.pdf(Partion2Indicator))))));
+ShareOfTFP(3)=nansum(TFP_pdf(Partion3Indicator).*(StationaryDist.pdf(Partion3Indicator)/(nansum(nansum(StationaryDist.pdf(Partion3Indicator))))));
+ShareOfTFP(4)=nansum(nansum(nansum(TFP_pdf(logical(nbarValues>=0)).*StationaryDist.pdf(nbarValues>=0))));
 
 
-TFP_ear = sum(sum(TFP_pdf(:,:,2).*(StationaryDist.pdf(:,:,2)/(sum(sum(StationaryDist.pdf(:,:,2)))))));
+MinOfTFP(1)=min(min(min(nonzeros(TFP_pdf(Partion1Indicator)))));
+MinOfTFP(2)=min(min(min(nonzeros(TFP_pdf(Partion2Indicator)))));
+MinOfTFP(3)=min(min(min(nonzeros(TFP_pdf(Partion3Indicator)))));
+MinOfTFP(4)=min(min(min(nonzeros(TFP_pdf(logical(nbarValues>=0))))));
 
-TFP_nonear = sum(sum(TFP_pdf(:,:,1).*(StationaryDist.pdf(:,:,1)/(sum(sum(StationaryDist.pdf(:,:,1)))))));
 
+TFP_ear = nansum(nansum(TFP_pdf(:,:,2).*(StationaryDist.pdf(:,:,2)/(nansum(nansum(StationaryDist.pdf(:,:,2)))))));
+
+TFP_nonear = nansum(nansum(TFP_pdf(:,:,1).*(StationaryDist.pdf(:,:,1))/(nansum(nansum(StationaryDist.pdf(:,:,1))))));
+
+%%
+SUBStationaryDist.pdf=squeeze(StationaryDist.pdf(:,:,2));
+Partion1Indicator=squeeze(Partion1Indicator(:,:,2));
+Partion2Indicator=squeeze(Partion2Indicator(:,:,2));
+Partion3Indicator=squeeze(Partion3Indicator(:,:,2));
+
+SUBShareOfEstablishments(1)=100*(nansum(nansum(SUBStationaryDist.pdf(Partion1Indicator)))/nansum(nansum(SUBStationaryDist.pdf)));
+SUBShareOfEstablishments(2)=100*(nansum(nansum(SUBStationaryDist.pdf(Partion2Indicator)))/nansum(nansum(SUBStationaryDist.pdf)));
+SUBShareOfEstablishments(3)=100*(nansum(nansum(SUBStationaryDist.pdf(Partion3Indicator)))/nansum(nansum(SUBStationaryDist.pdf)));
+SUBShareOfEstablishments(4)=100*(nansum(nansum(SUBStationaryDist.pdf))/nansum(nansum(SUBStationaryDist.pdf)));
+
+SUBOutput_pdf=shiftdim(ProbDensityFns(2,:,:,2),1);
+SUBShareOfOutput(1)=100*(nansum(nansum(SUBOutput_pdf(Partion1Indicator)))/nansum(nansum(SUBOutput_pdf)));
+SUBShareOfOutput(2)=100*(nansum(nansum(SUBOutput_pdf(Partion2Indicator)))/nansum(nansum(SUBOutput_pdf)));
+SUBShareOfOutput(3)=100*(nansum(nansum(SUBOutput_pdf(Partion3Indicator)))/nansum(nansum(SUBOutput_pdf)));
+SUBShareOfOutput(4)=100*(nansum(nansum(SUBOutput_pdf))/nansum(nansum(SUBOutput_pdf)));
+
+SUBLabour_pdf=shiftdim(ProbDensityFns(3,:,:,2),1);
+SUBShareOfLabour(1)=100*(nansum(nansum(SUBLabour_pdf(Partion1Indicator)))/nansum(nansum(SUBLabour_pdf)));
+SUBShareOfLabour(2)=100*(nansum(nansum(SUBLabour_pdf(Partion2Indicator)))/nansum(nansum(SUBLabour_pdf)));
+SUBShareOfLabour(3)=100*(nansum(nansum(SUBLabour_pdf(Partion3Indicator)))/nansum(nansum(SUBLabour_pdf)));
+SUBShareOfLabour(4)=100*(nansum(nansum(SUBLabour_pdf))/nansum(nansum(SUBLabour_pdf)));
+
+
+SUBCapital_pdf=shiftdim(ProbDensityFns(1,:,:,2),1);
+SUBShareOfCapital(1)=100*(nansum(nansum(SUBCapital_pdf(Partion1Indicator)))/(nansum(nansum(SUBCapital_pdf))));
+SUBShareOfCapital(2)=100*(nansum(nansum(SUBCapital_pdf(Partion2Indicator)))/(nansum(nansum(SUBCapital_pdf))));
+SUBShareOfCapital(3)=100*(nansum(nansum(SUBCapital_pdf(Partion3Indicator)))/(nansum(nansum(SUBCapital_pdf))));
+SUBShareOfCapital(4)=100*(nansum(nansum(SUBCapital_pdf))/(nansum(nansum(SUBCapital_pdf))));
+
+
+%%
 %fprintf('Distribution statistics of benchmark economy  \n');
 %fprintf('                               <5     5 to 49     >=50   total\n');
 %fprintf('Share of establishments  %8.2f  %8.2f  %8.2f  %8.2f  \n', ShareOfEstablishments);
@@ -580,7 +647,7 @@ TFP_nonear = sum(sum(TFP_pdf(:,:,1).*(StationaryDist.pdf(:,:,1)/(sum(sum(Station
 %fprintf('%9.2f  %12.2f   \n',Percentage_tax )
 
 %fprintf('   Total(just for checking)  \n' )
-%fprintf('%9.2f    \n', sum(Percentage_tax))
+%fprintf('%9.2f    \n', nansum(Percentage_tax))
 
 
 %fprintf('                     Total  with r_ear   with r_market\n');
@@ -592,12 +659,12 @@ TFP_nonear = sum(sum(TFP_pdf(:,:,1).*(StationaryDist.pdf(:,:,1)/(sum(sum(Station
 
 
 %hold on;
-%plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,1)),1)),'b')
+%plot(s_grid,(nansum(squeeze(StationaryDist.pdf(:,:,1)),1)),'b')
 %hold on;
-%plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,2)),1)),':')
+%plot(s_grid,(nansum(squeeze(StationaryDist.pdf(:,:,2)),1)),':')
 
-lambda = sum(sum(sum(Params.oneminuslambda(:,:,:)==1)))/sum(sum(sum(Params.oneminuslambda(:,:,:)>=0)));
-probenter = sum(sum(sum(Params.ebar(:,:,:)==1)))/sum(sum(sum(Params.ebar(:,:,:)>=0)));
+lambda = nansum(nansum(nansum(Params.oneminuslambda(:,:,:)==1)))/nansum(nansum(nansum(Params.oneminuslambda(:,:,:)>=0)));
+probenter = nansum(nansum(nansum(Params.ebar(:,:,:)==1)))/nansum(nansum(nansum(Params.ebar(:,:,:)>=0)));
 
 
 %toc;
