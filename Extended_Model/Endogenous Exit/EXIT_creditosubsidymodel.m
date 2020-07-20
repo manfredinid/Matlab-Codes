@@ -7,6 +7,7 @@ clear all; clear mex; clear functions;clear java;
 close all;
 clearvars -global
 
+transition=0;
 Parallel=2; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 %vfoptions.lowmemory=1;
 tic;
@@ -83,6 +84,16 @@ A.ebar=Params.ebar;
 A.lambda=lambda;
 A.probenter=probenter;
 A.ProbnbarValues=ProbnbarValues;
+
+%% For the transition path
+
+if transition == 1
+Params_initial=Params;
+
+    save ./SavedOutput/TPDynamics_initial.mat...
+        Params_initial V_initial Policy_initial StationaryDist_initial
+end
+
 %% Model B 
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -145,6 +156,14 @@ B.ebar=Params.ebar;
 B.lambda=lambda;
 B.probenter=probenter;
 B.ProbnbarValues=ProbnbarValues;
+
+%% For the transition path
+if transition == 1
+Params_final=Params;
+
+ save ./SavedOutput/TPDynamics_final.mat...
+        Params_final V_final Policy_final StationaryDist_final
+end
 %% Model C
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -323,20 +342,22 @@ figure;
 hold on;
 plot(s_grid,B.ProbnbarValues, '-k');
 hold on;
-line([s_grid(sum(B.ProbnbarValues==0)) s_grid(sum(B.ProbnbarValues==0))], get(gca, 'ylim'));
-hold on;
-plot(s_grid,C.ProbnbarValues', ':k');
-hold on;
-line([s_grid(sum(C.ProbnbarValues==0)) s_grid(sum(C.ProbnbarValues==0))], get(gca, 'ylim'), 'Color', 'red',...
-    'LineStyle', ':');
+plot(s_grid,C.ProbnbarValues', '-r');
 xlim([0.9 2.5])
+%hold on;
+%line([s_grid(sum(C.ProbnbarValues==0)) s_grid(sum(C.ProbnbarValues==0))], get(gca, 'ylim'), 'Color', 'red',...
+%    'LineStyle', '-');
+%hold on;
+%line([s_grid(sum(B.ProbnbarValues==0)) s_grid(sum(B.ProbnbarValues==0))], get(gca, 'ylim'), 'Color', 'black',...
+%    'LineStyle', '-');
 %title('earmarked')
 xlabel('productivity')
 %ylabel('employees')
-legend('Observed', 'Alternative')
+legend('Observed','Alternative')
 
 %% Transition Path
-
+if transition == 1
 transitionpath;
+end
 
 toc;

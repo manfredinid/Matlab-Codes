@@ -28,7 +28,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=3.5; % Fixed cost of production
+Params.cf=3; % Fixed cost of production
 %3
 
 Params.w=1; % Normalization
@@ -37,7 +37,7 @@ Params.p=0.3549; % output price
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=3.5*Params.cf; % Fixed cost of entry 
+Params.ce=4*Params.cf; % Fixed cost of entry 
 %4
 %% States
 
