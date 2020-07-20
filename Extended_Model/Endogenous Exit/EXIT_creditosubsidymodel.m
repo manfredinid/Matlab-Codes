@@ -38,7 +38,7 @@ Params.r_ear=A.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = A.Params.r_international;
 %% Initial Guesses
-%Params.p = 0.527;
+Params.p = 0.527;
 Params.Ne=0.51; % total mass of new entrants
 
 %%
@@ -91,10 +91,13 @@ Params.r_ear=B.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=B.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = B.Params.r_international;
 
+%% Initial Guesses
+Params.p = 0.527;
+Params.Ne=0.51; % total mass of new entrants
+%%
 
 fprintf(2,'\nModel B  \n');
 exitcreditsubsidymodel;
-
 
 
 % Agggregate Values
@@ -150,6 +153,10 @@ Params.r_ear=C.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=C.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = C.Params.r_international;
 
+%% Initial Guesses
+Params.p = 0.527;
+Params.Ne=0.51; % total mass of new entrants
+%%
 
 fprintf(2,'\nModel C  \n');
 exitcreditsubsidymodel;
@@ -296,10 +303,10 @@ fprintf('Model C       %8.3f     %8.3f    %8.3f   %8.3f\n',[C.ShareOfTFP])
 %%
 
 fprintf('Min TFP  \n');
-fprintf('                  <5         5 to 49      >=50       total \n');
-fprintf('Model A       %8.3f     %8.3f    %8.3f   %8.3f \n',[A.MinOfTFP])
-fprintf('Model B       %8.3f     %8.3f    %8.3f   %8.3f\n',[B.MinOfTFP])
-fprintf('Model C       %8.3f     %8.3f    %8.3f   %8.3f\n',[C.MinOfTFP])
+fprintf('                  <5         5 to 49      >=50 \n');
+fprintf('Model A       %8.3f     %8.3f    %8.3f    \n',[A.MinOfTFP])
+fprintf('Model B       %8.3f     %8.3f    %8.3f    \n',[B.MinOfTFP])
+fprintf('Model C       %8.3f     %8.3f    %8.3f    \n',[C.MinOfTFP])
 %%
 fprintf('                    Model A    Model B   Model C\n');
 fprintf('Prob Stay         %8.3f  %8.3f %8.3f\n',[ A.lambda B.lambda C.lambda])
@@ -307,21 +314,29 @@ fprintf('Prob Enter        %8.3f  %8.3f %8.3f\n',[ A.probenter B.probenter C.pro
 %%
 figure;
 %subplot(1,2,1)
-plot(s_grid,A.ProbnbarValues);
+%plot(s_grid,A.ProbnbarValues);
 %xlim([0.9 2.5])
 %title('non-earmarked')
 %xlabel('productivity')
 %ylabel('employees')
 %subplot(1,2,2)
 hold on;
-plot(s_grid,B.ProbnbarValues);
+plot(s_grid,B.ProbnbarValues, '-k');
 hold on;
-plot(s_grid,C.ProbnbarValues);
+line([s_grid(sum(B.ProbnbarValues==0)) s_grid(sum(B.ProbnbarValues==0))], get(gca, 'ylim'));
+hold on;
+plot(s_grid,C.ProbnbarValues', ':k');
+hold on;
+line([s_grid(sum(C.ProbnbarValues==0)) s_grid(sum(C.ProbnbarValues==0))], get(gca, 'ylim'), 'Color', 'red',...
+    'LineStyle', ':');
 xlim([0.9 2.5])
 %title('earmarked')
 xlabel('productivity')
-ylabel('employees')
-legend('Initial','Observed', 'Alternative')
+%ylabel('employees')
+legend('Observed', 'Alternative')
 
+%% Transition Path
+
+transitionpath;
 
 toc;

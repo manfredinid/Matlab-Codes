@@ -8,6 +8,7 @@
 %close all;
 %Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 %tic;
+%rng(1);
 
 %% Toolkit options 
 
@@ -27,8 +28,8 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=3; % Fixed cost of production
-%3.5
+Params.cf=3.5; % Fixed cost of production
+%3
 
 Params.w=1; % Normalization
 Params.p=0.3549; % output price
@@ -36,14 +37,14 @@ Params.p=0.3549; % output price
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=5*Params.cf; % Fixed cost of entry 
+Params.ce=3.5*Params.cf; % Fixed cost of entry 
 %4
 %% States
 
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=20;
+n_s=30;
 n_a=205;
 % n_psi is two since psi \in {0,1}
 
@@ -512,14 +513,14 @@ NONnbarValues=NONnbarValues./(normalize_employment);
 %%
 figure;
 %subplot(1,2,1)
-plot(s_grid,mean(mean(SUBnbarValues(:,:,:),3)));
-%xlim([0.9 2.5])
+plot(s_grid,nanmean(nanmean(SUBnbarValues(:,:,:),3)));
+xlim([0.9 2.5])
 %title('non-earmarked')
 %xlabel('productivity')
 %ylabel('employees')
 %subplot(1,2,2)
 hold on;
-plot(s_grid,mean(mean(NONnbarValues(:,:,:),3)),'-r');
+plot(s_grid,nanmean(nanmean(NONnbarValues(:,:,:),3)),'-r');
 %xlim([0.9 2.5])
 %title('earmarked')
 xlabel('productivity')
@@ -584,7 +585,7 @@ ShareOfTFP(4)=nansum(nansum(nansum(TFP_pdf(logical(nbarValues>=0)).*StationaryDi
 MinOfTFP(1)=min(min(min(nonzeros(TFP_pdf(Partion1Indicator)))));
 MinOfTFP(2)=min(min(min(nonzeros(TFP_pdf(Partion2Indicator)))));
 MinOfTFP(3)=min(min(min(nonzeros(TFP_pdf(Partion3Indicator)))));
-MinOfTFP(4)=min(min(min(nonzeros(TFP_pdf(logical(nbarValues>=0))))));
+
 
 
 TFP_ear = nansum(nansum(TFP_pdf(:,:,2).*(StationaryDist.pdf(:,:,2)/(nansum(nansum(StationaryDist.pdf(:,:,2)))))));
@@ -619,7 +620,6 @@ SUBCapital_pdf=shiftdim(ProbDensityFns(1,:,:,2),1);
 SUBShareOfCapital(1)=100*(nansum(nansum(SUBCapital_pdf(Partion1Indicator)))/(nansum(nansum(SUBCapital_pdf))));
 SUBShareOfCapital(2)=100*(nansum(nansum(SUBCapital_pdf(Partion2Indicator)))/(nansum(nansum(SUBCapital_pdf))));
 SUBShareOfCapital(3)=100*(nansum(nansum(SUBCapital_pdf(Partion3Indicator)))/(nansum(nansum(SUBCapital_pdf))));
-SUBShareOfCapital(4)=100*(nansum(nansum(SUBCapital_pdf))/(nansum(nansum(SUBCapital_pdf))));
 
 
 %%
