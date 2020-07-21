@@ -8,7 +8,7 @@
 %close all;
 %Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 %tic;
-%rng(1);
+rng(1);
 
 %% Toolkit options 
 
@@ -28,7 +28,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=3; % Fixed cost of production
+Params.cf=2.5; % Fixed cost of production
 %3
 
 Params.w=1; % Normalization
@@ -37,7 +37,7 @@ Params.p=0.3549; % output price
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=4*Params.cf; % Fixed cost of entry 
+Params.ce=3.5*Params.cf; % Fixed cost of entry 
 %4
 %% States
 
@@ -525,7 +525,7 @@ plot(s_grid,nanmean(nanmean(NONnbarValues(:,:,:),3)),'-r');
 %title('earmarked')
 xlabel('productivity')
 ylabel('employees')
-legend('earmarked','non-earmarked')
+legend('earmarked','non-earmarked', 'Location', 'northwest')
 %%
 Partion1Indicator=logical(nbarValues<5);
 Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
@@ -582,9 +582,9 @@ ShareOfTFP(3)=nansum(TFP_pdf(Partion3Indicator).*(StationaryDist.pdf(Partion3Ind
 ShareOfTFP(4)=nansum(nansum(nansum(TFP_pdf(logical(nbarValues>=0)).*StationaryDist.pdf(nbarValues>=0))));
 
 
-MinOfTFP(1)=min(min(min(nonzeros(TFP_pdf(Partion1Indicator)))));
-MinOfTFP(2)=min(min(min(nonzeros(TFP_pdf(Partion2Indicator)))));
-MinOfTFP(3)=min(min(min(nonzeros(TFP_pdf(Partion3Indicator)))));
+MinOfTFP(1)=nanmin(nanmin(nanmin(nonzeros(TFP_pdf(Partion1Indicator)))));
+MinOfTFP(2)=nanmin(nanmin(nanmin(nonzeros(TFP_pdf(Partion2Indicator)))));
+MinOfTFP(3)=nanmin(nanmin(nanmin(nonzeros(TFP_pdf(Partion3Indicator)))));
 
 
 

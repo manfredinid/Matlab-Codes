@@ -39,12 +39,13 @@ Params.r_ear=A.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = A.Params.r_international;
 %% Initial Guesses
-Params.p = 0.527;
-Params.Ne=0.51; % total mass of new entrants
+Params.p = 0.481;
+Params.Ne=0.421; % total mass of new entrants
 
 %%
 fprintf(2,'\nModel A  \n');
 exitcreditsubsidymodel;
+saveas(gcf,'initial','epsc')
 %%
 % Agggregate Values
 A.Output.Y=AggVars(2);
@@ -109,7 +110,7 @@ Params.Ne=0.51; % total mass of new entrants
 
 fprintf(2,'\nModel B  \n');
 exitcreditsubsidymodel;
-
+saveas(gcf,'observed','epsc')
 
 % Agggregate Values
 B.Output.Y=AggVars(2);
@@ -179,7 +180,7 @@ Params.Ne=0.51; % total mass of new entrants
 
 fprintf(2,'\nModel C  \n');
 exitcreditsubsidymodel;
-
+saveas(gcf,'alternative','epsc')
 
 % Agggregate Values
 C.Output.Y=AggVars(2);
@@ -353,7 +354,9 @@ xlim([0.9 2.5])
 %title('earmarked')
 xlabel('productivity')
 %ylabel('employees')
-legend('Observed','Alternative')
+legend('Observed','Alternative', 'Location', 'northwest')
+
+saveas(gcf,'proddist','epsc')
 
 %% Transition Path
 if transition == 1
