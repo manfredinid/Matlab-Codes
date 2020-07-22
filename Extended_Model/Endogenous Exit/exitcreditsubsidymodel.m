@@ -8,7 +8,7 @@
 %close all;
 %Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 %tic;
-rng(1);
+%rng(1);
 
 %% Toolkit options 
 
@@ -28,7 +28,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=2.5; % Fixed cost of production
+Params.cf=1; % Fixed cost of production
 %3
 
 Params.w=1; % Normalization
@@ -37,15 +37,15 @@ Params.p=0.3549; % output price
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=3.5*Params.cf; % Fixed cost of entry 
+Params.ce=4*Params.cf; % Fixed cost of entry 
 %4
 %% States
 
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=30;
-n_a=205;
+n_s=10;
+n_a=65;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -527,7 +527,7 @@ xlabel('productivity')
 ylabel('employees')
 legend('earmarked','non-earmarked', 'Location', 'northwest')
 %%
-Partion1Indicator=logical(nbarValues<5);
+Partion1Indicator=logical((nbarValues>0).*(nbarValues<5));
 Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
 Partion3Indicator=logical(nbarValues>=50);
 
@@ -536,10 +536,14 @@ if ((nansum(nansum(nansum(Partion1Indicator+Partion2Indicator+Partion3Indicator)
     error('error')
 end
 
-ShareOfEstablishments(1)=100*nansum(nansum(nansum(StationaryDist.pdf(Partion1Indicator))));
-ShareOfEstablishments(2)=100*nansum(nansum(nansum(StationaryDist.pdf(Partion2Indicator))));
-ShareOfEstablishments(3)=100*nansum(nansum(nansum(StationaryDist.pdf(Partion3Indicator))));
-ShareOfEstablishments(4)=100*nansum(nansum(nansum(StationaryDist.pdf)));
+ShareOfEstablishments(1)=100*nansum(nansum(nansum(StationaryDist.pdf(Partion1Indicator))))...
+    ./nansum(nansum(nansum(StationaryDist.pdf(logical(nbarValues>0)))));
+ShareOfEstablishments(2)=100*nansum(nansum(nansum(StationaryDist.pdf(Partion2Indicator))))...
+   ./ nansum(nansum(nansum(StationaryDist.pdf(logical(nbarValues>0)))));
+ShareOfEstablishments(3)=100*nansum(nansum(nansum(StationaryDist.pdf(Partion3Indicator))))...
+    ./nansum(nansum(nansum(StationaryDist.pdf(logical(nbarValues>0)))));
+ShareOfEstablishments(4)=100*nansum(nansum(nansum(StationaryDist.pdf(logical(nbarValues>0)))))...
+    ./nansum(nansum(nansum(StationaryDist.pdf(logical(nbarValues>0)))));
 
 Output_pdf=shiftdim(ProbDensityFns(2,:,:,:),1);
 ShareOfOutput(1)=100*nansum(nansum(nansum(Output_pdf(Partion1Indicator))));
