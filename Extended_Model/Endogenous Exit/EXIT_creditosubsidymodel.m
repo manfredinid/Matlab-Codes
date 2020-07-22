@@ -8,7 +8,7 @@ close all;
 clearvars -global
 
 transition=0;
-Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+Parallel=2; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 %vfoptions.lowmemory=1;
 tic;
 
@@ -104,8 +104,8 @@ Params.g_ear=B.Params.g_ear; % Share of (unconditional) potential entrants who h
 Params.r_international = B.Params.r_international;
 
 %% Initial Guesses
-Params.p = 0.527;
-Params.Ne=0.51; % total mass of new entrants
+%Params.p = 0.527;
+%Params.Ne=0.51; % total mass of new entrants
 %%
 
 fprintf(2,'\nModel B  \n');
@@ -174,8 +174,8 @@ Params.g_ear=C.Params.g_ear; % Share of (unconditional) potential entrants who h
 Params.r_international = C.Params.r_international;
 
 %% Initial Guesses
-Params.p = 0.527;
-Params.Ne=0.51; % total mass of new entrants
+Params.p = 0.54;
+Params.Ne=0.37; % total mass of new entrants
 %%
 
 fprintf(2,'\nModel C  \n');
