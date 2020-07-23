@@ -140,8 +140,8 @@ ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
 ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
     'cf', 'adjustcostparam'}; %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
-vfoptions.ReturnToExitFn=@(kprime_val,k_val,s_val, psi_val)1.1*kprime; 
-vfoptions.ReturnToExitFnParamNames={};
+vfoptions.ReturnToExitFn=@(kprime_val,s_val, psi_val,p,w,alpha,gamma,cf) cf; 
+vfoptions.ReturnToExitFnParamNames={'p','w','alpha','gamma','cf'};
 
 [V,Policy,ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid,...
     pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
@@ -160,7 +160,7 @@ Params.oneminuslambda=1-ExitPolicy;
 EntryExitParamNames.CondlEntryDecisions={'ebar'};
 % Takes value of one for enter, zero for not-enter. This is just an initial
 %guess as the actual decisions are determined as part of general equilibrium.
-Params.ebar=zeros([n_a,n_z]); 
+Params.ebar=ones([n_a,n_z]); 
 
 EntryExitParamNames.MassOfNewAgents={'Ne'};
 
@@ -181,55 +181,51 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
     Params, EntryExitParamNames);
 %% General Equilibrium Equations
 %Now define the functions for the General Equilibrium conditions
-GEPriceParamNames={'ebar'}; 
-FnsToEvaluateParamNames(1).Names={};
-FnsToEvaluate={};
-heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
-%FnsToEvaluateParamNames(1).Names={'p', 'w','alpha','gamma'};
-%FnsToEvaluateFn_1 = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-%    z1_val*(aprime_val^alpha)*...
-%    (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma); 
-%FnsToEvaluate={FnsToEvaluateFn_1};
+%GEPriceParamNames={'ebar'}; 
+%FnsToEvaluateParamNames(1).Names={};
+%FnsToEvaluate={};
+%heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
 
-%simoptions.keeppolicyonexit=1;
-%AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
-%    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
-%    d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+%GEPriceParamNames={'p','Ne'}; 
 
-% A 'condlentry' general equilibrium condition will take values of greater
-% than zero for firms that decide to enter, less than zero for first that
-% decide not to enter (or more accurately, after entry decision they draw
-% their state, and then decide to cancel/abort their entry).
+%GeneralEqmEqnParamNames(1).Names={'beta'};
+%GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
+%GeneralEqmEqnParamNames(2).Names={'beta','ce'};
+%GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
+
+%heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
+%GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry}; 
+ 
+%GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry}; 
 %%
+%% General Equilibrium Equations
+%Now define the functions for the General Equilibrium conditions
 
-GEPriceParamNames={'p','Ne'}; 
+GEPriceParamNames={'Ne','ebar'};
+
+
+FnsToEvaluateParamNames(1).Names={'p','alpha','gamma'};
+FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
+((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+FnsToEvaluate={FnsToEvaluateFn_nbar};
+
+heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
+
+
+GEPriceParamNames={'Ne','p'};
 
 GeneralEqmEqnParamNames(1).Names={'beta'};
 GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
+
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
 GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
 
 
- heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
- GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry}; 
-  
- %% 
-  
-%  FnsToEvaluateParamNames(1).Names={'p', 'w','alpha','gamma'};
-%FnsToEvaluateFn_1 = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-%    z1_val*(aprime_val^alpha)*...
-%    (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma); 
+GeneralEqmEqnParamNames(3).Names={};
+GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
 
-%AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
-%    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
-%    d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
-%FnsToEvaluate={FnsToEvaluateFn_1};
-
-%GeneralEqmEqnParamNames(3).Names={'p'};
-%GeneralEqmEqn_1 = @(AggVars,GEprices,p) 1/AggVars-p;
-
-% heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
-GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry}; 
+heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
+GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry,GeneralEqmEqn_LabourMarket};
 %% Find equilibrium prices
 
 n_p=0;
