@@ -8,7 +8,7 @@ close all;
 clearvars -global
 
 transition=0;
-Parallel=0; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
+Parallel=2; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
 %vfoptions.lowmemory=1;
 tic;
 
