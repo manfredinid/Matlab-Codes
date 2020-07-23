@@ -28,7 +28,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=5; % Fixed cost of production
+Params.cf=1; % Fixed cost of production
 %3
 
 Params.w=1; % Normalization
@@ -203,28 +203,33 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
 
 GEPriceParamNames={'Ne','ebar'};
 
-
-FnsToEvaluateParamNames(1).Names={'p','alpha','gamma'};
-FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
-((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
-FnsToEvaluate={FnsToEvaluateFn_nbar};
+FnsToEvaluateParamNames(1).Names={};
+FnsToEvaluate={};
 
 heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
 
-
-GEPriceParamNames={'Ne','p'};
-
+GEPriceParamNames={'p'}; 
 GeneralEqmEqnParamNames(1).Names={'beta'};
 GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
 
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
 GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
 
+GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry};
+
+GEPriceParamNames={'Ne','p'};
+
+FnsToEvaluateParamNames(1).Names={'p','alpha','gamma'};
+FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
+((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+
 
 GeneralEqmEqnParamNames(3).Names={};
 GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
 
-heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
+FnsToEvaluate={FnsToEvaluateFn_nbar};
+heteroagentoptions.specialgeneqmcondn={0,'condlentry','entry'};
+
 GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry,GeneralEqmEqn_LabourMarket};
 %% Find equilibrium prices
 
