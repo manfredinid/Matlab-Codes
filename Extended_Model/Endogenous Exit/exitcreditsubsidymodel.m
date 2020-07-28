@@ -160,7 +160,7 @@ Params.oneminuslambda=1-ExitPolicy;
 EntryExitParamNames.CondlEntryDecisions={'ebar'};
 % Takes value of one for enter, zero for not-enter. This is just an initial
 %guess as the actual decisions are determined as part of general equilibrium.
-Params.ebar=ones([n_a,n_z]); 
+Params.ebar=ones([n_a,n_z],'gpuArray'); 
 
 EntryExitParamNames.MassOfNewAgents={'Ne'};
 
@@ -201,36 +201,31 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
 %% General Equilibrium Equations
 %Now define the functions for the General Equilibrium conditions
 
-GEPriceParamNames={'Ne','ebar'};
+GEPriceParamNames={'ebar'};
 
-FnsToEvaluateParamNames(1).Names={};
-FnsToEvaluate={};
-
-heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
-
-GEPriceParamNames={'p'}; 
-GeneralEqmEqnParamNames(1).Names={'beta'};
-GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
-
-GeneralEqmEqnParamNames(2).Names={'beta','ce'};
-GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; % Free entry conditions (expected returns equal zero in eqm); note that the first 'General eqm price' is ce, the fixed-cost of entry.
-
-GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry};
+FnsToEvaluateParamNames(1).Names={'p','alpha','gamma'};
+FnsToEvaluateFn_nbar1 = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
+((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+FnsToEvaluate={FnsToEvaluateFn_nbar1};
 
 GEPriceParamNames={'Ne','p'};
 
-FnsToEvaluateParamNames(1).Names={'p','alpha','gamma'};
-FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
-((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+% Conditional entry
+GeneralEqmEqnParamNames(1).Names={'beta'};
+GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
 
+% Entry
+GeneralEqmEqnParamNames(2).Names={'beta','ce'};
+GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; 
 
+% Labor Market Equilibrium
 GeneralEqmEqnParamNames(3).Names={};
 GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
 
-FnsToEvaluate={FnsToEvaluateFn_nbar};
-heteroagentoptions.specialgeneqmcondn={0,'condlentry','entry'};
+heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
 
 GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry,GeneralEqmEqn_LabourMarket};
+
 %% Find equilibrium prices
 
 n_p=0;
