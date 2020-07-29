@@ -1,33 +1,34 @@
 close all;
 % Gráficos do Modelo TVP-VAR 
-
+load yearlab.dat
 %% Figura das Séries Originais
 figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-.|-|--|:')
   
 subplot(3,1,1)
-plot(yearlab1,Y(:,1),'-','LineWidth',1);
+plot(yearlab,Y(:,1),'-','LineWidth',0.7);
 set(gca,'Fontsize',8);
-title('Produtividade Total dos Fatores ')
-xlim([2003.00 2020.02])
+title('BNDES/FBCF')
+xlim([1954 2017])
 
 subplot(3,1,2)
-plot(yearlab1,Y(:,2),'-','LineWidth',1);
+plot(yearlab,Y(:,2),'-','LineWidth',0.7);
 set(gca,'Fontsize',8);
-title('Importações (%PIB)')
-xlim([2003.00 2020.02])
+title('TFP')
+xlim([1954 2017])
 
 subplot(3,1,3)
-plot(yearlab1,Y(:,3),'-','LineWidth',1);
+plot(yearlab,Y(:,3),'-','LineWidth',0.7);
 set(gca,'Fontsize',8);
-title('Formação Bruta de Capital Fixo (%PIB)')
-xlim([2003.00 2020.02])
+title('GDP per capita')
+xlim([1954 2017])
 
 
 
 
 %% Desvio Padrão dos resíduos
+yearlab = yearlab(p+1:end);
 figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-.|-|--|:')
@@ -36,20 +37,20 @@ set(groot,'DefaultAxesColorOrder',[0 0 0],...
 subplot(3,1,1)
 plot(yearlab,sigmean(:,1),':','LineWidth',1);
 set(gca,'Fontsize',8);
-title('Produtividade Total dos Fatores ')
-xlim([2003.00 2020.02])
+title('BNDES/FBCF')
+xlim([1954 2017])
 
 subplot(3,1,2)
 plot(yearlab,sigmean(:,2),':','LineWidth',1);
 set(gca,'Fontsize',8);
-title('Importações (%PIB)')
-xlim([2003.00 2020.02])
+title('TFP')
+xlim([1954 2017])
 
 subplot(3,1,3)
 plot(yearlab,sigmean(:,3),':','LineWidth',1);
 set(gca,'Fontsize',8);
-title('Formação Bruta de Capital Fixo (%PIB)')
-xlim([2003.00 2020.02])
+title('GDP per capita')
+xlim([1954 2017])
 
 %% Cálculo das Funções Impulso Resposta
 % Os anos das Funções estão no script FIR
@@ -68,7 +69,7 @@ if istore == 1
   
  subplot(2,1,1)
  plot(1:nhor,squeeze(imp75XY(2,1,:)))
-     title('Impulso resposta da produtividade')
+     title('Impulso resposta da BNDES/FBCF')
     hold on
     plot(1:nhor,squeeze(imp81XY(2,1,:)))
     hold on
@@ -76,7 +77,7 @@ if istore == 1
     legend('2003','2009','2015');
 set(gca,'Fontsize',8);
  xlim([1 nhor]);
-title(['Resposta da Produtividade Total dos Fatores'],'FontSize',8,'FontWeight','bold');
+title(['Resposta da BNDES/FBCF'],'FontSize',8,'FontWeight','bold');
     
  subplot(2,1,2)
   plot(1:nhor,squeeze(imp75XY(2,2,:)))
@@ -85,7 +86,7 @@ title(['Resposta da Produtividade Total dos Fatores'],'FontSize',8,'FontWeight',
     hold on
     plot(1:nhor,squeeze(imp96XY(2,2,:)))
  xlim([1 nhor]);
-title(['Resposta ds Importações (%PIB)'],'FontSize',8,'FontWeight','bold');
+title(['Resposta ds TFP'],'FontSize',8,'FontWeight','bold');
        
 
  % Resposta da Última Equação
@@ -93,7 +94,7 @@ title(['Resposta ds Importações (%PIB)'],'FontSize',8,'FontWeight','bold');
      set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|:|--')
      plot(1:nhor,squeeze(imp75XY(2,3,:)))
-     title('Impulso resposta do estoque de capital')
+     title('Impulso resposta do GDP per capita')
     hold on
     plot(1:nhor,squeeze(imp81XY(2,3,:)))
     hold on
@@ -202,7 +203,7 @@ hold on
 plot(yearlab,a2,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Produtividade na Produtividade ')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 subplot(3,1,2)
 plot(yearlab,Bt_postmean(3,:),'-','LineWidth',1);
@@ -210,7 +211,7 @@ hold on
 plot(yearlab,a3,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Importação na Produtividade')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 subplot(3,1,3)
 plot(yearlab,Bt_postmean(4,:),'-','LineWidth',1);
@@ -218,7 +219,7 @@ hold on
 plot(yearlab,a4,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito do Investimento na Produtividade')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 % Segunda Equação 
      figure;
@@ -230,7 +231,7 @@ hold on
 plot(yearlab,a6,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Produtividade nas Importações ')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 subplot(3,1,2)
 plot(yearlab,Bt_postmean(7,:),'-','LineWidth',1);
@@ -238,7 +239,7 @@ hold on
 plot(yearlab,a7,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Importação nas Importações')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 subplot(3,1,3)
 plot(yearlab,Bt_postmean(8,:),'-','LineWidth',1);
@@ -246,7 +247,7 @@ hold on
 plot(yearlab,a8,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito do Investimento nas Importações')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 
   
@@ -260,7 +261,7 @@ hold on
 plot(yearlab,a10,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Produtividade no Investimento')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 subplot(3,1,2)
 plot(yearlab,Bt_postmean(11,:),'-','LineWidth',1);
@@ -268,7 +269,7 @@ hold on
 plot(yearlab,a11,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito da Importação no Investimento')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 subplot(3,1,3)
 plot(yearlab,Bt_postmean(12,:),'-','LineWidth',1);
@@ -276,7 +277,7 @@ hold on
 plot(yearlab,a12,':','LineWidth',1);
 set(gca,'Fontsize',8);
 title('Efeito do Investimento no Investimento')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 
 
@@ -313,7 +314,7 @@ hold off
 alpha(.3)
 set(gca,'Fontsize',8);
 title('Efeito das Importações na Produtividade ')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 % Terceira Equação -- Terceiro Coficiente  
 subplot(2,1,2)
@@ -328,7 +329,7 @@ hold off
 alpha(.3)
 set(gca,'Fontsize',8);
 title('Efeito do Investimento na Produtividade')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
  figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
@@ -347,7 +348,7 @@ hold off
 alpha(.3)
 set(gca,'Fontsize',8);
 title('Efeito do Investimento nas Importações ')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 % Terceira Equação -- Terceiro Coficiente  
 subplot(2,1,2)
@@ -362,7 +363,7 @@ hold off
 alpha(.3)
 set(gca,'Fontsize',8);
 title('Efeito da Produtividade no Investimento')
-xlim([2003.00 2020.02])
+xlim([1954 2017])
 
 
 end;

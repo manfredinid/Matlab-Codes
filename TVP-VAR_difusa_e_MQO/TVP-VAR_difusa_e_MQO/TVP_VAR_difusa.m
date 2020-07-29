@@ -12,12 +12,12 @@ randn('state',sum(100*clock));
 rand('twister',sum(100*clock));
 %----------------------------------DADOS----------------------------------------
 
-load ydata1.dat
-load yearlab1.dat
+load ydata.dat
+load yearlab.dat
 
 % you have to x13 the series
-Y = ydata1;
-yearlab =datenum(2003,1:208,1)';
+Y = ydata;
+%yearlab =datenum(2003,1:208,1)';
 
 % Dimensões de X e Y
 t=size(Y,1); % t is the time-series observations of Y
@@ -46,7 +46,7 @@ end
 
 % Redefine y
 y = Y(p+1:t,:)';
-yearlab = yearlab1(p+1:t);
+yearlab = yearlab(p+1:t);
 
 % Tamanho da série temporal
 t=size(y,2);  
@@ -58,9 +58,9 @@ nburn = round(0.20*nrep);   % burn-in
 it_print = round(0.05*nrep);
 
 % Escolha dos anos da FIR
-FIR1 = 2003.00;
-FIR2 = 2009.00;
-FIR3 = 2015.00;
+FIR1 = 1975;
+FIR2 = 1985;
+FIR3 = 2015;
 
 %========= PRIORS NÃO INFORMATIVA:
 
@@ -70,7 +70,7 @@ FIR3 = 2015.00;
  VB_OLS = eye(K);
  sigma_OLS = [-9; 0; 0]; %ones tinha dados certo
 
-% Hiperparâmetros k
+% Hiperparameters k
 k_Q = 0.1;
 k_S = 0.1;
 k_W = 0.1;

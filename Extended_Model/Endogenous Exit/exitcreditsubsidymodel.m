@@ -44,7 +44,7 @@ Params.ce=5*Params.cf; % Fixed cost of entry
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=5;%15;
+n_s=15;%15;
 n_a=100;%350;
 % n_psi is two since psi \in {0,1}
 
@@ -140,7 +140,7 @@ ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
 ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
     'cf', 'adjustcostparam'}; %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
-vfoptions.ReturnToExitFn=@(kprime_val,s_val, psi_val,p,w,alpha,gamma,cf) cf; 
+vfoptions.ReturnToExitFn=@(kprime_val,s_val, psi_val,p,w,alpha,gamma,cf) 0; 
 vfoptions.ReturnToExitFnParamNames={'p','w','alpha','gamma','cf'};
 
 [V,Policy,ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid,...
