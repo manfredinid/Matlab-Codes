@@ -91,12 +91,14 @@ quarter = datetime(2003,01,30):calquarters(1):datetime(2019,12,31);
 dateshift(quarter,'end','month');
 
 figure;
-set(gcf,'Color',[1,1,1],...
+set(gcf,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|:|--|:');
 plot(quarter, Privatenonfinancial1);
 ylabel('Credit-to-GDP ratio')
 legend('Brazil', 'Japan', 'Portugal','Location', 'northeast');
 
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 10]);
 saveas(gcf,'Private_non_finantial','epsc')
 %%
 %%% Import the data
