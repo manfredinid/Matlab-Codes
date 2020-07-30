@@ -85,4 +85,59 @@ line([quarter_gad(1) quarter_gad(end)],[mean(GAD),mean(GAD)],'Color','red','Line
 legend('Antidumping Investigations', 'Average','Location', 'northwest');
 snapnow
 
+%%
+load Private
+quarter = datetime(2003,01,30):calquarters(1):datetime(2019,12,31);
+dateshift(quarter,'end','month');
 
+figure;
+set(gcf,'Color',[1,1,1],...
+      'DefaultAxesLineStyleOrder','-|:|--|:');
+plot(quarter, Privatenonfinancial1);
+ylabel('Credit-to-GDP ratio')
+legend('Brazil', 'Japan', 'Portugal','Location', 'northeast');
+
+saveas(gcf,'Private_non_finantial','epsc')
+%%
+%%% Import the data
+[~, ~, raw] = xlsread('C:\Users\manfr\Documents\GitHub\Matlab-Codes\Graphs_thesis_intro\BNDES.xlsx','Sheet4','A2:D65');
+
+% Create output variable
+data = reshape([raw{:}],size(raw));
+
+% Allocate imported array to column variable names
+YEAR = data(:,1);
+PIBPC = data(:,2);
+TFP = data(:,3);
+BNDESFBCF = data(:,4);
+
+% Clear temporary variables
+clearvars data raw;
+figure;
+set(gcf,'Color',[1,1,1],...
+      'DefaultAxesLineStyleOrder','-|:|--|:');
+plot(YEAR, BNDESFBCF);
+xlim([1954 2017])
+hold on;
+line([1974 1974], get(gca, 'ylim'), 'Color', 'red',...
+   'LineStyle', ':');
+line([1979 1979], get(gca, 'ylim'), 'Color', 'red',...
+   'LineStyle', ':');
+line([2009 2009], get(gca, 'ylim'), 'Color', 'red',...
+   'LineStyle', ':');
+line([2014 2014], get(gca, 'ylim'), 'Color', 'red',...
+   'LineStyle', ':');
+line([1930 1930], get(gca, 'ylim'), 'Color', 'red',...
+   'LineStyle', ':');
+line([1964 1964], get(gca, 'ylim'), 'Color', 'red',...
+   'LineStyle', ':');
+txt = {'Authoritarian national','developmentalism'};
+text(1974, 23 ,txt,'FontSize',10)
+txt = {'New','developmentalism'};
+text(2010, 23 ,txt,'FontSize',10,'HorizontalAlignment','center')
+txt = {'Golden age of:','import substitution'};
+text(1955, 23 ,txt,'FontSize',10)
+ylabel('BNDES disbursements to GFCF')
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 30 35]);
+saveas(gcf,'BNDES','epsc')
