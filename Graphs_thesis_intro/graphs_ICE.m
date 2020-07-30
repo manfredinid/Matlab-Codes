@@ -132,12 +132,12 @@ line([1930 1930], get(gca, 'ylim'), 'Color', 'red',...
 line([1964 1964], get(gca, 'ylim'), 'Color', 'red',...
    'LineStyle', ':');
 txt = {'Authoritarian national','developmentalism'};
-text(1974, 23 ,txt,'FontSize',10)
+text(1974, 23 ,txt,'FontSize',14)
 txt = {'New','developmentalism'};
-text(2010, 23 ,txt,'FontSize',10,'HorizontalAlignment','center')
+text(2010, 23 ,txt,'FontSize',14,'HorizontalAlignment','center')
 txt = {'Golden age of:','import substitution'};
-text(1955, 23 ,txt,'FontSize',10)
+text(1955, 23 ,txt,'FontSize',14)
 ylabel('BNDES disbursements to GFCF')
 set(gcf, 'PaperUnits', 'centimeters');
-set(gcf, 'PaperPosition', [0 0 30 35]);
+set(gcf, 'PaperPosition', [0 0 25 15]);
 saveas(gcf,'BNDES','epsc')
