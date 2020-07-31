@@ -91,9 +91,9 @@ quarter = datetime(2003,01,30):calquarters(1):datetime(2019,12,31);
 dateshift(quarter,'end','month');
 
 figure;
-set(gcf,'DefaultAxesColorOrder',[0 0 0],...
-      'DefaultAxesLineStyleOrder','-|:|--|:');
-plot(quarter, Privatenonfinancial1);
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder','-|-.|--|:');
+  plot(quarter, Privatenonfinancial1);
 ylabel('Credit-to-GDP ratio')
 legend('Brazil', 'Japan', 'Portugal','Location', 'northeast');
 
@@ -102,7 +102,7 @@ set(gcf, 'PaperPosition', [0 0 20 10]);
 saveas(gcf,'Private_non_finantial','epsc')
 %%
 %%% Import the data
-[~, ~, raw] = xlsread('C:\Users\manfr\Documents\GitHub\Matlab-Codes\Graphs_thesis_intro\BNDES.xlsx','Sheet4','A2:D65');
+[~, ~, raw] = xlsread('BNDES.xlsx','Sheet4','A2:D65');
 
 % Create output variable
 data = reshape([raw{:}],size(raw));
@@ -116,7 +116,7 @@ BNDESFBCF = data(:,4);
 % Clear temporary variables
 clearvars data raw;
 figure;
-set(gcf,'Color',[1,1,1],...
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|:|--|:');
 plot(YEAR, BNDESFBCF);
 xlim([1954 2017])
@@ -143,3 +143,28 @@ ylabel('BNDES disbursements to GFCF')
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 25 15]);
 saveas(gcf,'BNDES','epsc')
+
+%%
+
+
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder','-|-.|--|:');
+figure;
+indicator = [ones(1,sum(YEAR<1964)) zeros(1,sum((YEAR>=1964).*(YEAR<1974)))...
+    ones(1,sum((YEAR>=1974).*(YEAR<1980)))  zeros(1,sum((YEAR>=1980).*(YEAR<2009)))...
+    ones(1,sum((YEAR>=2009).*(YEAR<2015)))  zeros(1,sum((YEAR>=2015).*(YEAR<=2017)))]';
+shadedTimeSeries(YEAR, BNDESFBCF ,[indicator], 'Ano', {'invest'}, [0 0 0]+0.8, 07);
+txt = {'\leftarrow Authoritarian national','developmentalism'};
+text(1976, 15 ,txt,'FontSize',12)
+txt = {'New','developmentalism \rightarrow '};
+text(2003, 1,txt,'FontSize',12,'HorizontalAlignment', 'center')
+txt = {'\leftarrow Golden age of','import substitution'};
+text(1960, 20 ,txt,'FontSize',12)
+ylabel('BNDES disbursements to GFCF')
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 15]);
+saveas(gcf,'BNDES1','epsc')
+
+
+
+
