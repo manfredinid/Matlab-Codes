@@ -10,7 +10,7 @@ close all;
 clc;
 randn('state',sum(100*clock));
 rand('twister',sum(100*clock));
-%----------------------------------DADOS----------------------------------------
+%% ----------------------------------DADOS----------------------------------------
 
 load ydata.dat
 load yearlab.dat
@@ -26,7 +26,7 @@ M=size(Y,2); % M is the dimensionality of Y
 % Defasagens
 p = 1; % defasagem do VAR
 numa = M*(M-1)/2; % Number of lower triangular elements of A_t (other than 0's and 1's)
-% ===================================| VAR EQUATION |==============================
+%%  ===================================| VAR EQUATION |==============================
 % Gera a matriz de regressores X_t = [1 y_t-1 y_t-2 ... y_t-k] para t=1:T
 ylag = mlag2(Y,p); % Y is [T x M]. ylag is [T x (Mp)]
 ylag = ylag(p+1:t,:);
@@ -51,18 +51,18 @@ yearlab = yearlab(p+1:t);
 % Tamanho da série temporal
 t=size(y,2);  
 
-%----------------------------PRELIMINARES---------------------------------
+%% ----------------------------PRELIMINARES---------------------------------
 % Preliminares para o Gibbs
 nrep = 1000;  % Amostragens
 nburn = round(0.20*nrep);   % burn-in
 it_print = round(0.05*nrep);
 
 % Escolha dos anos da FIR
-FIR1 = 1975;
-FIR2 = 1985;
+FIR1 = 1963;
+FIR2 = 1979;
 FIR3 = 2015;
 
-%========= PRIORS NÃO INFORMATIVA:
+%========= PRIORS NAO INFORMATIVA:
 
  A_OLS = zeros(numa,1);
  B_OLS = zeros(K,1);
@@ -111,7 +111,7 @@ for ii = 2:M
     ind = ind + ii;
 end
 
-%========= MARIZES DE INICIALIZAÇÃO:
+%% ========= MARIZES DE INICIALIZACAO:
 
 consQ = 0.0001;
 consS = 0.0001;
@@ -150,11 +150,11 @@ cormean = zeros(t,numa);
 sig2mo = zeros(t,M);     
 cor2mo = zeros(t,numa); 
 
-%========= IMPULsO RESPOSTA:
+%========= IMPULSO RESPOSTA:
 
 istore = 1;
-if istore == 1;
-    nhor = 12;  % Impulse response horizon
+if istore == 1
+    nhor = 15;  % Impulse response horizon
     imp75 = zeros(nrep,M,nhor);
     imp81 = zeros(nrep,M,nhor);
     imp96 = zeros(nrep,M,nhor);
@@ -163,13 +163,13 @@ if istore == 1;
 end
 
 
-%====================================== IN�?CIO DO AMOSTRADOR SAMPLING ========================================
-%==============================================================================================
+%% ====================================== INICIO DO AMOSTRADOR SAMPLING ========================================
+
 tic; % This is just a timer
 disp('Number of iterations');
 
 
-for irep = 1:nrep + nburn    % Início do Gibbs
+for irep = 1:nrep + nburn    % Inicio do Gibbs
   
     if mod(irep,it_print) == 0
         disp(irep);toc;
@@ -211,8 +211,8 @@ for irep = 1:nrep + nburn    % Início do Gibbs
         Htsd((i-1)*M+1:i*M,:) = Hsd;  % Cholesky DE H(t)
     end
     
-    %----------------------------IMPULSO RESPOSTAS E RESULTADOS PÓS DESCARTE-----------------
-    if irep > nburn;      
+    %----------------------------IMPULSO RESPOSTAS E RESULTADOS PARA DESCARTE-----------------
+    if irep > nburn      
         
         Bt_save(:,:,nrep) = Btdraw;
         Bt_postmean = Bt_postmean + Btdraw;   % regression coefficients B(t)
@@ -226,7 +226,7 @@ for irep = 1:nrep + nburn    % Início do Gibbs
         end
         Smean = Smean + Sdraw;    % covariance matrix S of A(t)
         Wmean = Wmean + Wdraw;    % covariance matrix W of SIGMA(t)
-        % Correlações e variâncias variantes no tempo
+        % Correlacoes e variancias variantes no tempo
         stemp6 = zeros(M,1);
         stemp5 = [];
         stemp7 = [];
@@ -235,7 +235,7 @@ for irep = 1:nrep + nburn    % Início do Gibbs
             stemp7a = [];
             ic = 1;
             for j = 1:M
-                if j>1;
+                if j>1
                     stemp7a = [stemp7a ; stemp8(j,1:ic)']; 
                     ic = ic+1;
                 end
@@ -249,7 +249,7 @@ for irep = 1:nrep + nburn    % Início do Gibbs
         sig2mo = sig2mo + stemp5.^2;
         cor2mo = cor2mo + stemp7.^2;
          
-        if istore==1;
+        if istore==1
             
             
             IRA_tvp
@@ -275,5 +275,6 @@ cormean = cormean./nrep;
 sig2mo = sig2mo./nrep;
 cor2mo = cor2mo./nrep;
 
-%Gráficos
+%% Graficos
 graph_TVP;
+graph_TVP2;

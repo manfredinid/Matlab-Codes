@@ -32,7 +32,7 @@
                 end
 
                 % Only for specified periods
-                if yearlab(i,1) == FIR1;   % 1975:Q1
+                if yearlab(i,1) == FIR1   % 1975:Q1
                     impf_m = zeros(M,nhor);
                     jj=0;
                     for ij = 1:nhor
@@ -41,7 +41,7 @@
                     end
                     imp75(irep-nburn,:,:) = impf_m; % store draws of responses
                 end
-                if yearlab(i,1) == FIR2;   % 1981:Q3
+                if yearlab(i,1) == FIR2   % 1981:Q3
                     impf_m = zeros(M,nhor);
                     jj=0;
                     for ij = 1:nhor
@@ -50,7 +50,7 @@
                     end
                     imp81(irep-nburn,:,:) = impf_m;  % store draws of responses
                 end
-                if yearlab(i,1) == FIR3;   % 1991:Q1
+                if yearlab(i,1) == FIR3   % 1991:Q1
                     impf_m = zeros(M,nhor);
                     jj=0;
                     for ij = 1:nhor

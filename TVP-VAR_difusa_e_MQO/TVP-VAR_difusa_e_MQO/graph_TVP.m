@@ -1,4 +1,4 @@
-close all;
+%close all;
 % Gráficos do Modelo TVP-VAR 
 load yearlab.dat
 %% Figura das Séries Originais
@@ -63,11 +63,13 @@ if istore == 1
     
 
  %% Gráfico das Funções Impulso Resposta 
+ 
+
  figure;
  set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-|:|--')
   
- subplot(2,1,1)
+ subplot(3,1,1)
  plot(1:nhor,squeeze(imp75XY(2,1,:)))
      title('Impulso resposta da BNDES/FBCF')
     hold on
@@ -79,7 +81,7 @@ set(gca,'Fontsize',8);
  xlim([1 nhor]);
 title(['Resposta da BNDES/FBCF'],'FontSize',8,'FontWeight','bold');
     
- subplot(2,1,2)
+ subplot(3,1,2)
   plot(1:nhor,squeeze(imp75XY(2,2,:)))
     hold on
     plot(1:nhor,squeeze(imp81XY(2,2,:)))
@@ -87,18 +89,27 @@ title(['Resposta da BNDES/FBCF'],'FontSize',8,'FontWeight','bold');
     plot(1:nhor,squeeze(imp96XY(2,2,:)))
  xlim([1 nhor]);
 title(['Resposta ds TFP'],'FontSize',8,'FontWeight','bold');
-       
 
- % Resposta da Última Equação
-    figure;
-     set(groot,'DefaultAxesColorOrder',[0 0 0],...
-      'DefaultAxesLineStyleOrder','-|:|--')
-     plot(1:nhor,squeeze(imp75XY(2,3,:)))
-     title('Impulso resposta do GDP per capita')
+subplot(3,1,3)
+  plot(1:nhor,squeeze(imp75XY(2,3,:)))
     hold on
     plot(1:nhor,squeeze(imp81XY(2,3,:)))
     hold on
     plot(1:nhor,squeeze(imp96XY(2,3,:)))
+ xlim([1 nhor]);
+title(['Resposta ds TFP'],'FontSize',8,'FontWeight','bold');
+       
+%%
+ % Resposta da Última Equação
+    figure;
+     set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder','-|:|--')
+     plot(1:nhor,squeeze(imp75XY(2,1,:)))
+     title('Impulso resposta do GDP per capita')
+    hold on
+    plot(1:nhor,squeeze(imp81XY(2,1,:)))
+    hold on
+    plot(1:nhor,squeeze(imp96XY(2,1,:)))
     xlim([1 nhor])
     legend('2003','2009','2015')
 
@@ -366,4 +377,4 @@ title('Efeito da Produtividade no Investimento')
 xlim([1954 2017])
 
 
-end;
+end
