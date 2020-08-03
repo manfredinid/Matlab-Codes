@@ -53,7 +53,7 @@ t=size(y,2);
 
 %% ----------------------------PRELIMINARES---------------------------------
 % Preliminares para o Gibbs
-nrep = 1000;  % Amostragens
+nrep = 500000;  % Amostragens
 nburn = round(0.20*nrep);   % burn-in
 it_print = round(0.05*nrep);
 
@@ -276,5 +276,5 @@ sig2mo = sig2mo./nrep;
 cor2mo = cor2mo./nrep;
 
 %% Graficos
-graph_TVP;
+%graph_TVP;
 graph_TVP2;
