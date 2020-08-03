@@ -5,9 +5,6 @@
 %Denise Manfredini
 
 
-clear all;
-close all;
-clc;
 randn('state',sum(100*clock));
 rand('twister',sum(100*clock));
 %% ----------------------------------DADOS----------------------------------------
@@ -53,7 +50,7 @@ t=size(y,2);
 
 %% ----------------------------PRELIMINARES---------------------------------
 % Preliminares para o Gibbs
-nrep = 500000;  % Amostragens
+nrep = round(0.80*5000);  % Amostragens
 nburn = round(0.20*nrep);   % burn-in
 it_print = round(0.05*nrep);
 
@@ -69,12 +66,6 @@ FIR3 = 2015;
  VA_OLS = eye(numa);
  VB_OLS = eye(K);
  sigma_OLS = [-9; 0; 0]; %ones tinha dados certo
-
-% Hiperparameters k
-k_Q = 0.1;
-k_S = 0.1;
-k_W = 0.1;
-
 
 sizeW = M; % Size of matrix W
 sizeS = 1:M; % Size of matrix S
@@ -275,6 +266,4 @@ cormean = cormean./nrep;
 sig2mo = sig2mo./nrep;
 cor2mo = cor2mo./nrep;
 
-%% Graficos
-%graph_TVP;
-graph_TVP2;
+
