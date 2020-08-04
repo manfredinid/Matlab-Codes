@@ -50,7 +50,7 @@ t=size(y,2);
 
 %% ----------------------------PRELIMINARES---------------------------------
 % Preliminares para o Gibbs
-nrep = round(0.80*5000);  % Amostragens
+nrep = round(0.80*500000);  % Amostragens
 nburn = round(0.20*nrep);   % burn-in
 it_print = round(0.05*nrep);
 

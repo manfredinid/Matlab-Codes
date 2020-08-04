@@ -69,12 +69,14 @@ if istore == 1
     imp96XY=squeeze(quantile(imp96,qus));
     %%
 figure;
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder',':|-|--|:')
  plot(1:nhor,squeeze(imp75XY(2,1,:)))
     hold on
     plot(1:nhor,squeeze(imp81XY(2,1,:)))
     hold on
     plot(1:nhor,squeeze(imp96XY(2,1,:)))
-    legend('2003','2009','2015');
+    legend('1963','1979','2015');
 set(gca,'Fontsize',8);
  xlim([1 nhor]);
 %title(['Response Growth'],'FontSize',8,'FontWeight','bold');
@@ -253,7 +255,10 @@ hold on;
 shadedplot(yearlab, error3n(:,1)', error3n(:,2)'  , [0.7 0.8 0.8]);
 hold off
 alpha(.3)
+xlim([1954 2017])
 set(gca,'Fontsize',8);
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
 saveas(gcf,'GDPTFP_1','epsc')
 %%
 % BNDES no GDP
@@ -268,10 +273,10 @@ shadedplot(yearlab, error4n(:,1)', error4n(:,2)'  , [0.7 0.8 0.8]);
 hold off
 alpha(.3)
 set(gca,'Fontsize',8);
-title('Efeito do Investimento nas Importações ')
 xlim([1954 2017])
-title('Efeito das Importações na Produtividade ')
-xlim([1954 2017])
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
+%title('Efeito das Importações na Produtividade ')
 saveas(gcf,'GDPBNDES_1','epsc')
 %%
 % BNDES no TFP
@@ -286,9 +291,11 @@ shadedplot(yearlab, error8n(:,1)', error8n(:,2)'  , [0.7 0.8 0.8]);
 hold off
 alpha(.3)
 set(gca,'Fontsize',8);
-title('Efeito da Produtividade no Investimento')
+%title('Efeito da Produtividade no Investimento')
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
 xlim([1954 2017])
-saveas(gcf,'TFPBNDES_1_1','epsc')
+saveas(gcf,'TFPBNDES_1','epsc')
 
 
 %%
@@ -302,7 +309,7 @@ set(groot,'DefaultAxesColorOrder',[0 0 0],...
     plot(1:nhor,squeeze(imp81XY(2,1,:)))
     hold on
     plot(1:nhor,squeeze(imp96XY(2,1,:)))
-    legend('2003','2009','2015');
+    legend('1963','1979','2015')
 set(gca,'Fontsize',8);
  xlim([1 nhor]);
 %title(['Response Growth'],'FontSize',8,'FontWeight','bold');
@@ -344,6 +351,9 @@ plot(yearlab,Bt_postmean(3,:),':','LineWidth',1);
 alpha(.3)
 set(gca,'Fontsize',8);
 legend('Model1', 'Model2')
+xlim([1954 2017])
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
 saveas(gcf,'SGDPTFP_1','epsc')
 %%
 % BNDES no GDP
@@ -357,6 +367,8 @@ alpha(.3)
 set(gca,'Fontsize',8);
 legend('Model1', 'Model2')
 xlim([1954 2017])
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
 saveas(gcf,'SGDPBNDES_1','epsc')
 
 figure;
@@ -369,7 +381,8 @@ alpha(.3)
 set(gca,'Fontsize',8);
 legend('Model1', 'Model2')
 xlim([1954 2017])
-xlim([1954 2017])
-saveas(gcf,'STFPBNDES_1_1','epsc')
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
+saveas(gcf,'STFPBNDES_1','epsc')
 
 end
