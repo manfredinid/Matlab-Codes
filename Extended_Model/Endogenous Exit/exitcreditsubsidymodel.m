@@ -28,7 +28,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=1; % Fixed cost of production
+Params.cf=10; % Fixed cost of production
 %3
 
 Params.w=1; % Normalization
@@ -44,8 +44,8 @@ Params.ce=5*Params.cf; % Fixed cost of entry
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=15;%15;
-n_a=100;%350;
+n_s=10;%15;
+n_a=10;%350;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -116,7 +116,7 @@ Params.r_market=Params.r_international;
 
 
 
-%% Potential New Entrants Distribution over the states (k,z)
+%% Potential New Entrants Distribution over the states (s, psi)
 
 pistar_s=ones(size(s_grid))/n_s; % Initial guess
 dist=1;
@@ -125,6 +125,14 @@ while dist>10^(-7)
     pistar_s=(pi_s)'*pistar_s;
     dist=max(abs(pistar_s-pistar_s_old));
 end
+
+if Parallel==2
+    Params.upsilon = zeros([n_a, n_z],'gpuArray');
+else
+    Params.upsilon = zeros([n_a, n_z]);
+end
+Params.upsilon(1,:,:) = kron(pistar_s,[1-Params.g_ear, Params.g_ear]);
+
 
 %% Aspects of the Endogenous entry
 % Exit is exogenous with probability lambda
@@ -140,7 +148,7 @@ ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
 ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
     'cf', 'adjustcostparam'}; %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
-vfoptions.ReturnToExitFn=@(kprime_val,s_val, psi_val,p,w,alpha,gamma,cf) 0; 
+vfoptions.ReturnToExitFn=@(kprime_val,s_val, psi_val,p,w,alpha,gamma,cf) 1.4*kprime_val; 
 vfoptions.ReturnToExitFnParamNames={'p','w','alpha','gamma','cf'};
 
 [V,Policy,ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid,...
@@ -164,12 +172,6 @@ Params.ebar=ones([n_a,n_z],'gpuArray');
 
 EntryExitParamNames.MassOfNewAgents={'Ne'};
 
-if Parallel==2
-    Params.upsilon = zeros([n_a, n_z],'gpuArray');
-else
-    Params.upsilon = zeros([n_a, n_z]);
-end
-Params.upsilon(1,:,:) = kron(pistar_s,[1-Params.g_ear, Params.g_ear]);
 
 % Some checks
 disp('upsilon size')
@@ -582,9 +584,9 @@ ShareOfTFP(3)=nansum(TFP_pdf(Partion3Indicator).*(StationaryDist.pdf(Partion3Ind
 ShareOfTFP(4)=nansum(nansum(nansum(TFP_pdf(logical(nbarValues>=0)).*StationaryDist.pdf(nbarValues>=0))));
 
 
-MinOfTFP(1)=nanmin(nanmin(nanmin(nonzeros(TFP_pdf(Partion1Indicator)))));
-MinOfTFP(2)=nanmin(nanmin(nanmin(nonzeros(TFP_pdf(Partion2Indicator)))));
-MinOfTFP(3)=nanmin(nanmin(nanmin(nonzeros(TFP_pdf(Partion3Indicator)))));
+MinOfTFP(1)=nanmin(nanmin(nanmin(TFP_pdf(Partion1Indicator))));
+MinOfTFP(2)=nanmin(nanmin(nanmin(TFP_pdf(Partion2Indicator))));
+MinOfTFP(3)=nanmin(nanmin(nanmin(TFP_pdf(Partion3Indicator))));
 
 
 
