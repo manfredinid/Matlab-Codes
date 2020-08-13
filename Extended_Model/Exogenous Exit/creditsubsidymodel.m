@@ -26,13 +26,13 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.001; % Fixed cost of production
+Params.cf=0.5; % Fixed cost of production
 
 % Adjustment cost of capital
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=1.5; % Fixed cost of entry 
+Params.ce=2*Params.cf; % Fixed cost of entry 
 Params.lambda= 1-(1-0.1859)^(1/4); % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
@@ -51,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=30;
-n_a=200;
+n_s=33;
+n_a=201;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -62,19 +62,16 @@ n_a=200;
 %Params.g_ear=0.4; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 
 %% Productivity (s)
-% Exogenous AR(1) process on (log) productivity
-% logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
-Params.rho=0.9; 
-Params.sigma_logz=0.13; 
-Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
-Params.a=0.04; 
-
-tauchenoptions.parallel=Parallel;
-Params.q=5; 
-%  q is max number of std devs from mean
-% max in s_grid has to be log(2.75)=1.0116
-[s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
-s_grid=exp(s_grid);
+rhoeps = 0.75; % persistence
+evallowpareto = 0.2; % lower bound
+evalhighpareto = 2.75;%upper bound
+eparampareto = 0.3; % shape parameter
+% lower eparampreto -- less small firms
+s_grid = linspace(evallowpareto,evalhighpareto,n_s);
+rand('state',1)
+[pistar_s, pi_s]= paretojo(n_s, s_grid, eparampareto, rhoeps);
+pistar_s=pistar_s';
+s_grid=s_grid';
 
 % Earmarked credit grid
 psi_grid=[0;1]; % Using this as a {0,1} helps, e.g., add up earmarked capital.
@@ -121,19 +118,9 @@ Params.r_hh=Params.rhhminusdelta+Params.delta;
 %% 3.Market interest rate
 Params.r_market=Params.r_international;
 
-%% Initial guesses and normalization
+%% normalization
 Params.w=1; % Normalization
-Params.p=0.355; % output price
-Params.Ne=0.66; % total mass of new entrants
-%% Potential New Entrants Distribution over the states (k,z)
 
-pistar_s=ones(size(s_grid))/n_s; % Initial guess
-dist=1;
-while dist>10^(-7)
-    pistar_s_old=pistar_s;
-    pistar_s=(pi_s)'*pistar_s;
-    dist=max(abs(pistar_s-pistar_s_old));
-end
 
 %% Aspects of the Endogenous entry
 % Exit is exogenous with probability lambda
@@ -173,39 +160,32 @@ ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta', 'cf', '
 
 %% General Equilibrium Equations
 %Now define the functions for the General Equilibrium conditions
-GEPriceParamNames={'ebar'}; 
-%FnsToEvaluateParamNames(1).Names={'p', 'w','alpha','gamma'};
-%FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-%    ((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
-%FnsToEvaluate={FnsToEvaluateFn_nbar};
-FnsToEvaluateParamNames(1).Names={};
-FnsToEvaluate={};
 
-%Note: length(AggVars) is as for FnsToEvaluate and length(p) is length(n_p)
+GEPriceParamNames={'ebar'};
 
+FnsToEvaluateParamNames(1).Names={'p','alpha','gamma'};
+FnsToEvaluateFn_nbar1 = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
+((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+FnsToEvaluate={FnsToEvaluateFn_nbar1};
 
-% A 'condlentry' general equilibrium condition will take values of greater
-% than zero for firms that decide to enter, less than zero for first that
-% decide not to enter (or more accurately, after entry decision they draw
-% their state, and then decide to cancel/abort their entry).
+GEPriceParamNames={'Ne','p'};
 
-GEPriceParamNames={'p', 'Ne'}; 
-    
-% % Conditional entry condition   (entry - 1st step)
+% Conditional entry
 GeneralEqmEqnParamNames(1).Names={'beta'};
 GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
 
-%  Free entry conditions  (entry - 2nd step)
+% Entry
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
-GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce;
+GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; 
 
-%GeneralEqmEqnParamNames(3).Names={};
-%GeneralEqmEqn_labor = @(AggVars,GEprices) 1-AggVars;
+% Labor Market Equilibrium
+GeneralEqmEqnParamNames(3).Names={};
+GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
 
-%heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
-heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
-%GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry,GeneralEqmEqn_labor};
-GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry};
+heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
+
+GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry,GeneralEqmEqn_LabourMarket};
+
 
 %% Find equilibrium prices
 
@@ -438,25 +418,25 @@ ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate
 % SUB 4 5 6
 % TAX 7 8 9
 %% Agggregate Values
-%Output.Y=AggVars(2);
-%Output.N=AggVars(3);
-%Output.K=AggVars(1);
-%Output.KdivY=Output.K/Output.Y;
-%Output.TFP=(Output.Y/((Output.K^ Params.alpha)*(Output.N^ Params.gamma)));
+Output.Y=AggVars(2);
+Output.N=AggVars(3);
+Output.K=AggVars(1);
+Output.KdivY=Output.K/Output.Y;
+Output.TFP=(Output.Y/((Output.K^ Params.alpha)*(Output.N^ Params.gamma)));
 
 %% Agggregate Values without Subsidy
-%TAX.Output.Y=AggVars(8);
-%TAX.Output.N=AggVars(9);
-%TAX.Output.K=AggVars(7);
-%TAX.Output.KdivY=TAX.Output.K/TAX.Output.Y;
-%TAX.Output.TFP=(TAX.Output.Y/((TAX.Output.K^ Params.alpha)*(TAX.Output.N^ Params.gamma)));
+TAX.Output.Y=AggVars(8);
+TAX.Output.N=AggVars(9);
+TAX.Output.K=AggVars(7);
+TAX.Output.KdivY=TAX.Output.K/TAX.Output.Y;
+TAX.Output.TFP=(TAX.Output.Y/((TAX.Output.K^ Params.alpha)*(TAX.Output.N^ Params.gamma)));
 
 %% Agggregate Values with Subsidy
-%SUB.Output.Y=AggVars(5);
-%SUB.Output.N=AggVars(6);
-%SUB.Output.K=AggVars(4);
-%SUB.Output.KdivY=SUB.Output.K/SUB.Output.Y;
-%SUB.Output.TFP=(SUB.Output.Y/((SUB.Output.K^ Params.alpha)*(SUB.Output.N^ Params.gamma)));
+SUB.Output.Y=AggVars(5);
+SUB.Output.N=AggVars(6);
+SUB.Output.K=AggVars(4);
+SUB.Output.KdivY=SUB.Output.K/SUB.Output.Y;
+SUB.Output.TFP=(SUB.Output.Y/((SUB.Output.K^ Params.alpha)*(SUB.Output.N^ Params.gamma)));
 
 %% Average values
 
@@ -471,8 +451,43 @@ Percentage_tax = [firms_tax  firms_sub] ;
 %%
 
 nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
-normalize_employment=min(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
+normalize_employment=nanmin(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
 nbarValues=nbarValues./(normalize_employment);
+
+ProbnbarValues=sum(sum(shiftdim(ValuesOnGrid(12,:,:,:),1).*...
+shiftdim(ProbDensityFns(12,:,:,:),1),3));
+
+% SUB
+SUBnbarValues=shiftdim(ValuesOnGrid(6,:,:,:),1);
+SUBnbarValues=SUBnbarValues./(normalize_employment);
+%SUBnbarValues=SUBnbarValues.*...
+%shiftdim(ProbDensityFns(6,:,:,:),1);
+
+% non sub
+NONnbarValues=shiftdim(ValuesOnGrid(9,:,:,:),1);
+NONnbarValues=NONnbarValues./(normalize_employment);
+%NONnbarValues=NONnbarValues.*...
+%shiftdim(ProbDensityFns(9,:,:,:),1);
+
+%%
+figure;
+%subplot(1,2,1)
+plot(s_grid,nanmean(nanmean(SUBnbarValues(:,:,:),3)));
+xlim([0.9 2.5])
+%title('non-earmarked')
+%xlabel('productivity')
+%ylabel('employees')
+%subplot(1,2,2)
+hold on;
+plot(s_grid,nanmean(nanmean(NONnbarValues(:,:,:),3)),'-r');
+%xlim([0.9 2.5])
+%title('earmarked')
+xlabel('productivity')
+ylabel('employees')
+legend('earmarked','non-earmarked', 'Location', 'northwest')
+%%
+
+
 
 
 Partion1Indicator=logical(nbarValues<5);

@@ -38,11 +38,13 @@ Params.r_ear=A.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = A.Params.r_international;
 %%
+Params.p=0.355; % output price
+Params.Ne=0.66; % total mass of new entrants
 
 fprintf(2,'\nModel A  \n');
 creditsubsidymodel;
 
-% Agggregate Values
+%% Agggregate Values
 A.Output.Y=AggVars(2);
 A.Output.N=AggVars(3);
 A.Output.K=AggVars(1);
