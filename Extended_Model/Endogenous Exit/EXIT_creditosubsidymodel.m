@@ -2,6 +2,8 @@
 % Model presented in the Brazilian Slump and the 
 % Government-driven Credit Expansion (2020)
 
+
+% higher exit cost higher number of small firms
 %% Initial setups
 clear all; clear mex; clear functions;clear java;
 close all;
@@ -38,9 +40,10 @@ C.Params.r_international = (1+0.15)^(1/4)-1;
 Params.r_ear=A.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = A.Params.r_international;
+
 %% Initial Guesses
-Params.p = 0.481;
-Params.Ne=0.421; % total mass of new entrants
+Params.p = 0.41;
+Params.Ne=0.018; % total mass of new entrants
 
 %%
 fprintf(2,'\nModel A  \n');
@@ -68,7 +71,7 @@ A.SUB.Output.N=AggVars(6);
 A.SUB.Output.K=AggVars(4);
 A.SUB.Output.KdivY=A.SUB.Output.K/A.SUB.Output.Y;
 A.SUB.Output.TFP=(A.SUB.Output.Y/((A.SUB.Output.K^ Params.alpha)*(A.SUB.Output.N^ Params.gamma)));
-A.MinOfTFP=MinOfTFP;
+%A.MinOfTFP=MinOfTFP;
 
 A.ShareOfEstablishments=ShareOfEstablishments;
 A.ShareOfOutput=ShareOfOutput;
@@ -83,7 +86,7 @@ A.TFP_ear =AggVars(13);
 A.TFP_nonear =AggVars(14);
 A.ebar=Params.ebar;
 A.lambda=lambda;
-A.probenter=probenter;
+%A.probenter=probenter;
 A.ProbnbarValues=ProbnbarValues;
 
 %% For the transition path
@@ -141,7 +144,7 @@ B.ShareOfLabour=ShareOfLabour;
 B.ShareOfCapital=ShareOfCapital;
 B.AverageEmployment=AverageEmployment;
 B.ShareOfTFP=ShareOfTFP;
-B.MinOfTFP=MinOfTFP;
+%B.MinOfTFP=MinOfTFP;
 
 B.SUBShareOfEstablishments=SUBShareOfEstablishments;
 B.SUBShareOfOutput=SUBShareOfOutput;
@@ -155,7 +158,7 @@ B.TFP_ear =AggVars(13);
 B.TFP_nonear =AggVars(14);
 B.ebar=Params.ebar;
 B.lambda=lambda;
-B.probenter=probenter;
+%B.probenter=probenter;
 B.ProbnbarValues=ProbnbarValues;
 
 %% For the transition path
@@ -210,7 +213,7 @@ C.ShareOfLabour=ShareOfLabour;
 C.ShareOfCapital=ShareOfCapital;
 C.AverageEmployment=AverageEmployment;
 C.ShareOfTFP=ShareOfTFP;
-C.MinOfTFP=MinOfTFP;
+%C.MinOfTFP=MinOfTFP;
 
 C.SUBShareOfEstablishments=SUBShareOfEstablishments;
 C.SUBShareOfOutput=SUBShareOfOutput;
@@ -224,7 +227,7 @@ C.TFP_nonear =AggVars(14);
 C.ebar=Params.ebar;
 
 C.lambda=lambda;
-C.probenter=probenter;
+%C.probenter=probenter;
 C.ProbnbarValues=ProbnbarValues;
 %%
 
@@ -255,6 +258,7 @@ fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfEstab
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
+fprintf('Average Employment       %8.3f  %8.3f  %8.3f   %8.3f\n', A.AverageEmployment);
 
 
 %%
@@ -341,9 +345,9 @@ figure;
 %ylabel('employees')
 %subplot(1,2,2)
 hold on;
-plot(s_grid,B.ProbnbarValues, '-k');
+plot(s_grid,B.ProbnbarValues, ':k');
 hold on;
-plot(s_grid,C.ProbnbarValues', '-r');
+plot(s_grid,C.ProbnbarValues', '-k');
 xlim([0.9 2.5])
 %hold on;
 %line([s_grid(sum(C.ProbnbarValues==0)) s_grid(sum(C.ProbnbarValues==0))], get(gca, 'ylim'), 'Color', 'red',...
@@ -354,7 +358,7 @@ xlim([0.9 2.5])
 %title('earmarked')
 xlabel('productivity')
 %ylabel('employees')
-legend('Observed','Alternative', 'Location', 'northwest')
+legend('Final','Counterfactual', 'Location', 'northwest')
 
 saveas(gcf,'proddist','epsc')
 

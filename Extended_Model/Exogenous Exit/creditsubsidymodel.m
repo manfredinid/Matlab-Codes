@@ -26,13 +26,13 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.5; % Fixed cost of production
+Params.cf=0.2;%0.0392; % Fixed cost of production
 
 % Adjustment cost of capital
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=2*Params.cf; % Fixed cost of entry 
+Params.ce=1;%.00991; % Fixed cost of entry 
 Params.lambda= 1-(1-0.1859)^(1/4); % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
@@ -51,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=33;
-n_a=201;
+n_s=15;
+n_a=301;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -62,10 +62,11 @@ n_a=201;
 %Params.g_ear=0.4; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 
 %% Productivity (s)
-rhoeps = 0.75; % persistence
-evallowpareto = 0.2; % lower bound
+
+rhoeps = 0.9; % persistence
+evallowpareto = 1.5; % lower bound
 evalhighpareto = 2.75;%upper bound
-eparampareto = 0.3; % shape parameter
+eparampareto = 5.7;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)
@@ -76,6 +77,8 @@ s_grid=s_grid';
 % Earmarked credit grid
 psi_grid=[0;1]; % Using this as a {0,1} helps, e.g., add up earmarked capital.
 pi_psi=[1,0;0,1];
+
+figure; plot(s_grid, pistar_s)
 
 %% Exogenous states (matrix z)
 
@@ -92,8 +95,8 @@ pi_z=kron(pi_psi,pi_s);
 % grid for capital
 
 % steady-state capital without distotions
+k_high = log(((Params.alpha/(Params.r_ear))^((1-Params.gamma)/(1-Params.gamma-Params.alpha)))*(Params.gamma^((Params.gamma)/(1-Params.gamma-Params.alpha)))*(s_grid(end)^(1/(1-Params.gamma-Params.alpha))))/log(10);
 a_grid = [0 logspace(0.0001,6.28,n_a-1)]'; 
-
 
 %% Decision variables
 %There is no d variable
@@ -452,7 +455,9 @@ Percentage_tax = [firms_tax  firms_sub] ;
 
 nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
 normalize_employment=nanmin(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
+if normalize_employment<1
 nbarValues=nbarValues./(normalize_employment);
+end
 
 ProbnbarValues=sum(sum(shiftdim(ValuesOnGrid(12,:,:,:),1).*...
 shiftdim(ProbDensityFns(12,:,:,:),1),3));
@@ -473,7 +478,7 @@ NONnbarValues=NONnbarValues./(normalize_employment);
 figure;
 %subplot(1,2,1)
 plot(s_grid,nanmean(nanmean(SUBnbarValues(:,:,:),3)));
-xlim([0.9 2.5])
+%xlim([0.9 2.5])
 %title('non-earmarked')
 %xlabel('productivity')
 %ylabel('employees')
@@ -515,6 +520,7 @@ ShareOfLabour(1)=100*sum(sum(sum(Labour_pdf(Partion1Indicator))));
 ShareOfLabour(2)=100*sum(sum(sum(Labour_pdf(Partion2Indicator))));
 ShareOfLabour(3)=100*sum(sum(sum(Labour_pdf(Partion3Indicator))));
 ShareOfLabour(4)=100*sum(sum(sum(Labour_pdf)));
+
 
 
 Capital_pdf=shiftdim(ProbDensityFns(1,:,:,:),1);
