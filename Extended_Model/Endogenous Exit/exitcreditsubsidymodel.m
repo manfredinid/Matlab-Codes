@@ -27,7 +27,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gamma must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.05; % Fixed cost of production
+Params.cf=0.2; % Fixed cost of production
 
 
 Params.w=1; % Normalization
@@ -36,7 +36,7 @@ Params.w=1; % Normalization
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=2*Params.cf; % Fixed cost of entry 
+Params.ce=1.05; % Fixed cost of entry 
 % larger ce implies lower lambda
 
 % Limit the amount of earmarked credit
@@ -46,8 +46,8 @@ Params.ce=2*Params.cf; % Fixed cost of entry
 % The model has three states, one endogenous state (capital), and two
 % exogenous states (productivity and subsidies)
 
-n_s=20;%30;
-n_a=100;%201;
+n_s=13;%30;
+n_a=401;%201;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -60,27 +60,11 @@ n_a=100;%201;
 %% Productivity (s)
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
-Params.rho=0.75; 
-Params.sigma_logz=0.13; 
-Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
-Params.a=0.09; 
 
-
-tauchenoptions.parallel=Parallel;
-Params.q=10; 
-  %q is max number of std devs from mean
- %max in s_grid has to be log(2.75)=1.0116
-[s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,...
-    n_s,Params.q,tauchenoptions);
-%[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,...
-%Parallel,Verbose), transmatix is (z,zprime)
-s_grid=exp(s_grid);
-
-
-rhoeps = 0.75; % persistence
-evallowpareto = 0.5; % lower bound
+rhoeps = 0.9; % persistence
+evallowpareto = 1.5; % lower bound
 evalhighpareto = 2.75;%upper bound
-eparampareto = 1; % shape parameter
+eparampareto = 5.7; % shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)

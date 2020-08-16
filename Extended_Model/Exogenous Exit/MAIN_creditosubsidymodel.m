@@ -38,11 +38,12 @@ Params.r_ear=A.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 Params.r_international = A.Params.r_international;
 %%
-Params.p=0.2636; % output price
-Params.Ne=0.7953; % total mass of new entrants
+Params.p=0.2939; % output price
+Params.Ne=0.0601; % total mass of new entrants
 %%
 fprintf(2,'\nModel A  \n');
 creditsubsidymodel;
+saveas(gcf,'initial','epsc')
 
 %% Agggregate Values
 A.Output.Y=AggVars(2);
@@ -78,6 +79,8 @@ A.K_nfa=K_nfa;
 A.TFP_ear =AggVars(13);
 A.TFP_nonear =AggVars(14);
 A.ebar=Params.ebar;
+
+A.ProbnbarValues=ProbnbarValues;
 %% Model B 
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -89,6 +92,7 @@ Params.r_international = B.Params.r_international;
 
 fprintf(2,'\nModel B  \n');
 creditsubsidymodel;
+saveas(gcf,'observed','epsc')
 
 
 
@@ -127,6 +131,8 @@ B.K_nfa=K_nfa;
 B.TFP_ear =AggVars(13);
 B.TFP_nonear =AggVars(14);
 B.ebar=Params.ebar;
+
+B.ProbnbarValues=ProbnbarValues;
 %% Model C
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -138,7 +144,7 @@ Params.r_international = C.Params.r_international;
 
 fprintf(2,'\nModel C  \n');
 creditsubsidymodel;
-
+saveas(gcf,'alternative','epsc')
 
 % Agggregate Values
 C.Output.Y=AggVars(2);
@@ -175,7 +181,7 @@ C.TFP_ear =AggVars(13);
 C.TFP_nonear =AggVars(14);
 C.ebar=Params.ebar;
 
-
+C.ProbnbarValues=ProbnbarValues;
 %%
 
 fprintf(' n_a  %8.3f \n', n_a);
@@ -197,7 +203,7 @@ fprintf('Subsidy Cost        %8.3f  %8.3f  %8.3f\n',[ A.cost B.cost C.cost])
 
 %%
 
-fprintf(2,'\nModel A  \n');
+fprintf(2,'\nModel A  \n'); 
 fprintf('Distribution statistics of benchmark economy  \n');
 fprintf('                              <5     5 to 49   >=50   total\n');
 fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfEstablishments);
@@ -267,20 +273,32 @@ fprintf('Model B       %8.3f     %8.3f  \n',[B.TFP_nonear B.TFP_ear])
 fprintf('Model C       %8.3f     %8.3f  \n',[C.TFP_nonear C.TFP_ear])
 
 
-
-%figure;
-%plot(s_grid,teste1,'r' )
+%%
+figure;
+%subplot(1,2,1)
+%plot(s_grid,A.ProbnbarValues);
+%xlim([0.9 2.5])
+%title('non-earmarked')
+%xlabel('productivity')
+%ylabel('employees')
+%subplot(1,2,2)
+hold on;
+plot(s_grid,B.ProbnbarValues, ':k');
+hold on;
+plot(s_grid,C.ProbnbarValues', '-k');
+xlim([0.9 2.5])
 %hold on;
-%plot(s_grid,teste2,'b' )
+%line([s_grid(sum(C.ProbnbarValues==0)) s_grid(sum(C.ProbnbarValues==0))], get(gca, 'ylim'), 'Color', 'red',...
+%    'LineStyle', '-');
+%hold on;
+%line([s_grid(sum(B.ProbnbarValues==0)) s_grid(sum(B.ProbnbarValues==0))], get(gca, 'ylim'), 'Color', 'black',...
+%    'LineStyle', '-');
+%title('earmarked')
+xlabel('productivity')
+%ylabel('employees')
+legend('Final','Counterfactual', 'Location', 'northwest')
 
-% CAPITAL
-%figure; plot((squeeze(sum(ProbDensityFns(1,:,:,:)))))
-
-%OUTPUT
-%figure; plot((squeeze(sum(ProbDensityFns(2,:,:,:)))))
-
-%LABOR
-%figure; plot((squeeze(sum(ProbDensityFns(3,:,:,:)))))
+saveas(gcf,'proddist','epsc')
 
 
 toc;

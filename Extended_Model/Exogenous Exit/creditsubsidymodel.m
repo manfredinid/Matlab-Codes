@@ -32,7 +32,7 @@ Params.cf=0.2;%0.0392; % Fixed cost of production
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=1;%.00991; % Fixed cost of entry 
+Params.ce=1.05;%.00991; % Fixed cost of entry 
 Params.lambda= 1-(1-0.1859)^(1/4); % Probability of firm exit
 % lambda is the average observed exit percentage between 2007--2017 
 % (https://sidra.ibge.gov.br/Tabela/2718#resultado)
@@ -51,8 +51,8 @@ EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
 % The model has three states, one endogenous state (capital), and tow
 % exogenous states (productivity and subsidies)
 
-n_s=15;
-n_a=301;
+n_s=13;
+n_a=501;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -78,7 +78,7 @@ s_grid=s_grid';
 psi_grid=[0;1]; % Using this as a {0,1} helps, e.g., add up earmarked capital.
 pi_psi=[1,0;0,1];
 
-figure; plot(s_grid, pistar_s)
+%figure; plot(s_grid, pistar_s)
 
 %% Exogenous states (matrix z)
 
@@ -459,6 +459,7 @@ if normalize_employment<1
 nbarValues=nbarValues./(normalize_employment);
 end
 
+
 ProbnbarValues=sum(sum(shiftdim(ValuesOnGrid(12,:,:,:),1).*...
 shiftdim(ProbDensityFns(12,:,:,:),1),3));
 
@@ -477,14 +478,14 @@ NONnbarValues=NONnbarValues./(normalize_employment);
 %%
 figure;
 %subplot(1,2,1)
-plot(s_grid,nanmean(nanmean(SUBnbarValues(:,:,:),3)));
+plot(s_grid,nanmean(nanmean(SUBnbarValues(:,:,:),3)),':k');
 %xlim([0.9 2.5])
 %title('non-earmarked')
 %xlabel('productivity')
 %ylabel('employees')
 %subplot(1,2,2)
 hold on;
-plot(s_grid,nanmean(nanmean(NONnbarValues(:,:,:),3)),'-r');
+plot(s_grid,nanmean(nanmean(NONnbarValues(:,:,:),3)),'-k');
 %xlim([0.9 2.5])
 %title('earmarked')
 xlabel('productivity')
