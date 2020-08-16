@@ -207,9 +207,9 @@ fprintf(2,'\nModel A  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
 fprintf('                              <5     5 to 49   >=50   total\n');
 fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfEstablishments);
-%fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutput);
+fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfLabour);
-%fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
+fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
 
 A.ShareOfEstablishments' - [41.03 51.59 7.38 100]'
 A.ShareOfLabour' - [3.35 26.42 70.24 100]'
@@ -229,9 +229,9 @@ fprintf(2,'\nModel C  \n');
 fprintf('Distribution statistics of benchmark economy  \n');
 fprintf('                             <5      5 to 49   >=50     total\n');
 fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfEstablishments);
-%fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfOutput);
+fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfOutput);
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfLabour);
-%fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfCapital);
+fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfCapital);
 
 
 %%
