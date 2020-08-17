@@ -39,7 +39,7 @@ Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who h
 Params.r_international = A.Params.r_international;
 %%
 Params.p=0.2939; % output price
-Params.Ne=0.0601; % total mass of new entrants
+Params.Ne=0.0694; % total mass of new entrants
 %%
 fprintf(2,'\nModel A  \n');
 creditsubsidymodel;
@@ -286,7 +286,7 @@ hold on;
 plot(s_grid,B.ProbnbarValues, ':k');
 hold on;
 plot(s_grid,C.ProbnbarValues', '-k');
-xlim([0.9 2.5])
+%xlim([0.9 2.5])
 %hold on;
 %line([s_grid(sum(C.ProbnbarValues==0)) s_grid(sum(C.ProbnbarValues==0))], get(gca, 'ylim'), 'Color', 'red',...
 %    'LineStyle', '-');

@@ -66,7 +66,7 @@ n_a=501;
 rhoeps = 0.9; % persistence
 evallowpareto = 1.5; % lower bound
 evalhighpareto = 2.75;%upper bound
-eparampareto = 5.7;% shape parameter
+eparampareto = 5.8;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)
@@ -128,7 +128,7 @@ Params.w=1; % Normalization
 %% Aspects of the Endogenous entry
 % Exit is exogenous with probability lambda
 simoptions.agententryandexit=1;
-%simoptions.endogenousexit=0;
+simoptions.endogenousexit=0;
 
 % Probability of being in the (k, s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
@@ -183,7 +183,7 @@ GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce;
 
 % Labor Market Equilibrium
 GeneralEqmEqnParamNames(3).Names={};
-GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
+GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars(1);
 
 heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
 
@@ -198,21 +198,42 @@ disp('Calculating price vector corresponding to the stationary eqm')
 % NOTE: EntryExitParamNames has to be passed as an additional input 
 
 [p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1...
-    (n_d, n_a, n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn,...
-    FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames,...
-    ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
-    GEPriceParamNames,heteroagentoptions, simoptions, [],...
-    EntryExitParamNames);
-
+    (0, n_a, n_z, n_p, pi_z, [], a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params,...
+    DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames,...
+    GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions,...
+    simoptions, vfoptions, EntryExitParamNames);
+%%
 Params.p=p_eqm.p;
-Params.Ne=p_eqm.Ne;
+Params.Ne=gather(p_eqm.Ne);
+Params.ebar=p_eqm.ebar;
+
+[p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1...
+    (0, n_a, n_z, n_p, pi_z, [], a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params,...
+    DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames,...
+    GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions,...
+    simoptions, vfoptions, EntryExitParamNames);
+%%
+Params.p=p_eqm.p;
+Params.Ne=gather(p_eqm.Ne);
 Params.ebar=p_eqm.ebar;
 
 %% Value Function, Policy and Firm Distribution in GE
-[V,Policy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z,...
-    ReturnFn, Params, DiscountFactorParamNames,ReturnFnParamNames);
-StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
-    Params, EntryExitParamNames);
+[V,Policy]=ValueFnIter_Case1(0,n_a,n_z,[],a_grid,z_grid, pi_z, ReturnFn,...
+    Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
+StationaryDist=StationaryDist_Case1(Policy,0,n_a,n_z,pi_z,...
+    simoptions, Params, EntryExitParamNames);
+
+%%
+FnsToEvaluateParamNames(1).Names={'p','alpha','gamma'};
+FnsToEvaluateFn_nbar1 = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
+((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
+FnsToEvaluate={FnsToEvaluateFn_nbar1};
+%%
+AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
+    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
+    d_grid, a_grid,z_grid, simoptions.parallel,simoptions,EntryExitParamNames)
+
+
 
 %% Solve the partial equilibrium problem of capital market clearance.
 % Calculate K_nfa
@@ -328,6 +349,7 @@ FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alph
 FnsToEvaluateParamNames(3).Names={'p', 'w','alpha','gamma'};
 FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
     ((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+
 
 %% SUB
 

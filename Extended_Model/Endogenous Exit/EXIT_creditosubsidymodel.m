@@ -42,8 +42,8 @@ Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who h
 Params.r_international = A.Params.r_international;
 
 %% Initial Guesses
-Params.p = 0.41;
-Params.Ne=0.018; % total mass of new entrants
+Params.p=0.2939; % output price
+Params.Ne=0.0601; % total mass of new entrants
 
 %%
 fprintf(2,'\nModel A  \n');
