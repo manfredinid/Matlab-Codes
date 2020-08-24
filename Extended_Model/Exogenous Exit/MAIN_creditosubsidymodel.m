@@ -81,6 +81,9 @@ A.TFP_nonear =AggVars(14);
 A.ebar=Params.ebar;
 
 A.ProbnbarValues=ProbnbarValues;
+
+A.NON_nbar = nanmean(nanmean(NONnbarValues(:,:,:),3));
+A.SUB_nbar = nanmean(nanmean(SUBnbarValues(:,:,:),3));
 %% Model B 
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -133,6 +136,8 @@ B.TFP_nonear =AggVars(14);
 B.ebar=Params.ebar;
 
 B.ProbnbarValues=ProbnbarValues;
+B.NON_nbar = nanmean(nanmean(NONnbarValues(:,:,:),3));
+B.SUB_nbar = nanmean(nanmean(SUBnbarValues(:,:,:),3));
 %% Model C
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -182,6 +187,9 @@ C.TFP_nonear =AggVars(14);
 C.ebar=Params.ebar;
 
 C.ProbnbarValues=ProbnbarValues;
+
+C.NON_nbar = nanmean(nanmean(NONnbarValues(:,:,:),3));
+C.SUB_nbar = nanmean(nanmean(SUBnbarValues(:,:,:),3));
 %%
 
 fprintf(' n_a  %8.3f \n', n_a);
@@ -300,5 +308,83 @@ legend('Final','Counterfactual', 'Location', 'northwest')
 
 saveas(gcf,'proddist','epsc')
 
+figure;
+%subplot(1,2,1)
+plot(s_grid,B.SUB_nbar,'-k');
+%xlim([0.9 2.5])
+%title('non-earmarked')
+%xlabel('productivity')
+%ylabel('employees')
+%subplot(1,2,2)
+hold on;
+plot(s_grid,B.NON_nbar,':k');
+hold on;
+plot(s_grid,C.NON_nbar,'--k');
+%xlim([0.9 2.5])
+%title('earmarked')
+xlabel('productivity')
+ylabel('employees')
+legend('earmarked (ECE)','non-earmarked (ECE)', 'Counterfactual','Location', 'northwest')
+%%
+%B = gather(B.ebar);
+%B = double(B);
 
+%%
+figure; 
+h=surf(B(:,:,1))
+set(h,'LineStyle','none');
+zticks([0 1])
+xticks(1:n_s-1:n_s)
+xticklabels({'1.4','2.75'});
+yticks(1:n_a-1:n_a)
+yticklabels({'0','1900000'});
+set(h,'LineStyle','none');
+xlabel('productivity')
+ylabel('capital')
+zlabel('entry decision, entry=1')
+c = jet(2);
+%colormap('gray');
+colormap(c);
+saveas(gcf,'2entryear','epsc')
+figure; 
+h=surf(B(:,:,2))
+zticks([0 1])
+xticks(1:n_s-1:n_s)
+xticklabels({'1.4','2.75'});
+yticks(1:n_a-1:n_a)
+yticklabels({'0','1900000'});
+set(h,'LineStyle','none');
+xlabel('productivity')
+ylabel('capital')
+zlabel('entry decision, entry=1')
+%colormap('gray');
+colormap(c);
+%colorbar
+saveas(gcf,'2entrynonear','epsc')
+
+%%
+
+%%
+figure; 
+bar(s_grid,B(1,:,1))
+%set(h,'LineStyle','none');
+yticks([0 1])
+%xticks(1:n_s-1:n_s)
+%xticklabels({'1.5','2.75'});
+%yticks(1:n_a-1:n_a)
+%yticklabels({'0','1900000'});
+%set(h,'LineStyle','none');
+xlabel('productivity')
+%ylabel('capital')
+ylabel('entry decision, entry=1')
+saveas(gcf,'entrynonear','epsc')
+
+figure; 
+bar(s_grid,B(1,:,2))
+yticks([0 1])
+xlabel('productivity')
+ylabel('entry decision, entry=1')
+saveas(gcf,'entryear','epsc')
+
+%%
 toc;
