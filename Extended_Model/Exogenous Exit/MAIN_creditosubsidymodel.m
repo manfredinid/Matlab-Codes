@@ -87,6 +87,8 @@ A.SUB_nbar = nanmean(nanmean(SUBnbarValues(:,:,:),3));
 %% Model B 
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
+%Params.p=0.2939; % output price
+%Params.Ne=0.0694; % total mass of new entrants
 
 Params.r_ear=B.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=B.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
@@ -141,6 +143,7 @@ B.SUB_nbar = nanmean(nanmean(SUBnbarValues(:,:,:),3));
 %% Model C
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
+
 
 Params.r_ear=C.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=C.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
@@ -326,8 +329,8 @@ xlabel('productivity')
 ylabel('employees')
 legend('earmarked (ECE)','non-earmarked (ECE)', 'Counterfactual','Location', 'northwest')
 %%
-%B = gather(B.ebar);
-%B = double(B);
+B = B.ebar;
+B = double(B);
 
 %%
 figure; 
@@ -378,7 +381,7 @@ xlabel('productivity')
 %ylabel('capital')
 ylabel('entry decision, entry=1')
 saveas(gcf,'entrynonear','epsc')
-
+%%
 figure; 
 bar(s_grid,B(1,:,2))
 yticks([0 1])

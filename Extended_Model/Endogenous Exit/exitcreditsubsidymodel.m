@@ -46,8 +46,8 @@ Params.ce=1.05; % Fixed cost of entry
 % The model has three states, one endogenous state (capital), and two
 % exogenous states (productivity and subsidies)
 
-n_s=13;%30;
-n_a=401;%201;
+n_s=35;%30;
+n_a=201;%201;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -61,16 +61,15 @@ n_a=401;%201;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
-rhoeps = 0.9; % persistence
-evallowpareto = 1.5; % lower bound
-evalhighpareto = 2.75;%upper bound
-eparampareto = 5.7; % shape parameter
-% lower eparampreto -- less small firms
-s_grid = linspace(evallowpareto,evalhighpareto,n_s);
-rand('state',1)
-[pistar_s, pi_s]= paretojo(n_s, s_grid, eparampareto, rhoeps);
-pistar_s=pistar_s';
-s_grid=s_grid';
+Params.rho=0.93; 
+Params.sigma_logz=sqrt(0.53); 
+Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
+Params.a=0.098; 
+
+tauchenoptions.parallel=Parallel;
+Params.q=2; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
+[s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
+s_grid=exp(s_grid);
 
 
 
@@ -124,7 +123,7 @@ Params.r_market=Params.r_international;
 
 %% Potential New Entrants Distribution over the states (s, psi)
 
-%pistar_s=ones(size(s_grid))/n_s; % Initial guess
+pistar_s=ones(size(s_grid))/n_s; % Initial guess
 dist=1;
 while dist>10^(-7)
     pistar_s_old=pistar_s;
