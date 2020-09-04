@@ -54,10 +54,6 @@ nrep = round(0.80*500000);  % Amostragens
 nburn = round(0.20*nrep);   % burn-in
 it_print = round(0.05*nrep);
 
-% Escolha dos anos da FIR
-FIR1 = 1963;
-FIR2 = 1979;
-FIR3 = 2015;
 
 %========= PRIORS NAO INFORMATIVA:
 

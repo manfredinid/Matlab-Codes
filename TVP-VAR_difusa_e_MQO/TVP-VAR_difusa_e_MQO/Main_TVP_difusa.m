@@ -5,19 +5,43 @@ close all;
 clc;
 sensitivity = 1;
 
+% Escolha dos anos da FIR
+FIR1 = 1963;
+FIR2 = 1979;
+FIR3 = 2015;
+
+
 % Hiperparameters k
-k_Q = 0.01;
+% Set some hyperparameters here (see page Koop 831, end of section 4.1)
+k_Q = 0.1;
 k_S = 0.1;
 k_W = 0.01;
 %%
 TVP_VAR_difusa;
+
+if istore ==1
+     
+    qus = [.10, .5, .90];
+    imp75XY=squeeze(quantile(imp75,qus));
+    imp81XY=squeeze(quantile(imp81,qus));
+    imp96XY=squeeze(quantile(imp96,qus));
+end
+
 save('Model1')
 
 if sensitivity == 1
 
-k_Q = 0.1;
+k_Q = 1;
 k_S = 0.01;
 k_W = 0.1;
+
+if istore ==1
+     
+    qus = [.10, .5, .90];
+    imp75XY=squeeze(quantile(imp75,qus));
+    imp81XY=squeeze(quantile(imp81,qus));
+    imp96XY=squeeze(quantile(imp96,qus));
+end
 
     TVP_VAR_difusa;
     save('Model2')
@@ -62,11 +86,9 @@ saveas(gcf,'allvars','epsc')
 %% Cálculo das Funções Impulso Resposta
 % Os anos das Funções estão no script FIR
 
-if istore == 1 
-    qus = [.10, .5, .90];
-    imp75XY=squeeze(quantile(imp75,qus));
-    imp81XY=squeeze(quantile(imp81,qus));
-    imp96XY=squeeze(quantile(imp96,qus));
+if istore == 1
+    %%
+    load('Model1')
     %%
 figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
@@ -106,6 +128,7 @@ figure;
 saveas(gcf,'ResponseBNDES','epsc')
 end
 %%
+load yearlab.dat
 yearlab = yearlab(2:end);
 %%
 figure;
@@ -293,13 +316,13 @@ alpha(.3)
 set(gca,'Fontsize',8);
 %title('Efeito da Produtividade no Investimento')
 set(gcf, 'PaperUnits', 'centimeters');
-set(gcf, 'PaperPosition', [0 0 20 9]);
+set(gcf, 'PaperPosition', [0 0 20 9]);6
 xlim([1954 2017])
 saveas(gcf,'TFPBNDES_1','epsc')
 
 
 %%
-if sensitivity==1
+if sensitivity==1 
     load('Model2')
 figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
@@ -384,5 +407,76 @@ xlim([1954 2017])
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 9]);
 saveas(gcf,'STFPBNDES_1','epsc')
+
+if istore == 1
+    load('Model1')
+
+    M1_imp75XY=squeeze(quantile(imp75,qus));
+    M1_imp81XY=squeeze(quantile(imp81,qus));
+    M1_imp96XY=squeeze(quantile(imp96,qus));
+    
+     load('Model2')
+    M2_imp75XY=squeeze(quantile(imp75,qus));
+    M2_imp81XY=squeeze(quantile(imp81,qus));
+    M2_imp96XY=squeeze(quantile(imp96,qus));
+    %%
+figure;
+
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder','-|:|--|:')
+  subplot(1,3,1);
+ plot(1:nhor,squeeze(M1_imp75XY(2,1,:)))
+ hold on; 
+  plot(1:nhor,squeeze(M2_imp75XY(2,1,:)))
+
+subplot(1,3,2);
+    plot(1:nhor,squeeze(M1_imp81XY(2,1,:)))
+    hold on;
+ plot(1:nhor,squeeze(M2_imp81XY(2,1,:)))
+ 
+   subplot(1,3,3);
+    plot(1:nhor,squeeze(M1_imp96XY(2,1,:)))
+    hold on;
+     plot(1:nhor,squeeze(M2_imp96XY(2,1,:)))
+    %legend('1963','1979','2015');
+    
+    set(gca,'Fontsize',8);
+    legend('Model1', 'Model2')
+ xlim([1 nhor]);
+  %ylim([-0.1 0.6]);
+
+%title(['Response Growth'],'FontSize',8,'FontWeight','bold');
+saveas(gcf,'sensiResponseGrowth','epsc')
+%%
+
+figure;
+
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder','-|:|--|:')
+  subplot(1,3,1);
+ plot(1:nhor,squeeze(M1_imp75XY(2,2,:)))
+ hold on; 
+  plot(1:nhor,squeeze(M2_imp75XY(2,2,:)))
+
+subplot(1,3,2);
+    plot(1:nhor,squeeze(M1_imp81XY(2,2,:)))
+    hold on;
+ plot(1:nhor,squeeze(M2_imp81XY(2,2,:)))
+ 
+   subplot(1,3,3);
+    plot(1:nhor,squeeze(M1_imp96XY(2,2,:)))
+    hold on;
+     plot(1:nhor,squeeze(M2_imp96XY(2,2,:)))
+    %legend('1963','1979','2015');
+    
+    set(gca,'Fontsize',8);
+    legend('Model1', 'Model2')
+ xlim([1 nhor]);
+  %ylim([-0.002 0.014])%title(['Response TFP'],'FontSize',8,'FontWeight','bold');
+saveas(gcf,'sensiResponseTFP','epsc')
+
+    
+end
+
 
 end
