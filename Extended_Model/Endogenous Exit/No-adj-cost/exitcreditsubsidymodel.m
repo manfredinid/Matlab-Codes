@@ -182,7 +182,7 @@ disp('sum of upsilon')
 disp(sum(Params.upsilon(:)))
 
 
-%Params.oneminuslambda = ones([n_z, n_a]);
+%Params.oneminuslambda = ones([n_z]);
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
     Params, EntryExitParamNames);
 
@@ -207,9 +207,9 @@ GeneralEqmEqn_CondlEntry = @(ValueFn,GEprices,beta) beta*ValueFn-0;
 GeneralEqmEqnParamNames(2).Names={'beta','ce'};
 GeneralEqmEqn_Entry = @(EValueFn,GEprices,beta,ce) beta*EValueFn-ce; 
 
-% Labor Market Equilibrium
-%GeneralEqmEqnParamNames(3).Names={};
-%GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
+%Labor Market Equilibrium
+GeneralEqmEqnParamNames(3).Names={};
+GeneralEqmEqn_LabourMarket = @(AggVars,GEprices) 1-AggVars;
 
 heteroagentoptions.specialgeneqmcondn={'condlentry','entry'};
 
