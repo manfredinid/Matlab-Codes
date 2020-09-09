@@ -14,8 +14,8 @@ FIR3 = 2015;
 % Hiperparameters k
 % Set some hyperparameters here (see page Koop 831, end of section 4.1)
 k_Q = 0.1;
-k_S = 0.1;
-k_W = 0.01;
+k_S = 0.01;
+k_W = 0.1;
 %%
 TVP_VAR_difusa;
 
@@ -32,8 +32,8 @@ save('Model1')
 if sensitivity == 1
 
 k_Q = 1;
-k_S = 0.01;
-k_W = 0.1;
+k_S = 0.1;
+k_W = 0.01;
 
 if istore ==1
      
