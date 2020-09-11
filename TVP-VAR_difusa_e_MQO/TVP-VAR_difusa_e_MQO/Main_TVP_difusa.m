@@ -6,16 +6,16 @@ clc;
 sensitivity = 1;
 
 % Escolha dos anos da FIR
-FIR1 = 1963;
-FIR2 = 1979;
-FIR3 = 2015;
+FIR1 = 1955;
+FIR2 = 1974;
+FIR3 = 2011;
 
 
 % Hiperparameters k
 % Set some hyperparameters here (see page Koop 831, end of section 4.1)
 k_Q = 0.1;
-k_S = 0.01;
-k_W = 0.1;
+k_S = 0.1;
+k_W = 0.01;
 %%
 TVP_VAR_difusa;
 
@@ -31,9 +31,9 @@ save('Model1')
 
 if sensitivity == 1
 
-k_Q = 1;
-k_S = 0.1;
-k_W = 0.01;
+k_Q = 0.1;
+k_S = 0.01;
+k_W = 0.001;
 
 if istore ==1
      
@@ -74,7 +74,7 @@ indicator = [ones(1,sum(yearlab<1964)) zeros(1,sum((yearlab>=1964).*(yearlab<197
 shadedTimeSeries(yearlab, Y(:,3) ,[indicator], '', {''}, [0 0 0]+0.8, 07);
 txt = {'\leftarrow Authoritarian national','developmentalism'};
 text(1976, 15 ,txt,'FontSize',10)
-txt = {'New','developmentalism \rightarrow '};
+txt = {'New','state-led development \rightarrow '};
 text(2003, 5,txt,'FontSize',10,'HorizontalAlignment', 'center')
 txt = {'\leftarrow Golden age of','import substitution'};
 text(1960, 20 ,txt,'FontSize',10)
@@ -138,6 +138,8 @@ set(groot,'DefaultAxesColorOrder',[0 0 0],...
   
 subplot(3,1,1)
 plot(yearlab,sigmean(:,1),'LineWidth',0.6);
+hold on;
+plot(yearlab,[0 0], '-r');
 set(gca,'Fontsize',8);
 title('GDP per capita (annual %)')
 xlim([1954 2017])

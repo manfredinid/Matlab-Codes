@@ -29,7 +29,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.2; % Fixed cost of production
+Params.cf=0; % Fixed cost of production
 
 
 Params.w=1; % Normalization
@@ -38,7 +38,7 @@ Params.w=1; % Normalization
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=1.05; % Fixed cost of entry 
+Params.ce=0.05; % Fixed cost of entry 
 % larger ce implies lower lambda
 
 % Limit the amount of earmarked credit
@@ -48,8 +48,8 @@ Params.ce=1.05; % Fixed cost of entry
 % The model has three states, one endogenous state (capital), and two
 % exogenous states (productivity and subsidies)
 
-n_s=35;%30;
-n_a=201;%201;
+n_s=5;%30;
+n_a=50;%201;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -65,16 +65,17 @@ n_a=201;%201;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
-Params.rho=0.93; 
-Params.sigma_logz=sqrt(0.53); 
-Params.sigma_epsilon=sqrt((1-Params.rho)*((Params.sigma_logz)^2));
-Params.a=0.098; 
 
-tauchenoptions.parallel=Parallel;
-Params.q=2; % Hopenhayn & Rogerson (1993) do not report (based on Table 4 is seems something around q=4 is used, otherwise don't get values of z anywhere near as high as 27.3. (HR1993 have typo and call the column 'log(s)' when it should be 's') 
-[s_grid, pi_s]=TauchenMethod(Params.a,Params.sigma_epsilon^2,Params.rho,n_s,Params.q,tauchenoptions); %[states, transmatrix]=TauchenMethod_Param(mew,sigmasq,rho,znum,q,Parallel,Verbose), transmatix is (z,zprime)
-s_grid=exp(s_grid);
-
+rhoeps = 0.9; % persistence
+evallowpareto = 1.5; % lower bound
+evalhighpareto = 2.75;%upper bound
+eparampareto = 5.8;% shape parameter
+% lower eparampreto -- less small firms
+s_grid = linspace(evallowpareto,evalhighpareto,n_s);
+rand('state',1)
+[pistar_s, pi_s]= paretojo(n_s, s_grid, eparampareto, rhoeps);
+pistar_s=pistar_s';
+s_grid=s_grid';
 
 
 
@@ -149,7 +150,7 @@ Params.upsilon(1,:,:) = kron(pistar_s,[1-Params.g_ear, Params.g_ear]);
 
 %% Aspects of Entry and Exit 
 % Continuation fixed cost for firms facing endogenous exit decision
-Params.phi=8.8;
+Params.phi=1.8;
 
 % Exit is exogenous with probability lambda
 DiscountFactorParamNames={'beta'};
@@ -173,11 +174,8 @@ ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
     'cf', 'adjustcostparam'}; 
 %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
-vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
-    alpha,gamma,delta, cf, adjustcostparam)Firms(kprime_val,...
-    k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, cf, adjustcostparam);
-vfoptions.ReturnToExitFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
-    'cf', 'adjustcostparam'}; 
+vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val)0;
+vfoptions.ReturnToExitFnParamNames={}; 
 
 %%
 [V, Policy, PolicyWhenExiting, ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
@@ -282,15 +280,18 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
 
 % STEP 1 - Let K_total=K_firm(r_market) 
 Params.r_market=Params.r_market;
-FnsToEvaluateParamNames(1).Names={};
+
 % Find Aggregate Capital with r = r_market
+clear FnsToEvaluateParamNames
+FnsToEvaluateParamNames(1).Names={};
 FnsToEvaluateFn_Kfirm = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass)...
     aprime_val; 
 FnsToEvaluate={FnsToEvaluateFn_Kfirm};
-K_total=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
-    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
-    d_grid, a_grid, z_grid, [],simoptions,EntryExitParamNames);
 
+
+K_total=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid,[], simoptions,EntryExitParamNames, PolicyWhenExiting);
+
+%%        
 % STEP 2 - Let K_HH=K_firm(r_HH)  
 % Params.rhhminusdelta=1/Params.beta-1, that is general eqm result in 
 % complete market models
@@ -300,10 +301,8 @@ Params.r_market=Params.r_hh;
 [~,Policy_rhh]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z,...
     ReturnFn, Params, DiscountFactorParamNames,ReturnFnParamNames); 
 % Find Aggregate Capital with r = r_HH
-K_hh=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy_rhh,...
-    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
-    d_grid, a_grid, z_grid, [],simoptions,EntryExitParamNames);
-
+K_hh=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, Parallel, simoptions, EntryExitParamNames, PolicyWhenExiting);
+%
 % STEP 3 - Now, set K_nfa=K_hh-K_total 
 K_nfa=K_hh-K_total;
 
@@ -362,8 +361,11 @@ fprintf('\n')
 %xlim([min(s_grid) max(s_grid)])
 %legend('Earmarked','Non-Earmarked', 'Location', 'Best');
 %% 
+clear FnsToEvaluateParamNames
 
 % CAPITAL
+FnsToEvaluateParamNames(1).ExitStatus=[1,1,0,0]; % [NoExit, EndogExit-choosenottoexit, EndogExit-choosetoexit,ExoExit] (1 means include 'this' status in calculation, 0 not include) (the default when not specified is [1,1,1,1])
+
 FnsToEvaluateParamNames(1).Names={};
 FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass)...
     aprime_val; 
@@ -453,7 +455,7 @@ FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output, FnsToEvaluateFn_nba
 
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
-    d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+    d_grid, a_grid, z_grid, simoptions.parallel,simoptions, EntryExitParamNames, PolicyWhenExiting);
 
 ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1(StationaryDist,...
     Policy, FnsToEvaluate, Params,...
@@ -498,7 +500,7 @@ Output.perK=AggVars(1)/StationaryDist.mass;
 firms_sub=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(10,:,:,:),1)==3))));
 firms_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(10,:,:,:),1)==2))));
 
-Percentage_tax = [firms_tax  firms_sub  100-firms_tax+firms_sub ] ;
+Percentage_tax = [firms_tax  firms_sub  firms_tax+firms_sub ] ;
 
 MassOfExitingFirms=sum(sum(sum(StationaryDist.pdf(logical(ExitPolicy)))))*StationaryDist.mass;
 ExitRateOfFirms=MassOfExitingFirms/StationaryDist.mass;
@@ -549,9 +551,9 @@ Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
 Partion3Indicator=logical(nbarValues>=50);
 
 
-ShareOfEstablishments(1)=100*sum(sum(sum(StationaryDist.pdf(logical(nbarValues<5)))))./(1-ExitRateOfFirms);
-ShareOfEstablishments(2)=100*sum(sum(sum(StationaryDist.pdf(Partion2Indicator))))./(1-ExitRateOfFirms);
-ShareOfEstablishments(3)=100*sum(sum(sum(StationaryDist.pdf(Partion3Indicator))))./(1-ExitRateOfFirms);
+ShareOfEstablishments(1)=100*sum(sum(sum(StationaryDist.pdf(logical(nbarValues<5)))));
+ShareOfEstablishments(2)=100*sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
+ShareOfEstablishments(3)=100*sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
 ShareOfEstablishments(4)=ShareOfEstablishments(1)+ShareOfEstablishments(2)+ShareOfEstablishments(3);
 
 Output_pdf=shiftdim(ProbDensityFns(2,:,:,:),1);
