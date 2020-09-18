@@ -1,4 +1,4 @@
-function F=ExistingFirm_ReturnFn(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma, delta,cf, adjustcostparam)
+function F=ExistingFirm_ReturnFn(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma, delta, adjustcostparam)
 
 F=-Inf;
 
@@ -13,7 +13,7 @@ r=r_ear*psi_val + r_market*(1-psi_val);
 % Labour
 nbar=((s_val*p*gamma))^(1/(1-gamma)) *kprime_val^(alpha/(1-gamma));
 
-pi =  p*s_val*(kprime_val^alpha)*(nbar^gamma)-w*nbar-r*kprime_val-cf-adjcost;
+pi =  p*s_val*(kprime_val^alpha)*(nbar^gamma)-w*nbar-r*kprime_val-adjcost;
 
 F=pi;
 

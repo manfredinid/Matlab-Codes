@@ -33,6 +33,11 @@ C.Params.r_ear=(1+0.15)^(1/4)-1; % Interest rate on earmarked credit
 C.Params.g_ear=0;
 C.Params.r_international = (1+0.15)^(1/4)-1;
 
+% Model D
+D.Params.r_ear=(1+0.12)^(1/4)-1; % Interest rate on earmarked credit
+D.Params.g_ear=0.4336;
+D.Params.r_international = Params.r_hh;
+
 %% Model A
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -89,14 +94,7 @@ A.lambda=lambda;
 %A.probenter=probenter;
 A.ProbnbarValues=ProbnbarValues;
 
-%% For the transition path
 
-if transition == 1
-Params_initial=Params;
-
-    save ./SavedOutput/TPDynamics_initial.mat...
-        Params_initial V_initial Policy_initial StationaryDist_initial
-end
 
 %% Model B 
 % Earmarked credit with embebed subsidies (psi)
@@ -161,13 +159,6 @@ B.lambda=lambda;
 %B.probenter=probenter;
 B.ProbnbarValues=ProbnbarValues;
 
-%% For the transition path
-if transition == 1
-Params_final=Params;
-
- save ./SavedOutput/TPDynamics_final.mat...
-        Params_final V_final Policy_final StationaryDist_final
-end
 %% Model C
 % Earmarked credit with embebed subsidies (psi)
 % Exgoenous states
@@ -177,8 +168,8 @@ Params.g_ear=C.Params.g_ear; % Share of (unconditional) potential entrants who h
 Params.r_international = C.Params.r_international;
 
 %% Initial Guesses
-Params.p = 0.54;
-Params.Ne=0.37; % total mass of new entrants
+%Params.p = 0.54;
+%Params.Ne=0.37; % total mass of new entrants
 %%
 
 fprintf(2,'\nModel C  \n');
@@ -226,9 +217,71 @@ C.TFP_ear =AggVars(13);
 C.TFP_nonear =AggVars(14);
 C.ebar=Params.ebar;
 
-C.lambda=lambda;
+C.notexit=lambda;
 %C.probenter=probenter;
 C.ProbnbarValues=ProbnbarValues;
+
+%% Model D
+% Earmarked credit with embebed subsidies (psi)
+% Exgoenous states
+
+Params.r_ear=D.Params.r_ear; % Interest rate on earmarked credit
+Params.g_ear=D.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
+Params.r_international = D.Params.r_international;
+
+%% Initial Guesses
+%Params.p = 0.54;
+%Params.Ne=0.37; % total mass of new entrants
+%%
+
+fprintf(2,'\nModel C  \n');
+exitcreditsubsidymodel;
+saveas(gcf,'alternative','epsc')
+
+% Agggregate Values
+D.Output.Y=AggVars(2);
+D.Output.N=AggVars(3);
+D.Output.K=AggVars(1);
+D.Output.KdivY=D.Output.K/D.Output.Y;
+D.Output.TFP=(D.Output.Y/((D.Output.K^Params.alpha)*(D.Output.N^Params.gamma)));
+D.cost = AggVars(11);
+
+% Agggregate Values without Subsidy
+D.TAX.Output.Y=AggVars(8);
+D.TAX.Output.N=AggVars(9);
+D.TAX.Output.K=AggVars(7);
+D.TAX.Output.KdivY=D.TAX.Output.K/D.TAX.Output.Y;
+D.TAX.Output.TFP=(D.TAX.Output.Y/((D.TAX.Output.K^ Params.alpha)*(D.TAX.Output.N^ Params.gamma)));
+
+% Agggregate Values with Subsidy
+D.SUB.Output.Y=AggVars(5);
+D.SUB.Output.N=AggVars(6);
+D.SUB.Output.K=AggVars(4);
+D.SUB.Output.KdivY=D.SUB.Output.K/D.SUB.Output.Y;
+D.SUB.Output.TFP=(D.SUB.Output.Y/((D.SUB.Output.K^ Params.alpha)*(D.SUB.Output.N^ Params.gamma)));
+
+D.ShareOfEstablishments=ShareOfEstablishments;
+D.ShareOfOutput=ShareOfOutput;
+D.ShareOfLabour=ShareOfLabour;
+D.ShareOfCapital=ShareOfCapital;
+D.AverageEmployment=AverageEmployment;
+D.ShareOfTFP=ShareOfTFP;
+%D.MinOfTFP=MinOfTFP;
+
+D.SUBShareOfEstablishments=SUBShareOfEstablishments;
+D.SUBShareOfOutput=SUBShareOfOutput;
+D.SUBShareOfLabour=SUBShareOfLabour;
+D.SUBShareOfCapital=SUBShareOfCapital;
+
+D.Percentage_tax=Percentage_tax;
+D.K_nfa=K_nfa;
+D.TFP_ear =AggVars(13);
+D.TFP_nonear =AggVars(14);
+D.ebar=Params.ebar;
+
+D.notexit=lambda;
+%D.probenter=probenter;
+D.ProbnbarValues=ProbnbarValues;
 %%
 
 fprintf(' n_a  %8.3f \n', n_a);
@@ -251,8 +304,8 @@ fprintf('Subsidy Cost        %8.3f  %8.3f  %8.3f\n',[ A.cost B.cost C.cost])
 
 %%
 
-fprintf(2,'\nModel A  \n');
-fprintf('Distribution statistics of benchmark economy  \n');
+fprintf(2,'\nModel A  \n'); 
+fprintf('Distribution statistics of benchmallrk economy  \n');
 fprintf('                              <5     5 to 49   >=50   total\n');
 fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfEstablishments);
 fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutput);
@@ -333,7 +386,7 @@ fprintf('Model B       %8.3f     %8.3f    %8.3f    \n',[B.MinOfTFP])
 fprintf('Model C       %8.3f     %8.3f    %8.3f    \n',[C.MinOfTFP])
 %%
 fprintf('                    Model A    Model B   Model C\n');
-fprintf('Prob Stay         %8.3f  %8.3f %8.3f\n',[ A.lambda B.lambda C.lambda])
+fprintf('Prob Stay         %8.3f  %8.3f %8.3f\n',[ A.notexit B.notexit C.notexit])
 fprintf('Prob Enter        %8.3f  %8.3f %8.3f\n',[ A.probenter B.probenter C.probenter])
 %%
 figure;

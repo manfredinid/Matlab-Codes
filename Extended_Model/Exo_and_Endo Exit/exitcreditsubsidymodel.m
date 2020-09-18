@@ -29,7 +29,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0; % Fixed cost of production
+%Params.cf=0.05; % Fixed cost of production
 
 
 Params.w=1; % Normalization
@@ -38,7 +38,7 @@ Params.w=1; % Normalization
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=0.05; % Fixed cost of entry 
+Params.ce=6; % Fixed cost of entry 
 % larger ce implies lower lambda
 
 % Limit the amount of earmarked credit
@@ -48,8 +48,8 @@ Params.ce=0.05; % Fixed cost of entry
 % The model has three states, one endogenous state (capital), and two
 % exogenous states (productivity and subsidies)
 
-n_s=5;%30;
-n_a=50;%201;
+n_s=11;
+n_a=480;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -65,11 +65,10 @@ n_a=50;%201;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
-
 rhoeps = 0.9; % persistence
-evallowpareto = 1.5; % lower bound
+evallowpareto = 1.45; % lower bound
 evalhighpareto = 2.75;%upper bound
-eparampareto = 5.8;% shape parameter
+eparampareto = 5.9;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)
@@ -77,6 +76,8 @@ rand('state',1)
 pistar_s=pistar_s';
 s_grid=s_grid';
 
+figure;
+plot(s_grid, pistar_s)
 
 
 % Earmarked credit grid
@@ -150,7 +151,7 @@ Params.upsilon(1,:,:) = kron(pistar_s,[1-Params.g_ear, Params.g_ear]);
 
 %% Aspects of Entry and Exit 
 % Continuation fixed cost for firms facing endogenous exit decision
-Params.phi=1.8;
+Params.phi=8.8;
 
 % Exit is exogenous with probability lambda
 DiscountFactorParamNames={'beta'};
@@ -159,8 +160,8 @@ vfoptions.endogenousexit=1;
 vfoptions.endogenousexit=2;
 % We also need to create 'vfoptions.ReturnToExitFn' (and 'vfoptions.ReturnToExitFnParamNames'), as below.
 % For 'mixed' exit, we also need the probabilities.
-Params.lambda_phi=0.0197;
-Params.lambda_infty=0.0051;
+Params.lambda_phi=0.045;
+Params.lambda_infty=0.025;
 % The following are the probabilities on 'no exit decision', 'endogenous exit decision', and 'exogenous exit decision' respectively.
 vfoptions.exitprobabilities=[1-Params.lambda_phi-Params.lambda_infty,Params.lambda_phi,Params.lambda_infty]; % These are what S2008 calls lambda_phi and lambda_infinity
 % For firms facing 'endogenous exit decision', there is a continuation cost:
@@ -168,14 +169,16 @@ vfoptions.endogenousexitcontinuationcost=Params.phi;
 
 % Return Function
 ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
-    alpha,gamma,delta, cf, adjustcostparam)ExistingFirm_ReturnFn(kprime_val,...
-    k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, cf, adjustcostparam);
+    alpha,gamma,delta, adjustcostparam)ExistingFirm_ReturnFn(kprime_val,...
+    k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, adjustcostparam);
 ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
-    'cf', 'adjustcostparam'}; 
+     'adjustcostparam'}; 
 %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
-vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val)0;
-vfoptions.ReturnToExitFnParamNames={}; 
+vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
+    alpha,gamma,delta, adjustcostparam)Firms(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma, delta, adjustcostparam);
+vfoptions.ReturnToExitFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
+     'adjustcostparam'}; 
 
 %%
 [V, Policy, PolicyWhenExiting, ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
@@ -188,8 +191,8 @@ simoptions.exitprobabilities=vfoptions.exitprobabilities;
 % Probability of being in the (k, s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
-EntryExitParamNames.CondlProbOfSurvival={'oneminuslambda'};
-Params.oneminuslambda=1-ExitPolicy;
+EntryExitParamNames.CondlProbOfSurvival={'notexit'};
+Params.notexit=1-ExitPolicy;
 
 % Conditional entry will allow for different productivity cutoffs for 
 %new entrants depending on earmarked-vs-nonearmarked.
@@ -364,7 +367,7 @@ fprintf('\n')
 clear FnsToEvaluateParamNames
 
 % CAPITAL
-FnsToEvaluateParamNames(1).ExitStatus=[1,1,0,0]; % [NoExit, EndogExit-choosenottoexit, EndogExit-choosetoexit,ExoExit] (1 means include 'this' status in calculation, 0 not include) (the default when not specified is [1,1,1,1])
+%FnsToEvaluateParamNames.ExitStatus=[1,1,0,0]; % [NoExit, EndogExit-choosenottoexit, EndogExit-choosetoexit,ExoExit] (1 means include 'this' status in calculation, 0 not include) (the default when not specified is [1,1,1,1])
 
 FnsToEvaluateParamNames(1).Names={};
 FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass)...
@@ -503,8 +506,7 @@ firms_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(10,:,:,:),1)=
 Percentage_tax = [firms_tax  firms_sub  firms_tax+firms_sub ] ;
 
 MassOfExitingFirms=sum(sum(sum(StationaryDist.pdf(logical(ExitPolicy)))))*StationaryDist.mass;
-ExitRateOfFirms=MassOfExitingFirms/StationaryDist.mass;
-DistOfExitingFirms=StationaryDist.pdf.*ExitPolicy/sum(sum(sum(StationaryDist.pdf.*ExitPolicy)));
+ExitRateOfFirms=(MassOfExitingFirms/StationaryDist.mass).*Params.lambda_phi;
 
 
 %%
@@ -665,9 +667,9 @@ TFP_nonear = sum(sum(TFP_pdf(:,:,1).*(StationaryDist.pdf(:,:,1))/(sum(sum(Statio
 %plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,2)),1)),':')
 
 
-lambda = ExitRateOfFirms;
+exit = ExitRateOfFirms
+empirical = 1-(1-0.1625)^(1/4)
 
 
-lambda %0.047
 
 %toc;
