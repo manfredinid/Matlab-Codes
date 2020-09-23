@@ -36,7 +36,7 @@ C.Params.r_international = (1+0.15)^(1/4)-1;
 % Model D
 D.Params.r_ear=(1+0.12)^(1/4)-1; % Interest rate on earmarked credit
 D.Params.g_ear=0.4336;
-D.Params.r_international = Params.r_hh;
+%D.Params.r_international =1/Params.beta-1;
 
 %% Model A
 % Earmarked credit with embebed subsidies (psi)
@@ -90,7 +90,7 @@ A.K_nfa=K_nfa;
 A.TFP_ear =AggVars(13);
 A.TFP_nonear =AggVars(14);
 A.ebar=Params.ebar;
-A.lambda=lambda;
+A.lambda=ExitRateOfFirms;
 %A.probenter=probenter;
 A.ProbnbarValues=ProbnbarValues;
 
@@ -155,7 +155,7 @@ B.K_nfa=K_nfa;
 B.TFP_ear =AggVars(13);
 B.TFP_nonear =AggVars(14);
 B.ebar=Params.ebar;
-B.lambda=lambda;
+B.ExitRateOfFirms=ExitRateOfFirms;
 %B.probenter=probenter;
 B.ProbnbarValues=ProbnbarValues;
 
@@ -217,7 +217,7 @@ C.TFP_ear =AggVars(13);
 C.TFP_nonear =AggVars(14);
 C.ebar=Params.ebar;
 
-C.notexit=lambda;
+C.ExitRateOfFirms=ExitRateOfFirms;
 %C.probenter=probenter;
 C.ProbnbarValues=ProbnbarValues;
 
@@ -227,16 +227,18 @@ C.ProbnbarValues=ProbnbarValues;
 
 Params.r_ear=D.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=D.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
-Params.r_international = D.Params.r_international;
+%Params.r_international = D.Params.r_international;
 
 %% Initial Guesses
 %Params.p = 0.54;
 %Params.Ne=0.37; % total mass of new entrants
 %%
 
-fprintf(2,'\nModel C  \n');
+fprintf(2,'\nModel D  \n');
+D.Params.r_international =1/Params.beta-1;
 exitcreditsubsidymodel;
-saveas(gcf,'alternative','epsc')
+%%
+saveas(gcf,'nfa','epsc')
 
 % Agggregate Values
 D.Output.Y=AggVars(2);
@@ -279,7 +281,7 @@ D.TFP_ear =AggVars(13);
 D.TFP_nonear =AggVars(14);
 D.ebar=Params.ebar;
 
-D.notexit=lambda;
+D.ExitRateOfFirms=ExitRateOfFirms;
 %D.probenter=probenter;
 D.ProbnbarValues=ProbnbarValues;
 %%
@@ -288,18 +290,18 @@ fprintf(' n_a  %8.3f \n', n_a);
 
 fprintf(' n_s  %8.3f \n', n_s);
 
-fprintf('                      Model A    Model B   Model C\n');
-fprintf('r earmarked         %8.3f  %8.3f %8.3f\n',[ A.Params.r_ear B.Params.r_ear C.Params.r_ear])
-fprintf('r Market            %8.3f  %8.3f %8.3f\n',[ A.Params.r_international B.Params.r_international C.Params.r_international])
-fprintf('Subsidized Firms      %8.3f  %8.3f %8.3f\n',[ A.Params.g_ear B.Params.g_ear C.Params.g_ear])
+fprintf('                      Model A    Model B   Model C Model D\n');
+fprintf('r earmarked         %8.3f  %8.3f %8.3f %8.3f\n',[ A.Params.r_ear B.Params.r_ear C.Params.r_ear D.Params.r_ear])
+fprintf('r Market            %8.3f  %8.3f %8.3f %8.3f\n',[ A.Params.r_international B.Params.r_international C.Params.r_international D.Params.r_international])
+fprintf('Subsidized Firms      %8.3f  %8.3f %8.3f %8.3f\n',[ A.Params.g_ear B.Params.g_ear C.Params.g_ear D.Params.g_ear])
 
-fprintf('                      Model A    Model B   Model C\n');
-fprintf('Total Output        %8.3f  %8.3f  %8.3f\n', [A.Output.Y B.Output.Y C.Output.Y])
-fprintf('Labor               %8.3f  %8.3f  %8.3f\n', [A.Output.N B.Output.N C.Output.N])
-fprintf('Capital             %8.3f  %8.3f  %8.3f\n', [A.Output.K B.Output.K C.Output.K])
-fprintf('TFP                 %8.3f  %8.3f  %8.3f\n',[ A.Output.TFP B.Output.TFP C.Output.TFP])
-fprintf('Net Foreign Assets  %8.3f  %8.3f  %8.3f\n',[ A.K_nfa B.K_nfa C.K_nfa])
-fprintf('Subsidy Cost        %8.3f  %8.3f  %8.3f\n',[ A.cost B.cost C.cost])
+fprintf('                      Model A    Model B   Model C Model D\n');
+fprintf('Total Output        %8.3f  %8.3f  %8.3f %8.3f\n', [A.Output.Y B.Output.Y C.Output.Y D.Output.Y])
+fprintf('Labor               %8.3f  %8.3f  %8.3f %8.3f\n', [A.Output.N B.Output.N C.Output.N D.Output.N])
+fprintf('Capital             %8.3f  %8.3f  %8.3f %8.3f\n', [A.Output.K B.Output.K C.Output.K D.Output.K])
+fprintf('TFP                 %8.3f  %8.3f  %8.3f %8.3f\n',[ A.Output.TFP B.Output.TFP C.Output.TFP D.Output.TFP])
+fprintf('Net Foreign Assets  %8.3f  %8.3f  %8.3f %8.3f\n',[ A.K_nfa B.K_nfa C.K_nfa D.K_nfa])
+fprintf('Subsidy Cost        %8.3f  %8.3f  %8.3f %8.3f\n',[ A.cost B.cost C.cost D.cost])
 
 
 %%
@@ -336,6 +338,15 @@ fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfOutpu
 fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfLabour);
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', C.ShareOfCapital);
 
+
+fprintf(2,'\nModel D \n');
+fprintf('Distribution statistics of benchmark economy  \n');
+fprintf('                             <5      5 to 49   >=50     total\n');
+fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', D.ShareOfEstablishments);
+fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', D.ShareOfOutput);
+fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', D.ShareOfLabour);
+fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', D.ShareOfCapital);
+
 %%
 
 fprintf(2,'\nModel B Subsidized\n');
@@ -369,6 +380,14 @@ fprintf('TFP               %8.3f    %8.3f    %8.3f    \n',[ C.SUB.Output.TFP C.T
 fprintf('Aggregate output  %8.3f    %8.3f    %8.3f \n', [ C.SUB.Output.Y C.TAX.Output.Y C.Output.Y]);
 fprintf('Aggregate labor   %8.3f    %8.3f    %8.3f \n', [C.SUB.Output.N C.TAX.Output.N  C.Output.N]);
 fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [C.SUB.Output.K C.TAX.Output.K  C.Output.K]);
+
+
+fprintf(2,'\nModel D \n');
+fprintf('                  with r_ear  with r_market  Total\n');
+fprintf('TFP               %8.3f    %8.3f    %8.3f    \n',[ D.SUB.Output.TFP D.TAX.Output.TFP D.Output.TFP]);
+fprintf('Aggregate output  %8.3f    %8.3f    %8.3f \n', [ D.SUB.Output.Y D.TAX.Output.Y D.Output.Y]);
+fprintf('Aggregate labor   %8.3f    %8.3f    %8.3f \n', [D.SUB.Output.N D.TAX.Output.N  D.Output.N]);
+fprintf('Aggregate capital %8.3f    %8.3f    %8.3f \n ', [D.SUB.Output.K D.TAX.Output.K  D.Output.K]);
 %%
 
 fprintf('Average TFP  \n');
@@ -376,6 +395,7 @@ fprintf('                  <5         5 to 49      >=50       total \n');
 fprintf('Model A       %8.3f     %8.3f    %8.3f   %8.3f \n',[A.ShareOfTFP])
 fprintf('Model B       %8.3f     %8.3f    %8.3f   %8.3f\n',[B.ShareOfTFP])
 fprintf('Model C       %8.3f     %8.3f    %8.3f   %8.3f\n',[C.ShareOfTFP])
+fprintf('Model D       %8.3f     %8.3f    %8.3f   %8.3f\n',[D.ShareOfTFP])
 
 %%
 
@@ -384,10 +404,11 @@ fprintf('                  <5         5 to 49      >=50 \n');
 fprintf('Model A       %8.3f     %8.3f    %8.3f    \n',[A.MinOfTFP])
 fprintf('Model B       %8.3f     %8.3f    %8.3f    \n',[B.MinOfTFP])
 fprintf('Model C       %8.3f     %8.3f    %8.3f    \n',[C.MinOfTFP])
+fprintf('Model D       %8.3f     %8.3f    %8.3f    \n',[D.MinOfTFP])
 %%
-fprintf('                    Model A    Model B   Model C\n');
-fprintf('Prob Stay         %8.3f  %8.3f %8.3f\n',[ A.notexit B.notexit C.notexit])
-fprintf('Prob Enter        %8.3f  %8.3f %8.3f\n',[ A.probenter B.probenter C.probenter])
+%fprintf('                    Model A    Model B   Model C\n');
+%fprintf('Prob Stay         %8.3f  %8.3f %8.3f\n',[ A.ExitRateOfFirms B.ExitRateOfFirms C.ExitRateOfFirms])
+%fprintf('Prob Enter        %8.3f  %8.3f %8.3f\n',[ A.probenter B.probenter C.probenter])
 %%
 figure;
 %subplot(1,2,1)

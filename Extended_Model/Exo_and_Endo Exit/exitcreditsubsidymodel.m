@@ -15,10 +15,9 @@ vfoptions.agententryandexit=1;
 vfoptions.endogenousexit=2;
 vfoptions.parallel=Parallel;
 simoptions.parallel=Parallel;
-heteroagentoptions.verbose=1;
 simoptions.agententryandexit=1;
 simoptions.endogenousexit=2;
-
+simoptions.iterate=1;
 
 %% Parameters
 
@@ -29,7 +28,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-%Params.cf=0.05; % Fixed cost of production
+Params.cf=0.05; % Fixed cost of production
 
 
 Params.w=1; % Normalization
@@ -49,7 +48,7 @@ Params.ce=6; % Fixed cost of entry
 % exogenous states (productivity and subsidies)
 
 n_s=11;
-n_a=480;
+n_a=501;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -155,13 +154,10 @@ Params.phi=8.8;
 
 % Exit is exogenous with probability lambda
 DiscountFactorParamNames={'beta'};
-vfoptions.endogenousexit=1;
 
-vfoptions.endogenousexit=2;
-% We also need to create 'vfoptions.ReturnToExitFn' (and 'vfoptions.ReturnToExitFnParamNames'), as below.
-% For 'mixed' exit, we also need the probabilities.
-Params.lambda_phi=0.045;
-Params.lambda_infty=0.025;
+
+Params.lambda_phi=0.035;
+Params.lambda_infty=0.0501;
 % The following are the probabilities on 'no exit decision', 'endogenous exit decision', and 'exogenous exit decision' respectively.
 vfoptions.exitprobabilities=[1-Params.lambda_phi-Params.lambda_infty,Params.lambda_phi,Params.lambda_infty]; % These are what S2008 calls lambda_phi and lambda_infinity
 % For firms facing 'endogenous exit decision', there is a continuation cost:
@@ -169,10 +165,10 @@ vfoptions.endogenousexitcontinuationcost=Params.phi;
 
 % Return Function
 ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
-    alpha,gamma,delta, adjustcostparam)ExistingFirm_ReturnFn(kprime_val,...
-    k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, adjustcostparam);
+    alpha,gamma,delta, adjustcostparam,cf)ExistingFirm_ReturnFn(kprime_val,...
+    k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, adjustcostparam,cf);
 ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
-     'adjustcostparam'}; 
+     'adjustcostparam','cf'}; 
 %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
 vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
@@ -199,7 +195,7 @@ Params.notexit=1-ExitPolicy;
 EntryExitParamNames.CondlEntryDecisions={'ebar'};
 % Takes value of one for enter, zero for not-enter. This is just an initial
 %guess as the actual decisions are determined as part of general equilibrium.
-Params.ebar=ones([n_a,n_z],'gpuArray'); 
+Params.ebar=zeros([n_a,n_z],'gpuArray'); 
 
 EntryExitParamNames.MassOfNewAgents={'Ne'};
 
@@ -217,7 +213,7 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
 %Now define the functions for the General Equilibrium conditions
 
 GEPriceParamNames={'ebar'};
-
+FnsToEvaluateParamNames(1).ExitStatus=[1,1,1,1];
 FnsToEvaluateParamNames(1).Names={'p','alpha','gamma'};
 FnsToEvaluateFn_nbar1 = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
 ((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
@@ -242,28 +238,24 @@ heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
 GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry,GeneralEqmEqn_LabourMarket};
 
 %% Find equilibrium prices
-
+heteroagentoptions.verbose=1;
+simoptions.endogenousexit=2;
 n_p=0;
 disp('Calculating price vector corresponding to the stationary eqm')
 % NOTE: EntryExitParamNames has to be passed as an additional input 
 
-[p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1...
-    (n_d, n_a, n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn,...
-    FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames,...
-    ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames,...
-    GEPriceParamNames,heteroagentoptions, simoptions, vfoptions,...
-    EntryExitParamNames);
+[p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1(n_d, n_a, n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
 
 Params.p=p_eqm.p;
 Params.Ne=p_eqm.Ne;
 Params.ebar=p_eqm.ebar;
 
 %% Value Function, Policy and Firm Distribution in GE
-[V, Policy, PolicyWhenExiting, ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z,...
-    ReturnFn, Params, DiscountFactorParamNames,ReturnFnParamNames, vfoptions);
-Params.oneminuslambda=1-ExitPolicy;
-StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
-    Params, EntryExitParamNames);
+[V, Policy, PolicyWhenExiting, ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
+Params.notexit=1-ExitPolicy;
+
+StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,Params,EntryExitParamNames);
+
 
 %% Solve the partial equilibrium problem of capital market clearance.
 % Calculate K_nfa
@@ -285,14 +277,14 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
 Params.r_market=Params.r_market;
 
 % Find Aggregate Capital with r = r_market
-clear FnsToEvaluateParamNames
+%clear FnsToEvaluateParamNames
 FnsToEvaluateParamNames(1).Names={};
 FnsToEvaluateFn_Kfirm = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass)...
     aprime_val; 
 FnsToEvaluate={FnsToEvaluateFn_Kfirm};
 
 
-K_total=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid,[], simoptions,EntryExitParamNames, PolicyWhenExiting);
+K_total=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, Parallel, simoptions, EntryExitParamNames, PolicyWhenExiting);
 
 %%        
 % STEP 2 - Let K_HH=K_firm(r_HH)  
@@ -301,11 +293,9 @@ K_total=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, P
 % Params.r_hh=Params.rhhminusdelta+Params.delta;
 Params.r_market=Params.r_hh;
 % Policy function with r = r_HH
-[~,Policy_rhh]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z,...
-    ReturnFn, Params, DiscountFactorParamNames,ReturnFnParamNames); 
-% Find Aggregate Capital with r = r_HH
-K_hh=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, Parallel, simoptions, EntryExitParamNames, PolicyWhenExiting);
-%
+[~,Policy_rhh,~,~]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
+K_hh=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy_rhh, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, Parallel, simoptions, EntryExitParamNames, PolicyWhenExiting);
+
 % STEP 3 - Now, set K_nfa=K_hh-K_total 
 K_nfa=K_hh-K_total;
 
@@ -364,25 +354,26 @@ fprintf('\n')
 %xlim([min(s_grid) max(s_grid)])
 %legend('Earmarked','Non-Earmarked', 'Location', 'Best');
 %% 
-clear FnsToEvaluateParamNames
+
 
 % CAPITAL
-%FnsToEvaluateParamNames.ExitStatus=[1,1,0,0]; % [NoExit, EndogExit-choosenottoexit, EndogExit-choosetoexit,ExoExit] (1 means include 'this' status in calculation, 0 not include) (the default when not specified is [1,1,1,1])
-
+FnsToEvaluateParamNames(1).ExitStatus=[1,1,1,1]; % [NoExit, EndogExit-choosenottoexit, EndogExit-choosetoexit,ExoExit] (1 means include 'this' status in calculation, 0 not include) (the default when not specified is [1,1,1,1])
 FnsToEvaluateParamNames(1).Names={};
 FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass)...
     aprime_val; 
 
 %OUTPUT
-FnsToEvaluateParamNames(2).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+FnsToEvaluateParamNames(2).ExitStatus=[1,1,1,1];
+FnsToEvaluateParamNames(2).Names={'p','alpha','gamma'};
+FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
     z1_val*(aprime_val^alpha)*...
     (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma);  
 
 %LABOR
-FnsToEvaluateParamNames(3).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_nbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
-    ((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma));
+FnsToEvaluateParamNames(3).ExitStatus=[1,1,1,1];
+FnsToEvaluateParamNames(3).Names={'p','alpha','gamma'};
+FnsToEvaluateFn_nbar =  @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
+((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
 
 %% SUB
 
@@ -456,9 +447,8 @@ FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output, FnsToEvaluateFn_nba
     FnsToEvaluateFn_num,FnsToEvaluateFn_cost, FnsToEvaluateFn_tfp,...
     FnsToEvaluateFn_eartfp,FnsToEvaluateFn_noneartfp};
 
-AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
-    FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
-    d_grid, a_grid, z_grid, simoptions.parallel,simoptions, EntryExitParamNames, PolicyWhenExiting);
+AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, Parallel, simoptions, EntryExitParamNames, PolicyWhenExiting);
+AggVars(3)
 
 ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1(StationaryDist,...
     Policy, FnsToEvaluate, Params,...
@@ -506,7 +496,7 @@ firms_tax=100*sum(sum(sum(StationaryDist.pdf(shiftdim(ValuesOnGrid(10,:,:,:),1)=
 Percentage_tax = [firms_tax  firms_sub  firms_tax+firms_sub ] ;
 
 MassOfExitingFirms=sum(sum(sum(StationaryDist.pdf(logical(ExitPolicy)))))*StationaryDist.mass;
-ExitRateOfFirms=(MassOfExitingFirms/StationaryDist.mass).*Params.lambda_phi;
+ExitRateOfFirms=(MassOfExitingFirms/StationaryDist.mass).*Params.lambda_phi+Params.lambda_infty;
 
 
 %%
@@ -598,31 +588,31 @@ TFP_ear = sum(sum(TFP_pdf(:,:,2).*(StationaryDist.pdf(:,:,2)/(sum(sum(Stationary
 TFP_nonear = sum(sum(TFP_pdf(:,:,1).*(StationaryDist.pdf(:,:,1))/(sum(sum(StationaryDist.pdf(:,:,1))))));
 
 %%
-%SUBStationaryDist.pdf=squeeze(StationaryDist.pdf(:,:,2));
-%nbarValues=squeeze(nbarValues(:,:,2));
+SUBStationaryDist.pdf=squeeze(StationaryDist.pdf(:,:,2));
+nbarValues=squeeze(nbarValues(:,:,2));
 
-%SUBShareOfEstablishments(1)=100*(sum(sum(SUBStationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5)))))/sum(sum(SUBStationaryDist.pdf)));
-%SUBShareOfEstablishments(2)=100*(sum(sum(SUBStationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50)))))/sum(sum(SUBStationaryDist.pdf)));
-%SUBShareOfEstablishments(3)=100*(sum(sum(SUBStationaryDist.pdf(logical(nbarValues>=50))))/sum(sum(SUBStationaryDist.pdf)));
-%SUBShareOfEstablishments(4)=100*(sum(sum(SUBStationaryDist.pdf))/sum(sum(SUBStationaryDist.pdf)));
+SUBShareOfEstablishments(1)=100*(sum(sum(SUBStationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5)))))/sum(sum(SUBStationaryDist.pdf)));
+SUBShareOfEstablishments(2)=100*(sum(sum(SUBStationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50)))))/sum(sum(SUBStationaryDist.pdf)));
+SUBShareOfEstablishments(3)=100*(sum(sum(SUBStationaryDist.pdf(logical(nbarValues>=50))))/sum(sum(SUBStationaryDist.pdf)));
+SUBShareOfEstablishments(4)=100*(sum(sum(SUBStationaryDist.pdf))/sum(sum(SUBStationaryDist.pdf)));
 
-%SUBOutput_pdf=shiftdim(ProbDensityFns(2,:,:,2),1);
-%SUBShareOfOutput(1)=100*(sum(sum(SUBOutput_pdf(logical((nbarValues>0).*(nbarValues<5)))))/sum(sum(SUBOutput_pdf)));
-%SUBShareOfOutput(2)=100*(sum(sum(SUBOutput_pdf(logical((nbarValues>=5).*(nbarValues<50)))))/sum(sum(SUBOutput_pdf)));
-%SUBShareOfOutput(3)=100*(sum(sum(SUBOutput_pdf(logical(nbarValues>=50))))/sum(sum(SUBOutput_pdf)));
-%SUBShareOfOutput(4)=100*(sum(sum(SUBOutput_pdf))/sum(sum(SUBOutput_pdf)));
+SUBOutput_pdf=shiftdim(ProbDensityFns(2,:,:,2),1);
+SUBShareOfOutput(1)=100*(sum(sum(SUBOutput_pdf(logical((nbarValues>0).*(nbarValues<5)))))/sum(sum(SUBOutput_pdf)));
+SUBShareOfOutput(2)=100*(sum(sum(SUBOutput_pdf(logical((nbarValues>=5).*(nbarValues<50)))))/sum(sum(SUBOutput_pdf)));
+SUBShareOfOutput(3)=100*(sum(sum(SUBOutput_pdf(logical(nbarValues>=50))))/sum(sum(SUBOutput_pdf)));
+SUBShareOfOutput(4)=100*(sum(sum(SUBOutput_pdf))/sum(sum(SUBOutput_pdf)));
 
-%SUBLabour_pdf=shiftdim(ProbDensityFns(3,:,:,2),1);
-%SUBShareOfLabour(1)=100*(sum(sum(SUBLabour_pdf(logical((nbarValues>0).*(nbarValues<5)))))/sum(sum(SUBLabour_pdf)));
-%SUBShareOfLabour(2)=100*(sum(sum(SUBLabour_pdf(logical((nbarValues>=5).*(nbarValues<50)))))/sum(sum(SUBLabour_pdf)));
-%SUBShareOfLabour(3)=100*(sum(sum(SUBLabour_pdf(logical(nbarValues>=50))))/sum(sum(SUBLabour_pdf)));
-%SUBShareOfLabour(4)=100*(sum(sum(SUBLabour_pdf))/sum(sum(SUBLabour_pdf)));
+SUBLabour_pdf=shiftdim(ProbDensityFns(3,:,:,2),1);
+SUBShareOfLabour(1)=100*(sum(sum(SUBLabour_pdf(logical((nbarValues>0).*(nbarValues<5)))))/sum(sum(SUBLabour_pdf)));
+SUBShareOfLabour(2)=100*(sum(sum(SUBLabour_pdf(logical((nbarValues>=5).*(nbarValues<50)))))/sum(sum(SUBLabour_pdf)));
+SUBShareOfLabour(3)=100*(sum(sum(SUBLabour_pdf(logical(nbarValues>=50))))/sum(sum(SUBLabour_pdf)));
+SUBShareOfLabour(4)=100*(sum(sum(SUBLabour_pdf))/sum(sum(SUBLabour_pdf)));
 
 
-%SUBCapital_pdf=shiftdim(ProbDensityFns(1,:,:,2),1);
-%SUBShareOfCapital(1)=100*(sum(sum(SUBCapital_pdf(logical((nbarValues>0).*(nbarValues<5)))))/(sum(sum(SUBCapital_pdf))));
-%SUBShareOfCapital(2)=100*(sum(sum(SUBCapital_pdf(logical((nbarValues>=5).*(nbarValues<50)))))/(sum(sum(SUBCapital_pdf))));
-%SUBShareOfCapital(3)=100*(sum(sum(SUBCapital_pdf(logical(nbarValues>=50))))/(sum(sum(SUBCapital_pdf))));
+SUBCapital_pdf=shiftdim(ProbDensityFns(1,:,:,2),1);
+SUBShareOfCapital(1)=100*(sum(sum(SUBCapital_pdf(logical((nbarValues>0).*(nbarValues<5)))))/(sum(sum(SUBCapital_pdf))));
+SUBShareOfCapital(2)=100*(sum(sum(SUBCapital_pdf(logical((nbarValues>=5).*(nbarValues<50)))))/(sum(sum(SUBCapital_pdf))));
+SUBShareOfCapital(3)=100*(sum(sum(SUBCapital_pdf(logical(nbarValues>=50))))/(sum(sum(SUBCapital_pdf))));
 
 
 %%
