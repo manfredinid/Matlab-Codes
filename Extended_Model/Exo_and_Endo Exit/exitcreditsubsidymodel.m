@@ -195,7 +195,7 @@ Params.notexit=1-ExitPolicy;
 EntryExitParamNames.CondlEntryDecisions={'ebar'};
 % Takes value of one for enter, zero for not-enter. This is just an initial
 %guess as the actual decisions are determined as part of general equilibrium.
-Params.ebar=zeros([n_a,n_z],'gpuArray'); 
+Params.ebar=ones([n_a,n_z],'gpuArray'); 
 
 EntryExitParamNames.MassOfNewAgents={'Ne'};
 
@@ -657,8 +657,6 @@ SUBShareOfCapital(3)=100*(sum(sum(SUBCapital_pdf(logical(nbarValues>=50))))/(sum
 %plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,2)),1)),':')
 
 
-exit = ExitRateOfFirms
-empirical = 1-(1-0.1625)^(1/4)
 
 
 
