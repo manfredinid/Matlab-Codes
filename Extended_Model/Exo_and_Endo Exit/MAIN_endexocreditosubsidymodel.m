@@ -53,6 +53,7 @@ Params.Ne=0.0601; % total mass of new entrants
 %%
 fprintf(2,'\nModel A  \n');
 exitcreditsubsidymodel;
+plot_creditmodel;
 saveas(gcf,'initial','epsc')
 %%
 % Agggregate Values
@@ -111,6 +112,7 @@ Params.r_international = B.Params.r_international;
 
 fprintf(2,'\nModel B  \n');
 exitcreditsubsidymodel;
+plot_creditmodel;
 saveas(gcf,'observed','epsc')
 
 % Agggregate Values
@@ -174,6 +176,7 @@ Params.r_international = C.Params.r_international;
 
 fprintf(2,'\nModel C  \n');
 exitcreditsubsidymodel;
+plot_creditmodel;
 saveas(gcf,'alternative','epsc')
 
 % Agggregate Values
@@ -237,6 +240,7 @@ Params.g_ear=D.Params.g_ear; % Share of (unconditional) potential entrants who h
 fprintf(2,'\nModel D  \n');
 D.Params.r_international =1/Params.beta-1;
 exitcreditsubsidymodel;
+plot_creditmodel;
 %%
 saveas(gcf,'nfa','epsc')
 

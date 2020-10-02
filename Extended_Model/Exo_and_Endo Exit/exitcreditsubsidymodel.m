@@ -28,7 +28,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.05; % Fixed cost of production
+%Params.cf=0.05; % Fixed cost of production
 
 
 Params.w=1; % Normalization
@@ -38,6 +38,8 @@ Params.adjustcostparam = 3.219;
 
 % Entry and Exit
 Params.ce=6; % Fixed cost of entry 
+Params.ctau=0.02;
+Params.g_tau=0.43;
 % larger ce implies lower lambda
 
 % Limit the amount of earmarked credit
@@ -47,8 +49,8 @@ Params.ce=6; % Fixed cost of entry
 % The model has three states, one endogenous state (capital), and two
 % exogenous states (productivity and subsidies)
 
-n_s=11;
-n_a=501;
+n_s=10;
+n_a=250;
 % n_psi is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
@@ -83,15 +85,20 @@ plot(s_grid, pistar_s)
 psi_grid=[0;1]; %Using this as a {0,1} helps,e.g., add up earmarked capital
 pi_psi=[1,0;0,1];
 
+tau_grid=[0;1]; %Using this as a {0,1} helps,e.g., add up earmarked capital
+pi_tau=[1,0;0,1];%[0.8,0.2;0.2,0.8];
+
 % Exogenous states (matrix z)
 
 % Transition matrix 
 % Note: considering that productivity and taxes are independent 
-n_z=[n_s,length(psi_grid)];
-z_grid=[s_grid; psi_grid];
+n_z=[n_s,length(psi_grid), length(tau_grid)];
+z_grid=[s_grid; psi_grid; tau_grid];
 
 % Transition matrix for the exogenous s and psi variables
-pi_z=kron(pi_psi,pi_s);
+% Transition matrix for the exogenous s and psi variables
+pi_psitau=kron(pi_psi,pi_tau);
+pi_z=kron(pi_psitau,pi_s);
 
 % Endogenous state variables
 
@@ -145,35 +152,79 @@ if Parallel==2
 else
     Params.upsilon = zeros([n_a, n_z]);
 end
-Params.upsilon(1,:,:) = kron(pistar_s,[1-Params.g_ear, Params.g_ear]);
+%%
+type=2;
 
+if type==1
+taupsi_upsilon =  kron([1-Params.g_tau, Params.g_tau],[1-Params.g_ear; Params.g_ear]);   
+Params.upsilon(1,:,:,:) = reshape(kron(taupsi_upsilon,pistar_s),[10,2,2]);
+
+elseif type==2
+  % correlated case: subsidize a fraction g_tau of poor credit access firms
+  
+   taupsi_upsilon =  [1,0;0,1].*[1-Params.g_ear; Params.g_ear];
+   %taupsi_upsilon =  kron([0, 1],[1-Params.g_ear; Params.g_ear]);
+   Params.upsilon(1,:,:,:) = reshape(kron(taupsi_upsilon,pistar_s),[10,2,2]);
+
+%while a<Params.g_tau
+%    taupsi_upsilon =  [1,0;0,1].*[1-Params.g_ear; Params.g_ear]; 
+%    Params.upsilon(1,ii,:,:) = kron(pistar_s(ii),taupsi_upsilon);
+%    a=sum(sum(sum(Params.upsilon(1,:,:,2))));
+%    ii=ii+1;
+%end
+%for i2=ii:length(s_grid)
+%taupsi_upsilon =  kron([1, 0],[1-Params.g_ear; Params.g_ear]); 
+%Params.upsilon(1,i2,:,:) = kron(pistar_s(i2),taupsi_upsilon);
+%end
+sum(sum(sum(sum(Params.upsilon))))
+
+
+else
+    % correlated case: subsidize a fraction g_tau of good credit access firms
+  ii=1;
+  a2=0.1;
+while a2<Params.g_tau
+    taupsi_upsilon =  kron([1, 0],[1-Params.g_ear; Params.g_ear]); 
+    Params.upsilon(1,ii,:,:) = kron(pistar_s(ii),taupsi_upsilon);
+    a2=sum(sum(sum(Params.upsilon(1,:,:,1))));
+    ii=ii+1;
+end
+for i2=ii:length(s_grid)
+taupsi_upsilon =  kron([1, 0],[1-Params.g_ear; Params.g_ear]); 
+Params.upsilon(1,i2,:,:) = kron(pistar_s(i2),taupsi_upsilon);
+end
+sum(sum(sum(sum(Params.upsilon))))
+
+end
 
 %% Aspects of Entry and Exit 
 % Continuation fixed cost for firms facing endogenous exit decision
 Params.phi=8.8;
 
+
 % Exit is exogenous with probability lambda
 DiscountFactorParamNames={'beta'};
 
 
-Params.lambda_phi=0.035;
+Params.lambda_phi=0.35;
 Params.lambda_infty=0.0501;
 % The following are the probabilities on 'no exit decision', 'endogenous exit decision', and 'exogenous exit decision' respectively.
-vfoptions.exitprobabilities=[1-Params.lambda_phi-Params.lambda_infty,Params.lambda_phi,Params.lambda_infty]; % These are what S2008 calls lambda_phi and lambda_infinity
-% For firms facing 'endogenous exit decision', there is a continuation cost:
-vfoptions.endogenousexitcontinuationcost=Params.phi;
 
+vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
+simoptions.exitprobabilities=vfoptions.exitprobabilities;
+% For firms facing 'endogenous exit decision', there is a continuation cost:
+vfoptions.endogenousexitcontinuationcost={'phi'};
 % Return Function
-ReturnFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
-    alpha,gamma,delta, adjustcostparam,cf)ExistingFirm_ReturnFn(kprime_val,...
-    k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma,delta, adjustcostparam,cf);
-ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
-     'adjustcostparam','cf'}; 
+ReturnFn=@(kprime_val, k_val,s_val, psi_val,tau_val,  p,w,r_market,r_ear,...
+    alpha,gamma,delta, ctau, adjustcostparam)ExistingFirm_ReturnFn(kprime_val, k_val,s_val, psi_val, tau_val,  p,w,r_market,r_ear, alpha,gamma, delta, ctau, adjustcostparam);
+ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta','ctau',...
+     'adjustcostparam'}; 
 %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
-vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear,...
-    alpha,gamma,delta, adjustcostparam)Firms(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma, delta, adjustcostparam);
-vfoptions.ReturnToExitFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta',...
+vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val,tau_val,  p,w,r_market,r_ear,...
+    alpha,gamma,delta, adjustcostparam, ctau) Firms(kprime_val, k_val,s_val, psi_val,tau_val,  p,w,r_market,r_ear,...
+    alpha,gamma,delta, adjustcostparam, ctau);
+vfoptions.ReturnToExitFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta','ctau',...
      'adjustcostparam'}; 
 
 %%
@@ -182,7 +233,7 @@ vfoptions.ReturnToExitFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma',
 
 %% Set up entry distribution
 
-simoptions.exitprobabilities=vfoptions.exitprobabilities; 
+ 
 
 % Probability of being in the (k, s, psi) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
@@ -215,7 +266,7 @@ StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
 GEPriceParamNames={'ebar'};
 FnsToEvaluateParamNames(1).ExitStatus=[1,1,1,1];
 FnsToEvaluateParamNames(1).Names={'p','alpha','gamma'};
-FnsToEvaluateFn_nbar1 = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
+FnsToEvaluateFn_nbar1 = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,alpha,gamma)...
 ((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
 FnsToEvaluate={FnsToEvaluateFn_nbar1};
 
@@ -279,7 +330,7 @@ Params.r_market=Params.r_market;
 % Find Aggregate Capital with r = r_market
 %clear FnsToEvaluateParamNames
 FnsToEvaluateParamNames(1).Names={};
-FnsToEvaluateFn_Kfirm = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass)...
+FnsToEvaluateFn_Kfirm = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass)...
     aprime_val; 
 FnsToEvaluate={FnsToEvaluateFn_Kfirm};
 
@@ -359,38 +410,38 @@ fprintf('\n')
 % CAPITAL
 FnsToEvaluateParamNames(1).ExitStatus=[1,1,1,1]; % [NoExit, EndogExit-choosenottoexit, EndogExit-choosetoexit,ExoExit] (1 means include 'this' status in calculation, 0 not include) (the default when not specified is [1,1,1,1])
 FnsToEvaluateParamNames(1).Names={};
-FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass)...
+FnsToEvaluateFn_kbar = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass)...
     aprime_val; 
 
 %OUTPUT
 FnsToEvaluateParamNames(2).ExitStatus=[1,1,1,1];
 FnsToEvaluateParamNames(2).Names={'p','alpha','gamma'};
-FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
+FnsToEvaluateFn_output = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,alpha,gamma)...
     z1_val*(aprime_val^alpha)*...
     (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma);  
 
 %LABOR
 FnsToEvaluateParamNames(3).ExitStatus=[1,1,1,1];
 FnsToEvaluateParamNames(3).Names={'p','alpha','gamma'};
-FnsToEvaluateFn_nbar =  @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,alpha,gamma)...
+FnsToEvaluateFn_nbar =  @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,alpha,gamma)...
 ((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)); 
 
 %% SUB
 
 % CAPITAL WITH SUBSIDY
 FnsToEvaluateParamNames(4).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_SUBkbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+FnsToEvaluateFn_SUBkbar = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,alpha,gamma)...
     (z2_val==1)*aprime_val; 
 
 % OUTPUT WITH SUBSIDY
 FnsToEvaluateParamNames(5).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_SUBoutput = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+FnsToEvaluateFn_SUBoutput = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,alpha,gamma)...
     (z2_val==1)*z1_val*(aprime_val^alpha)*...
     (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma);
 
 %LABOR WITH SUBSIDY
 FnsToEvaluateParamNames(6).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_SUBnbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+FnsToEvaluateFn_SUBnbar = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,alpha,gamma)...
     (z2_val==1).*(((z1_val*p*gamma)^(1/(1-gamma))) *(aprime_val^(alpha/(1-gamma))));
 
 
@@ -399,56 +450,61 @@ FnsToEvaluateFn_SUBnbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alp
 
 % CAPITAL WITHOUT SUBSIDY
 FnsToEvaluateParamNames(7).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_TAXkbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+FnsToEvaluateFn_TAXkbar = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,alpha,gamma)...
     (z2_val==0)*aprime_val;
 
 % OUTPUT WITHOUT SUBSIDY
 FnsToEvaluateParamNames(8).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_TAXoutput = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+FnsToEvaluateFn_TAXoutput = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,alpha,gamma)...
     (z2_val==0)*(z1_val*(aprime_val^alpha)*...
     (((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma))^gamma));
 
 %LABOR WITHOUT SUBSIDY
 FnsToEvaluateParamNames(9).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_TAXnbar = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+FnsToEvaluateFn_TAXnbar = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,alpha,gamma)...
     (z2_val==0).*(((z1_val*p*gamma))^(1/(1-gamma)) *aprime_val^(alpha/(1-gamma)));
 
 %% Check
 
 % JUST TO CHECK N FIRMS
 FnsToEvaluateParamNames(10).Names={'p', 'w','alpha','gamma'};
-FnsToEvaluateFn_num = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,alpha,gamma)...
+FnsToEvaluateFn_num = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,alpha,gamma)...
     (z2_val==0)*2 + (z2_val==1)*3;
 
 % Subsity costs
 FnsToEvaluateParamNames(11).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
-FnsToEvaluateFn_cost = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
+FnsToEvaluateFn_cost = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
     (z2_val==1)*(r_market-r_ear)*aprime_val;
 
 % TFP 
 FnsToEvaluateParamNames(12).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
-FnsToEvaluateFn_tfp = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
+FnsToEvaluateFn_tfp = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
     z1_val;
 
 % Subsity costs
 FnsToEvaluateParamNames(13).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
-FnsToEvaluateFn_eartfp = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
+FnsToEvaluateFn_eartfp = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
     (z2_val==1)*z1_val;
 
 % TFP 
 FnsToEvaluateParamNames(14).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
-FnsToEvaluateFn_noneartfp = @(aprime_val,a_val,z1_val,z2_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
+FnsToEvaluateFn_noneartfp = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
      (z2_val==0)*z1_val;
+ 
+ % TFP 
+FnsToEvaluateParamNames(15).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
+FnsToEvaluateFn_poor = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
+     (z3_val==1);
 
 
 FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output, FnsToEvaluateFn_nbar,...
        FnsToEvaluateFn_SUBkbar, FnsToEvaluateFn_SUBoutput, FnsToEvaluateFn_SUBnbar,...
     FnsToEvaluateFn_TAXkbar, FnsToEvaluateFn_TAXoutput, FnsToEvaluateFn_TAXnbar,...
     FnsToEvaluateFn_num,FnsToEvaluateFn_cost, FnsToEvaluateFn_tfp,...
-    FnsToEvaluateFn_eartfp,FnsToEvaluateFn_noneartfp};
+    FnsToEvaluateFn_eartfp,FnsToEvaluateFn_noneartfp,FnsToEvaluateFn_poor};
 
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, Parallel, simoptions, EntryExitParamNames, PolicyWhenExiting);
-AggVars(3)
+
 
 ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1(StationaryDist,...
     Policy, FnsToEvaluate, Params,...
@@ -501,35 +557,35 @@ ExitRateOfFirms=(MassOfExitingFirms/StationaryDist.mass).*Params.lambda_phi+Para
 
 %%
 
-nbarValues=shiftdim(ValuesOnGrid(3,:,:,:),1);
+nbarValues=shiftdim(ValuesOnGrid(3,:,:,:,:),1);
 normalize_employment=nanmin(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
 nbarValues=nbarValues./(normalize_employment);
 
-ProbnbarValues=sum(sum(shiftdim(ValuesOnGrid(12,:,:,:),1).*...
-shiftdim(ProbDensityFns(12,:,:,:),1),3));
+ProbnbarValues=sum(sum(shiftdim(ValuesOnGrid(12,:,:,:,:),1).*...
+shiftdim(ProbDensityFns(12,:,:,:,:),1),3));
 
 % SUB
-SUBnbarValues=shiftdim(ValuesOnGrid(6,:,:,:),1);
+SUBnbarValues=shiftdim(ValuesOnGrid(6,:,:,:,:),1);
 SUBnbarValues=SUBnbarValues./(normalize_employment);
 %SUBnbarValues=SUBnbarValues.*...
 %shiftdim(ProbDensityFns(6,:,:,:),1);
 
 % non sub
-NONnbarValues=shiftdim(ValuesOnGrid(9,:,:,:),1);
+NONnbarValues=shiftdim(ValuesOnGrid(9,:,:,:,:),1);
 NONnbarValues=NONnbarValues./(normalize_employment);
 %NONnbarValues=NONnbarValues.*...
 %shiftdim(ProbDensityFns(9,:,:,:),1);
 %%
 figure;
 %subplot(1,2,1)
-plot(s_grid,nanmean(nanmean(SUBnbarValues(:,:,:),3)));
+plot(s_grid,squeeze(nanmean(nanmean(nanmean(SUBnbarValues(:,:,:,:),4),3))));
 xlim([0.9 2.5])
 %title('non-earmarked')
 %xlabel('productivity')
 %ylabel('employees')
 %subplot(1,2,2)
 hold on;
-plot(s_grid,nanmean(nanmean(NONnbarValues(:,:,:),3)),'-r');
+plot(s_grid,squeeze(nanmean(nanmean(nanmean(NONnbarValues(:,:,:,:),4),3))),'-r');
 %xlim([0.9 2.5])
 %title('earmarked')
 xlabel('productivity')
@@ -543,76 +599,76 @@ Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
 Partion3Indicator=logical(nbarValues>=50);
 
 
-ShareOfEstablishments(1)=100*sum(sum(sum(StationaryDist.pdf(logical(nbarValues<5)))));
-ShareOfEstablishments(2)=100*sum(sum(sum(StationaryDist.pdf(Partion2Indicator))));
-ShareOfEstablishments(3)=100*sum(sum(sum(StationaryDist.pdf(Partion3Indicator))));
+ShareOfEstablishments(1)=100*sum(sum(sum(sum(StationaryDist.pdf(logical(nbarValues<5))))));
+ShareOfEstablishments(2)=100*sum(sum(sum(sum(StationaryDist.pdf(Partion2Indicator)))));
+ShareOfEstablishments(3)=100*sum(sum(sum(sum(StationaryDist.pdf(Partion3Indicator)))));
 ShareOfEstablishments(4)=ShareOfEstablishments(1)+ShareOfEstablishments(2)+ShareOfEstablishments(3);
 
 Output_pdf=shiftdim(ProbDensityFns(2,:,:,:),1);
-ShareOfOutput(1)=100*sum(sum(sum(Output_pdf(logical((nbarValues>0).*(nbarValues<5))))));
-ShareOfOutput(2)=100*sum(sum(sum(Output_pdf(logical((nbarValues>=5).*(nbarValues<50))))));
-ShareOfOutput(3)=100*sum(sum(sum(Output_pdf(logical(nbarValues>=50)))));
+ShareOfOutput(1)=100*sum(sum(sum(sum(Output_pdf(logical((nbarValues>0).*(nbarValues<5)))))));
+ShareOfOutput(2)=100*sum(sum(sum(sum(Output_pdf(logical((nbarValues>=5).*(nbarValues<50)))))));
+ShareOfOutput(3)=100*sum(sum(sum(sum(Output_pdf(logical(nbarValues>=50))))));
 ShareOfOutput(4)=ShareOfOutput(1)+ShareOfOutput(2)+ShareOfOutput(3);
 
 Labour_pdf=shiftdim(ProbDensityFns(3,:,:,:),1);
-ShareOfLabour(1)=100*sum(sum(sum(Labour_pdf(logical((nbarValues>0).*(nbarValues<5))))));
-ShareOfLabour(2)=100*sum(sum(sum(Labour_pdf(logical((nbarValues>=5).*(nbarValues<50))))));
-ShareOfLabour(3)=100*sum(sum(sum(Labour_pdf(logical(nbarValues>=50)))));
+ShareOfLabour(1)=100*sum(sum(sum(sum(Labour_pdf(logical((nbarValues>0).*(nbarValues<5)))))));
+ShareOfLabour(2)=100*sum(sum(sum(sum(Labour_pdf(logical((nbarValues>=5).*(nbarValues<50)))))));
+ShareOfLabour(3)=100*sum(sum(sum(sum(Labour_pdf(logical(nbarValues>=50))))));
 ShareOfLabour(4)=ShareOfLabour(1)+ShareOfLabour(2)+ShareOfLabour(3);
 
 
 Capital_pdf=shiftdim(ProbDensityFns(1,:,:,:),1);
-ShareOfCapital(1)=100*sum(sum(sum(Capital_pdf(logical((nbarValues>0).*(nbarValues<5))))));
-ShareOfCapital(2)=100*sum(sum(sum(Capital_pdf(logical((nbarValues>=5).*(nbarValues<50))))));
-ShareOfCapital(3)=100*sum(sum(sum(Capital_pdf(logical(nbarValues>=50)))));
+ShareOfCapital(1)=100*sum(sum(sum(sum(Capital_pdf(logical((nbarValues>0).*(nbarValues<5)))))));
+ShareOfCapital(2)=100*sum(sum(sum(sum(Capital_pdf(logical((nbarValues>=5).*(nbarValues<50)))))));
+ShareOfCapital(3)=100*sum(sum(sum(sum(Capital_pdf(logical(nbarValues>=50))))));
 ShareOfCapital(4)=ShareOfCapital(1)+ShareOfCapital(2)+ShareOfCapital(3);
 
-AverageEmployment(1)=nansum(nansum(nansum(nbarValues(logical((nbarValues>0).*(nbarValues<5))).*StationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5))))))/sum(sum(sum(StationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5))))));
-AverageEmployment(2)=nansum(nansum(nansum(nbarValues(logical((nbarValues>=5).*(nbarValues<50))).*StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50))))))/sum(sum(sum(StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50))))));
-AverageEmployment(3)=nansum(nansum(nansum(nbarValues(logical(nbarValues>=50)).*StationaryDist.pdf(logical(nbarValues>=50)))))/sum(sum(sum(StationaryDist.pdf(logical(nbarValues>=50)))));
-AverageEmployment(4)=nansum(nansum(nansum(nbarValues.*StationaryDist.pdf)))/sum(sum(sum(StationaryDist.pdf)));
+AverageEmployment(1)=nansum(nansum(nansum(nansum(nbarValues(logical((nbarValues>0).*(nbarValues<5))).*StationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5)))))))/sum(sum(sum(sum(StationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5)))))));
+AverageEmployment(2)=nansum(nansum(nansum(nansum(nbarValues(logical((nbarValues>=5).*(nbarValues<50))).*StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50)))))))/sum(sum(sum(sum(StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50)))))));
+AverageEmployment(3)=nansum(nansum(nansum(nansum(nbarValues(logical(nbarValues>=50)).*StationaryDist.pdf(logical(nbarValues>=50))))))/sum(sum(sum(sum(StationaryDist.pdf(logical(nbarValues>=50))))));
+AverageEmployment(4)=nansum(nansum(nansum(nansum(nbarValues.*StationaryDist.pdf))))/sum(sum(sum(sum(StationaryDist.pdf))));
+
+
 
 
 %%
+TFP_pdf=shiftdim(ValuesOnGrid(12,:,:,:,:),1);
+ShareOfTFP(1)=nansum(nansum(TFP_pdf(logical((nbarValues>0).*(nbarValues<5))).*(StationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5))))))/sum(sum(sum(sum(StationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5)))))));
+ShareOfTFP(2)=nansum(nansum(TFP_pdf(logical((nbarValues>=5).*(nbarValues<50))).*(StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50))))))/sum(sum(sum(sum(StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50)))))));
+ShareOfTFP(3)=nansum(nansum(TFP_pdf(logical(nbarValues>=50)).*(StationaryDist.pdf(logical(nbarValues>=50)))))/sum(sum(sum(sum(StationaryDist.pdf(logical(nbarValues>=50))))));
+ShareOfTFP(4)=nansum(nansum(nansum(nansum(TFP_pdf(logical(nbarValues>=0)).*StationaryDist.pdf(nbarValues>=0)))));
+
+
+TFP_ear = sum(sum(sum(TFP_pdf(:,:,2,:).*(StationaryDist.pdf(:,:,2,:)))))/sum(sum(sum(StationaryDist.pdf(:,:,2,:))));
+
+TFP_nonear = sum(sum(sum(TFP_pdf(:,:,1,:).*(StationaryDist.pdf(:,:,1,:)))))/sum(sum(sum(StationaryDist.pdf(:,:,1,:))));
 
 %%
-TFP_pdf=shiftdim(ValuesOnGrid(12,:,:,:),1);
-ShareOfTFP(1)=nansum(TFP_pdf(logical((nbarValues>0).*(nbarValues<5))).*(StationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5)))/(sum(sum(StationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5))))))));
-ShareOfTFP(2)=nansum(TFP_pdf(logical((nbarValues>=5).*(nbarValues<50))).*(StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50)))/(sum(sum(StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50))))))));
-ShareOfTFP(3)=nansum(TFP_pdf(logical(nbarValues>=50)).*(StationaryDist.pdf(logical(nbarValues>=50))/(sum(sum(StationaryDist.pdf(logical(nbarValues>=50)))))));
-ShareOfTFP(4)=nansum(nansum(nansum(TFP_pdf(logical(nbarValues>=0)).*StationaryDist.pdf(nbarValues>=0))));
+SUBStationaryDist.pdf=squeeze(StationaryDist.pdf(:,:,2,:));
+nbarValues=squeeze(nbarValues(:,:,2,:));
+
+SUBShareOfEstablishments(1)=100*(sum(sum(sum(SUBStationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5))))))/sum(sum(sum(SUBStationaryDist.pdf))));
+SUBShareOfEstablishments(2)=100*(sum(sum(sum(SUBStationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50))))))/sum(sum(sum(SUBStationaryDist.pdf))));
+SUBShareOfEstablishments(3)=100*(sum(sum(sum(SUBStationaryDist.pdf(logical(nbarValues>=50)))))/sum(sum(sum(SUBStationaryDist.pdf))));
+SUBShareOfEstablishments(4)=100*(sum(sum(sum(SUBStationaryDist.pdf))/sum(sum(sum(SUBStationaryDist.pdf)))));
+
+SUBOutput_pdf=shiftdim(ProbDensityFns(2,:,:,2,:),1);
+SUBShareOfOutput(1)=100*(sum(sum(sum(SUBOutput_pdf(logical((nbarValues>0).*(nbarValues<5))))))/sum(sum(sum(SUBOutput_pdf))));
+SUBShareOfOutput(2)=100*(sum(sum(sum(SUBOutput_pdf(logical((nbarValues>=5).*(nbarValues<50))))))/sum(sum(sum(SUBOutput_pdf))));
+SUBShareOfOutput(3)=100*(sum(sum(sum(SUBOutput_pdf(logical(nbarValues>=50))))))/sum(sum(sum(SUBOutput_pdf)));
+SUBShareOfOutput(4)=100*(sum(sum(sum(SUBOutput_pdf)))/sum(sum(sum(SUBOutput_pdf))));
+
+SUBLabour_pdf=shiftdim(ProbDensityFns(3,:,:,2,:),1);
+SUBShareOfLabour(1)=100*(sum(sum(sum(SUBLabour_pdf(logical((nbarValues>0).*(nbarValues<5))))))/sum(sum(sum(SUBLabour_pdf))));
+SUBShareOfLabour(2)=100*(sum(sum(sum(SUBLabour_pdf(logical((nbarValues>=5).*(nbarValues<50))))))/sum(sum(sum(SUBLabour_pdf))));
+SUBShareOfLabour(3)=100*(sum(sum(sum(SUBLabour_pdf(logical(nbarValues>=50)))))/sum(sum(sum(SUBLabour_pdf))));
+SUBShareOfLabour(4)=100*(sum(sum(sum(SUBLabour_pdf)))/sum(sum(sum(SUBLabour_pdf))));
 
 
-TFP_ear = sum(sum(TFP_pdf(:,:,2).*(StationaryDist.pdf(:,:,2)/(sum(sum(StationaryDist.pdf(:,:,2)))))));
-
-TFP_nonear = sum(sum(TFP_pdf(:,:,1).*(StationaryDist.pdf(:,:,1))/(sum(sum(StationaryDist.pdf(:,:,1))))));
-
-%%
-SUBStationaryDist.pdf=squeeze(StationaryDist.pdf(:,:,2));
-nbarValues=squeeze(nbarValues(:,:,2));
-
-SUBShareOfEstablishments(1)=100*(sum(sum(SUBStationaryDist.pdf(logical((nbarValues>0).*(nbarValues<5)))))/sum(sum(SUBStationaryDist.pdf)));
-SUBShareOfEstablishments(2)=100*(sum(sum(SUBStationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50)))))/sum(sum(SUBStationaryDist.pdf)));
-SUBShareOfEstablishments(3)=100*(sum(sum(SUBStationaryDist.pdf(logical(nbarValues>=50))))/sum(sum(SUBStationaryDist.pdf)));
-SUBShareOfEstablishments(4)=100*(sum(sum(SUBStationaryDist.pdf))/sum(sum(SUBStationaryDist.pdf)));
-
-SUBOutput_pdf=shiftdim(ProbDensityFns(2,:,:,2),1);
-SUBShareOfOutput(1)=100*(sum(sum(SUBOutput_pdf(logical((nbarValues>0).*(nbarValues<5)))))/sum(sum(SUBOutput_pdf)));
-SUBShareOfOutput(2)=100*(sum(sum(SUBOutput_pdf(logical((nbarValues>=5).*(nbarValues<50)))))/sum(sum(SUBOutput_pdf)));
-SUBShareOfOutput(3)=100*(sum(sum(SUBOutput_pdf(logical(nbarValues>=50))))/sum(sum(SUBOutput_pdf)));
-SUBShareOfOutput(4)=100*(sum(sum(SUBOutput_pdf))/sum(sum(SUBOutput_pdf)));
-
-SUBLabour_pdf=shiftdim(ProbDensityFns(3,:,:,2),1);
-SUBShareOfLabour(1)=100*(sum(sum(SUBLabour_pdf(logical((nbarValues>0).*(nbarValues<5)))))/sum(sum(SUBLabour_pdf)));
-SUBShareOfLabour(2)=100*(sum(sum(SUBLabour_pdf(logical((nbarValues>=5).*(nbarValues<50)))))/sum(sum(SUBLabour_pdf)));
-SUBShareOfLabour(3)=100*(sum(sum(SUBLabour_pdf(logical(nbarValues>=50))))/sum(sum(SUBLabour_pdf)));
-SUBShareOfLabour(4)=100*(sum(sum(SUBLabour_pdf))/sum(sum(SUBLabour_pdf)));
-
-
-SUBCapital_pdf=shiftdim(ProbDensityFns(1,:,:,2),1);
-SUBShareOfCapital(1)=100*(sum(sum(SUBCapital_pdf(logical((nbarValues>0).*(nbarValues<5)))))/(sum(sum(SUBCapital_pdf))));
-SUBShareOfCapital(2)=100*(sum(sum(SUBCapital_pdf(logical((nbarValues>=5).*(nbarValues<50)))))/(sum(sum(SUBCapital_pdf))));
-SUBShareOfCapital(3)=100*(sum(sum(SUBCapital_pdf(logical(nbarValues>=50))))/(sum(sum(SUBCapital_pdf))));
+SUBCapital_pdf=shiftdim(ProbDensityFns(1,:,:,2,:),1);
+SUBShareOfCapital(1)=100*(sum(sum(sum(SUBCapital_pdf(logical((nbarValues>0).*(nbarValues<5))))))/sum(sum(sum(SUBCapital_pdf))));
+SUBShareOfCapital(2)=100*(sum(sum(sum(SUBCapital_pdf(logical((nbarValues>=5).*(nbarValues<50))))))/sum(sum(sum(SUBCapital_pdf))));
+SUBShareOfCapital(3)=100*(sum(sum(sum(SUBCapital_pdf(logical(nbarValues>=50)))))/sum(sum(sum(SUBCapital_pdf))));
 
 
 %%

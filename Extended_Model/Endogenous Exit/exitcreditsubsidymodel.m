@@ -131,8 +131,7 @@ while dist>10^(-7)
     dist=max(abs(pistar_s-pistar_s_old));
 end
 
-figure;
-plot(s_grid, pistar_s)
+
 
 if Parallel==2
     Params.upsilon = zeros([n_a, n_z],'gpuArray');
@@ -504,23 +503,6 @@ NONnbarValues=shiftdim(ValuesOnGrid(9,:,:,:),1);
 NONnbarValues=NONnbarValues./(normalize_employment);
 %NONnbarValues=NONnbarValues.*...
 %shiftdim(ProbDensityFns(9,:,:,:),1);
-%%
-figure;
-%subplot(1,2,1)
-plot(s_grid,nanmean(nanmean(SUBnbarValues(:,:,:),3)));
-xlim([0.9 2.5])
-%title('non-earmarked')
-%xlabel('productivity')
-%ylabel('employees')
-%subplot(1,2,2)
-hold on;
-plot(s_grid,nanmean(nanmean(NONnbarValues(:,:,:),3)),'-r');
-%xlim([0.9 2.5])
-%title('earmarked')
-xlabel('productivity')
-ylabel('employees')
-legend('earmarked','non-earmarked', 'Location', 'northwest')
-%%
 
 
 Partion1Indicator=logical(nbarValues<5);

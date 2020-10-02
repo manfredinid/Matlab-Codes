@@ -1,4 +1,4 @@
-function F=Firms(kprime_val, k_val,s_val, psi_val, p,w,r_market,r_ear, alpha,gamma, delta, adjustcostparam)
+function F=Firms(kprime_val, k_val,s_val, psi_val, tau_val, p,w,r_market,r_ear, alpha,gamma, delta, ctau, adjustcostparam)
 
 F=-Inf;
 
@@ -8,7 +8,7 @@ if k_val>0 && kprime_val>k_val
 end
 
 % Interest rate depends on earmarked vs non-earmarked credit firm
-r=r_ear*psi_val + r_market*(1-psi_val);
+r= tau_val*ctau+r_ear*psi_val + r_market*(1-psi_val);
 
 % Labour
 nbar=((s_val*p*gamma))^(1/(1-gamma)) *kprime_val^(alpha/(1-gamma));
