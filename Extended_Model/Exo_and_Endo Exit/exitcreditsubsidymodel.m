@@ -3,12 +3,6 @@
 % Model presented in the Brazilian Slump and the Government-driven 
 % Credit Expansion (2020)
 
-%% Initial setups
-%clear all;
-%close all;
-%Parallel=1; % 1 for (parallel) CPUs, 2 for GPU, 0 for single CPU
-%tic;
-
 %% Toolkit options 
 
 vfoptions.agententryandexit=1;
@@ -38,12 +32,10 @@ Params.adjustcostparam = 3.219;
 
 % Entry and Exit
 Params.ce=6; % Fixed cost of entry 
-Params.ctau=0.02;
-Params.g_tau=0.43;
+Params.ctau=0.0210;
+Params.g_tau=0.3;
 % larger ce implies lower lambda
 
-% Limit the amount of earmarked credit
-%Params.maxK_ear=Params.g_ear;
 %% States
 
 % The model has three states, one endogenous state (capital), and two
@@ -52,13 +44,13 @@ Params.g_tau=0.43;
 n_s=10;
 n_a=250;
 % n_psi is two since psi \in {0,1}
+% n_tau is two since psi \in {0,1}
 
 %% Earmarked credit with embebed subsidies (psi)
 % Exogenous states
 
-%Params.r_ear=0.02; % Interest rate on earmarked credit
-%Params.g_ear=0.4; % Share of (unconditional) potential entrants who have
-%access to earmarket credit. 
+%Params.r_ear= MAIN file
+%Params.g_ear= MAIN file
 
 %% Grids
 
@@ -77,44 +69,29 @@ rand('state',1)
 pistar_s=pistar_s';
 s_grid=s_grid';
 
-figure;
-plot(s_grid, pistar_s)
-
-
 % Earmarked credit grid
 psi_grid=[0;1]; %Using this as a {0,1} helps,e.g., add up earmarked capital
 pi_psi=[1,0;0,1];
 
-tau_grid=[0;1]; %Using this as a {0,1} helps,e.g., add up earmarked capital
-pi_tau=[1,0;0,1];%[0.8,0.2;0.2,0.8];
+tau_grid=[0;1]; %Using this as a {0,1} helps,e.g., add up poor credit access
+pi_tau=[1,0;0,1];
 
 % Exogenous states (matrix z)
 
 % Transition matrix 
-% Note: considering that productivity and taxes are independent 
 n_z=[n_s,length(psi_grid), length(tau_grid)];
 z_grid=[s_grid; psi_grid; tau_grid];
 
-% Transition matrix for the exogenous s and psi variables
-% Transition matrix for the exogenous s and psi variables
-pi_psitau=kron(pi_psi,pi_tau);
-pi_z=kron(pi_psitau,pi_s);
-
-% Endogenous state variables
+% Transition matrix for the exogenous states
+pi_z=kron(pi_tau,kron(pi_s, pi_psi));
 
 % grid for capital
-
-% steady-state capital without distotions
 a_grid = [0 logspace(0.0001,6.28,n_a-1)]'; 
-
 
 % Decision variables
 %There is no d variable
-
 d_grid=[]; 
 n_d=0;
-
-
 
 %% Interest rates
 % The model has three interest rates
@@ -127,14 +104,14 @@ n_d=0;
 Params.rhhminusdelta=1/Params.beta-1; 
 Params.r_hh=Params.rhhminusdelta+Params.delta; 
 %% 2.International interest rate
-%Params.r_international=0.15;
+%Params.r_international= Main file
 
 %% 3.Market interest rate
 Params.r_market=Params.r_international;
 
-
-
 %% Potential New Entrants Distribution over the states (s, psi)
+
+type=2;
 
 pistar_s=ones(size(s_grid))/n_s; % Initial guess
 dist=1;
@@ -144,27 +121,20 @@ while dist>10^(-7)
     dist=max(abs(pistar_s-pistar_s_old));
 end
 
-%figure;
-%plot(s_grid, pistar_s)
-
 if Parallel==2
     Params.upsilon = zeros([n_a, n_z],'gpuArray');
 else
     Params.upsilon = zeros([n_a, n_z]);
 end
-%%
-type=2;
 
 if type==1
-taupsi_upsilon =  kron([1-Params.g_tau, Params.g_tau],[1-Params.g_ear; Params.g_ear]);   
-Params.upsilon(1,:,:,:) = reshape(kron(taupsi_upsilon,pistar_s),[10,2,2]);
+Params.upsilon(1,:,:,:) = reshape(kron(pistar_s,kron([1-Params.g_tau, Params.g_tau],[1-Params.g_ear; Params.g_ear])),[10,2,2]);
 
 elseif type==2
   % correlated case: subsidize a fraction g_tau of poor credit access firms
-  
    taupsi_upsilon =  [1,0;0,1].*[1-Params.g_ear; Params.g_ear];
    %taupsi_upsilon =  kron([0, 1],[1-Params.g_ear; Params.g_ear]);
-   Params.upsilon(1,:,:,:) = reshape(kron(taupsi_upsilon,pistar_s),[10,2,2]);
+   Params.upsilon(1,:,:,:) = reshape(kron(pistar_s,taupsi_upsilon),[10,2,2]);
 
 %while a<Params.g_tau
 %    taupsi_upsilon =  [1,0;0,1].*[1-Params.g_ear; Params.g_ear]; 
@@ -198,29 +168,29 @@ sum(sum(sum(sum(Params.upsilon))))
 end
 
 %% Aspects of Entry and Exit 
-% Continuation fixed cost for firms facing endogenous exit decision
-Params.phi=8.8;
-
-
-% Exit is exogenous with probability lambda
+% Discount Factor
 DiscountFactorParamNames={'beta'};
 
-
-Params.lambda_phi=0.35;
-Params.lambda_infty=0.0501;
-% The following are the probabilities on 'no exit decision', 'endogenous exit decision', and 'exogenous exit decision' respectively.
+% Exit status
+Params.lambda_phi=0.035;    %endogenous exit decision
+Params.lambda_infty=0.0501; %exogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
 simoptions.exitprobabilities=vfoptions.exitprobabilities;
+
 % For firms facing 'endogenous exit decision', there is a continuation cost:
+Params.phi=8.8; % Continuation fixed cost for firms facing endogenous exit decision
 vfoptions.endogenousexitcontinuationcost={'phi'};
-% Return Function
+
+% Return Function for Remaning Firms
 ReturnFn=@(kprime_val, k_val,s_val, psi_val,tau_val,  p,w,r_market,r_ear,...
     alpha,gamma,delta, ctau, adjustcostparam)ExistingFirm_ReturnFn(kprime_val, k_val,s_val, psi_val, tau_val,  p,w,r_market,r_ear, alpha,gamma, delta, ctau, adjustcostparam);
 ReturnFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta','ctau',...
      'adjustcostparam'}; 
 %It is important that these are in same order as they appear in 'ExistingFirm_ReturnFn'
 
+
+% Return Function for Exiting Firms
 vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val,tau_val,  p,w,r_market,r_ear,...
     alpha,gamma,delta, adjustcostparam, ctau) Firms(kprime_val, k_val,s_val, psi_val,tau_val,  p,w,r_market,r_ear,...
     alpha,gamma,delta, adjustcostparam, ctau);
@@ -231,13 +201,12 @@ vfoptions.ReturnToExitFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma',
 [V, Policy, PolicyWhenExiting, ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
 
 
-%% Set up entry distribution
+%% Set up variables for entry and exit
 
- 
-
-% Probability of being in the (k, s, psi) category
+% Probability of being in the (k, s, psi, tau) category
 EntryExitParamNames.DistOfNewAgents={'upsilon'};
 
+% Exit decision
 EntryExitParamNames.CondlProbOfSurvival={'notexit'};
 Params.notexit=1-ExitPolicy;
 
@@ -248,6 +217,7 @@ EntryExitParamNames.CondlEntryDecisions={'ebar'};
 %guess as the actual decisions are determined as part of general equilibrium.
 Params.ebar=ones([n_a,n_z],'gpuArray'); 
 
+% Mass of new entrants
 EntryExitParamNames.MassOfNewAgents={'Ne'};
 
 
@@ -256,9 +226,6 @@ disp('upsilon size')
 disp(size(Params.upsilon))
 disp('sum of upsilon')
 disp(sum(Params.upsilon(:)))
-
-StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,...
-    Params, EntryExitParamNames);
 
 %% General Equilibrium Equations
 %Now define the functions for the General Equilibrium conditions
@@ -294,7 +261,6 @@ simoptions.endogenousexit=2;
 n_p=0;
 disp('Calculating price vector corresponding to the stationary eqm')
 % NOTE: EntryExitParamNames has to be passed as an additional input 
-
 [p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1(n_d, n_a, n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
 
 Params.p=p_eqm.p;
@@ -356,8 +322,6 @@ Params.r_market=Params.r_international;
 
 
 %%
-
-%
 fprintf('\n')
 fprintf('Capital Market Outcomes: \n')
 fprintf('The interest rate for household is %8.2f, the international interest rate is r%8.2f, and the interest rate on earmarked credit is %8.2f \n', 100*Params.r_hh, 100*Params.r_international, 100*Params.r_ear)
@@ -495,16 +459,34 @@ FnsToEvaluateFn_noneartfp = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMas
 FnsToEvaluateParamNames(15).Names={'p', 'w','r_market','r_ear','alpha','gamma'};
 FnsToEvaluateFn_poor = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,r_market,r_ear,alpha,gamma)...
      (z3_val==1);
+ 
+ %LABOR WITH SUBSIDY
+FnsToEvaluateParamNames(16).Names={'p', 'w','alpha','gamma'};
+FnsToEvaluateFn_POORnbar = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,alpha,gamma)...
+    (z3_val==1).*(((z1_val*p*gamma)^(1/(1-gamma))) *(aprime_val^(alpha/(1-gamma))));
+
+
+%LABOR WITH SUBSIDY
+FnsToEvaluateParamNames(17).Names={'p', 'w','alpha','gamma'};
+FnsToEvaluateFn_GOODnbar = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,alpha,gamma)...
+    (z3_val==0).*(((z1_val*p*gamma)^(1/(1-gamma))) *(aprime_val^(alpha/(1-gamma))));
+
+
+FnsToEvaluateParamNames(18).Names={'p', 'w','r_market','r_ear', 'ctau'};
+FnsToEvaluateFn_r = @(aprime_val,a_val,z1_val,z2_val,z3_val,AgentDistMass,p,w,r_market,r_ear, ctau)...
+    z3_val*ctau + r_ear*z2_val + r_market*(1-z2_val);
+
 
 
 FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output, FnsToEvaluateFn_nbar,...
        FnsToEvaluateFn_SUBkbar, FnsToEvaluateFn_SUBoutput, FnsToEvaluateFn_SUBnbar,...
     FnsToEvaluateFn_TAXkbar, FnsToEvaluateFn_TAXoutput, FnsToEvaluateFn_TAXnbar,...
     FnsToEvaluateFn_num,FnsToEvaluateFn_cost, FnsToEvaluateFn_tfp,...
-    FnsToEvaluateFn_eartfp,FnsToEvaluateFn_noneartfp,FnsToEvaluateFn_poor};
+    FnsToEvaluateFn_eartfp,FnsToEvaluateFn_noneartfp,FnsToEvaluateFn_poor,...
+    FnsToEvaluateFn_POORnbar, FnsToEvaluateFn_GOODnbar,FnsToEvaluateFn_r};
 
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, Parallel, simoptions, EntryExitParamNames, PolicyWhenExiting);
-
+AggVars(18)-((1+0.2142)^(1/4)-1)
 
 ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1(StationaryDist,...
     Policy, FnsToEvaluate, Params,...
@@ -561,39 +543,23 @@ nbarValues=shiftdim(ValuesOnGrid(3,:,:,:,:),1);
 normalize_employment=nanmin(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
 nbarValues=nbarValues./(normalize_employment);
 
-ProbnbarValues=sum(sum(shiftdim(ValuesOnGrid(12,:,:,:,:),1).*...
-shiftdim(ProbDensityFns(12,:,:,:,:),1),3));
-
 % SUB
 SUBnbarValues=shiftdim(ValuesOnGrid(6,:,:,:,:),1);
 SUBnbarValues=SUBnbarValues./(normalize_employment);
-%SUBnbarValues=SUBnbarValues.*...
-%shiftdim(ProbDensityFns(6,:,:,:),1);
 
 % non sub
 NONnbarValues=shiftdim(ValuesOnGrid(9,:,:,:,:),1);
 NONnbarValues=NONnbarValues./(normalize_employment);
-%NONnbarValues=NONnbarValues.*...
-%shiftdim(ProbDensityFns(9,:,:,:),1);
-%%
-figure;
-%subplot(1,2,1)
-plot(s_grid,squeeze(nanmean(nanmean(nanmean(SUBnbarValues(:,:,:,:),4),3))));
-xlim([0.9 2.5])
-%title('non-earmarked')
-%xlabel('productivity')
-%ylabel('employees')
-%subplot(1,2,2)
-hold on;
-plot(s_grid,squeeze(nanmean(nanmean(nanmean(NONnbarValues(:,:,:,:),4),3))),'-r');
-%xlim([0.9 2.5])
-%title('earmarked')
-xlabel('productivity')
-ylabel('employees')
-legend('earmarked','non-earmarked', 'Location', 'northwest')
-%%
 
+% Good
+GOODnbarValues=shiftdim(ValuesOnGrid(17,:,:,:,:),1);
+GOODnbarValues=GOODnbarValues./(normalize_employment);
 
+% Poor
+POORnbarValues=shiftdim(ValuesOnGrid(16,:,:,:,:),1);
+POORnbarValues=POORnbarValues./(normalize_employment);
+
+%%
 Partion1Indicator=logical(nbarValues<5);
 Partion2Indicator=logical((nbarValues>=5).*(nbarValues<50));
 Partion3Indicator=logical(nbarValues>=50);
@@ -627,8 +593,6 @@ AverageEmployment(1)=nansum(nansum(nansum(nansum(nbarValues(logical((nbarValues>
 AverageEmployment(2)=nansum(nansum(nansum(nansum(nbarValues(logical((nbarValues>=5).*(nbarValues<50))).*StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50)))))))/sum(sum(sum(sum(StationaryDist.pdf(logical((nbarValues>=5).*(nbarValues<50)))))));
 AverageEmployment(3)=nansum(nansum(nansum(nansum(nbarValues(logical(nbarValues>=50)).*StationaryDist.pdf(logical(nbarValues>=50))))))/sum(sum(sum(sum(StationaryDist.pdf(logical(nbarValues>=50))))));
 AverageEmployment(4)=nansum(nansum(nansum(nansum(nbarValues.*StationaryDist.pdf))))/sum(sum(sum(sum(StationaryDist.pdf))));
-
-
 
 
 %%
@@ -670,50 +634,10 @@ SUBShareOfCapital(1)=100*(sum(sum(sum(SUBCapital_pdf(logical((nbarValues>0).*(nb
 SUBShareOfCapital(2)=100*(sum(sum(sum(SUBCapital_pdf(logical((nbarValues>=5).*(nbarValues<50))))))/sum(sum(sum(SUBCapital_pdf))));
 SUBShareOfCapital(3)=100*(sum(sum(sum(SUBCapital_pdf(logical(nbarValues>=50)))))/sum(sum(sum(SUBCapital_pdf))));
 
-
 %%
-%fprintf('Distribution statistics of benchmark economy  \n');
-%fprintf('                               <5     5 to 49     >=50   total\n');
-%fprintf('Share of establishments  %8.2f  %8.2f  %8.2f  %8.2f  \n', ShareOfEstablishments);
-%fprintf('Share of output          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfOutput);
-%fprintf('Share of labor          %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfLabour);
-%fprintf('Share of capital         %8.2f  %8.2f  %8.2f  %8.2f\n', ShareOfCapital);
-%fprintf('Share of employment      %8.2f  %8.2f  %8.2f  %8.2f\n', AverageEmployment);
+min(min(min(ValuesOnGrid(18,:,:,:,1))))
+min(min(min(ValuesOnGrid(18,:,:,:,2))))
+max(max(max(ValuesOnGrid(18,:,:,:,1))))
+max(max(max(ValuesOnGrid(18,:,:,:,2))))
+sum(sum(sum(ProbDensityFns(18,:,:,:,2)))
 
-%% Display some output about the solution
-
-%fprintf('The equilibrium output price is p=%.4f \n', Params.p)
-%fprintf('The equilibrium value for the mass of entrants is Ne=%.4f \n', Params.Ne)
-
-%fprintf('Total Output is Y=%.4f \n', Output.Y)
-%fprintf('Labor is n=%.4f \n', Output.N)
-%fprintf('Capital is k=%.4f \n', Output.K)
-%fprintf('Total Factor Productivity is TFP=%.4f \n', Output.TFP)
-
-
-%fprintf('Percentage of firms with\n')
-%fprintf('Market Rate     Subsidized Rate\n')
-%fprintf('%9.2f  %12.2f   \n',Percentage_tax )
-
-%fprintf('   Total(just for checking)  \n' )
-%fprintf('%9.2f    \n', sum(Percentage_tax))
-
-
-%fprintf('                     Total  with r_ear   with r_market\n');
-%fprintf('TFP %22.2f  %8.2f  %8.2f    \n',[Output.TFP SUB.Output.TFP TAX.Output.TFP]);
-%fprintf('Aggregate output  %8.2f  %8.2f  %8.2f \n', [Output.Y SUB.Output.Y TAX.Output.Y]);
-%fprintf('Aggregate labor   %8.2f  %8.2f  %8.2f \n', [Output.N SUB.Output.N TAX.Output.N]);
-%fprintf('Aggregate capital %8.2f  %8.2f  %8.2f \n ', [Output.K SUB.Output.K TAX.Output.K]);
-
-
-
-%hold on;
-%plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,1)),1)),'b')
-%hold on;
-%plot(s_grid,(sum(squeeze(StationaryDist.pdf(:,:,2)),1)),':')
-
-
-
-
-
-%toc;
