@@ -13,7 +13,7 @@ r= tau_val*ctau + r_ear*psi_val + r_market*(1-psi_val);
 % Labour
 nbar=((s_val*p*gamma))^(1/(1-gamma)) *kprime_val^(alpha/(1-gamma));
 
-pi =  p*s_val*(kprime_val^alpha)*(nbar^gamma)-w*nbar-r*kprime_val-adjcost-1;
+pi =  p*s_val*(kprime_val^alpha)*(nbar^gamma)-w*nbar-r*kprime_val-adjcost-0.5;
 
 F=pi;
 

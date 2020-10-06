@@ -4,37 +4,61 @@ figure;
 plot(s_grid, pistar_s)
 
 %%
-figure;
-%subplot(1,2,1)
-plot(s_grid,nanmean(nanmean(SUBnbarValues(:,:,:),3)));
-xlim([0.9 2.5])
-%title('non-earmarked')
-%xlabel('productivity')
-%ylabel('employees')
-%subplot(1,2,2)
-hold on;
-plot(s_grid,nanmean(nanmean(NONnbarValues(:,:,:),3)),'-r');
-%xlim([0.9 2.5])
-%title('earmarked')
-xlabel('productivity')
-ylabel('employees')
-legend('earmarked','non-earmarked', 'Location', 'northwest')
+nbarValues=shiftdim(ValuesOnGrid(3,:,:,:,:),1);
+normalize_employment=nanmin(nonzeros(nbarValues)); % Normalize so that smallest occouring value of nbar in the baseline is equal to 1.
+nbarValues=(nbarValues./(normalize_employment)).*(StationaryDist.pdf~=0);
+
 
 figure;
-%subplot(1,2,1)
-plot(s_grid,nanmean(nanmean(POORnbarValues(:,:,:),3)));
+
+subplot(1,2,1)
+plot(s_grid,mean(nbarValues(:,:,2,1)),'-b');
 xlim([0.9 2.5])
 %title('non-earmarked')
 %xlabel('productivity')
 %ylabel('employees')
 %subplot(1,2,2)
 hold on;
-plot(s_grid,nanmean(nanmean(GOODnbarValues(:,:,:),3)),'-r');
+plot(s_grid,mean(nbarValues(:,:,1,2)),'-r');
 %xlim([0.9 2.5])
 %title('earmarked')
 xlabel('productivity')
 ylabel('employees')
-legend('poor credit','good credit', 'Location', 'northwest')
+legend('earmarked and good credit','non-earmarked and poor credit', 'Location', 'northwest')
+
+
+subplot(1,2,2)
+plot(s_grid,mean(nbarValues(:,:,1,1)),'-b');
+xlim([0.9 2.5])
+%title('non-earmarked')
+%xlabel('productivity')
+%ylabel('employees')
+%subplot(1,2,2)
+hold on;
+plot(s_grid,mean(nbarValues(:,:,2,2)),'-r');
+%xlim([0.9 2.5])
+%title('earmarked')
+xlabel('productivity')
+ylabel('employees')
+legend('non-earmarked and good credit','earmarked and poor credit', 'Location', 'northwest')
+%%
+
+figure;
+subplot(1,2,1)
+plot(s_grid,mean(nbarValues(:,:,1,1)),'-b');
+title('non-earmarked and good credit')
+xlabel('productivity')
+ylabel('employees')
+%ylabel('employees')
+%subplot(1,2,2)
+subplot(1,2,2)
+plot(s_grid,mean(nbarValues(:,:,2,2)),'-r');
+%xlim([0.9 2.5])
+%title('earmarked')
+xlabel('productivity')
+ylabel('employees')
+title('earmarked and poor credit')
+
 
 %%
 a11 = squeeze(Params.ebar(1,:,1,1));
@@ -71,6 +95,7 @@ zlabel('Exit Decision')
 %%
 
 %%
+
 a11 = squeeze(ExitPolicy(:,:,1,1));
 a21 = squeeze(ExitPolicy(:,:,2,1));
 a12 = squeeze(ExitPolicy(:,:,1,2));
@@ -78,26 +103,26 @@ a22 = squeeze(ExitPolicy(:,:,2,2));
 
 figure; 
 subplot(2,2,1)
-stem3(a11(end-30:end,:), 'Color', 'b','Marker' , 'x')
+stem3(a11(1:50,:), 'Color', 'b','Marker' , 'x')
 title('Tax and Good Credit')
 ylabel('Capital') 
 xlabel('Productivity')
 zlabel('Exit Decision') 
 subplot(2,2,2)
-stem3(a21(end-30:end,:), 'Color', 'b','Marker' , 'x')
+stem3(a21(1:50,:), 'Color', 'b','Marker' , 'x')
 title('Sub and Good Credit')
 ylabel('Capital') 
 xlabel('Productivity')
 zlabel('Exit Decision') 
 zlim([0 1])
 subplot(2,2,3)
-stem3(a12(end-30:end,:), 'Color', 'r','Marker' , 'x', 'LineStyle', ':')
+stem3(a12(1:50,:), 'Color', 'r','Marker' , 'x', 'LineStyle', ':')
 title('Tax and Bad Credit')
 ylabel('Capital') 
 xlabel('Productivity')
 zlabel('Exit Decision') 
 subplot(2,2,4)
-stem3(a22(end-30:end,:), 'Color', 'r','Marker' , 'x', 'LineStyle', ':')
+stem3(a22(1:50,:), 'Color', 'r','Marker' , 'x', 'LineStyle', ':')
 title('Sub and Bad Credit')
 ylabel('Capital') 
 xlabel('Productivity')

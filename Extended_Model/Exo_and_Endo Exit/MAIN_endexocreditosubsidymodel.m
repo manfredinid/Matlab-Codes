@@ -47,13 +47,12 @@ Params.g_ear=A.Params.g_ear; % Share of (unconditional) potential entrants who h
 Params.r_international = A.Params.r_international;
 
 %% Initial Guesses
-Params.p=0.2939; % output price
-Params.Ne=0.0601; % total mass of new entrants
+Params.p=0.4331; % output price
+Params.Ne=0.0199; % total mass of new entrants
 
 %%
 fprintf(2,'\nModel A  \n');
 exitcreditsubsidymodel;
-plot_creditmodel;
 saveas(gcf,'initial','epsc')
 %%
 % Agggregate Values
@@ -93,7 +92,7 @@ A.TFP_nonear =AggVars(14);
 A.ebar=Params.ebar;
 A.lambda=ExitRateOfFirms;
 %A.probenter=probenter;
-A.ProbnbarValues=ProbnbarValues;
+%A.ProbnbarValues=ProbnbarValues;
 
 
 
@@ -112,7 +111,6 @@ Params.r_international = B.Params.r_international;
 
 fprintf(2,'\nModel B  \n');
 exitcreditsubsidymodel;
-plot_creditmodel;
 saveas(gcf,'observed','epsc')
 
 % Agggregate Values
@@ -176,7 +174,6 @@ Params.r_international = C.Params.r_international;
 
 fprintf(2,'\nModel C  \n');
 exitcreditsubsidymodel;
-plot_creditmodel;
 saveas(gcf,'alternative','epsc')
 
 % Agggregate Values
@@ -240,7 +237,6 @@ Params.g_ear=D.Params.g_ear; % Share of (unconditional) potential entrants who h
 fprintf(2,'\nModel D  \n');
 D.Params.r_international =1/Params.beta-1;
 exitcreditsubsidymodel;
-plot_creditmodel;
 %%
 saveas(gcf,'nfa','epsc')
 
@@ -319,7 +315,7 @@ fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfLabou
 fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
 fprintf('Average Employment       %8.3f  %8.3f  %8.3f   %8.3f\n', A.AverageEmployment);
 
-
+A.lambda
 %%
 
 fprintf(2,'\nModel B  \n');

@@ -13,6 +13,11 @@ simoptions.agententryandexit=1;
 simoptions.endogenousexit=2;
 simoptions.iterate=1;
 
+type=3;
+% type 1: uncorrelated psi and tau
+% type 2: correlated psi and tau
+% type 3: tau is zero
+
 %% Parameters
 
 % Preferences 
@@ -31,9 +36,12 @@ Params.w=1; % Normalization
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=6; % Fixed cost of entry 
-Params.ctau=0.0210;
-Params.g_tau=0.3;
+Params.ce=2; % Fixed cost of entry 
+Params.phi=2; % Continuation fixed cost for firms facing endogenous exit decision
+
+Params.ctau=0.0210; % this is like a tax --- so if ctau is higher we need
+% a lower earmarket interest-rate to offset the cost of poor credit access
+Params.g_tau=1; % tau 1 and type 2 implies that psi and tau are 100% correlated
 % larger ce implies lower lambda
 
 %% States
@@ -42,7 +50,7 @@ Params.g_tau=0.3;
 % exogenous states (productivity and subsidies)
 
 n_s=10;
-n_a=250;
+n_a=280;
 % n_psi is two since psi \in {0,1}
 % n_tau is two since psi \in {0,1}
 
@@ -58,8 +66,8 @@ n_a=250;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
-rhoeps = 0.9; % persistence
-evallowpareto = 1.45; % lower bound
+rhoeps = 0.95; % persistence
+evallowpareto = 1.8; % lower bound
 evalhighpareto = 2.75;%upper bound
 eparampareto = 5.9;% shape parameter
 % lower eparampreto -- less small firms
@@ -83,7 +91,7 @@ n_z=[n_s,length(psi_grid), length(tau_grid)];
 z_grid=[s_grid; psi_grid; tau_grid];
 
 % Transition matrix for the exogenous states
-pi_z=kron(pi_tau,kron(pi_s, pi_psi));
+pi_z=kron(pi_tau,kron(pi_psi, pi_s));
 
 % grid for capital
 a_grid = [0 logspace(0.0001,6.28,n_a-1)]'; 
@@ -111,7 +119,6 @@ Params.r_market=Params.r_international;
 
 %% Potential New Entrants Distribution over the states (s, psi)
 
-type=2;
 
 pistar_s=ones(size(s_grid))/n_s; % Initial guess
 dist=1;
@@ -132,39 +139,13 @@ Params.upsilon(1,:,:,:) = reshape(kron(pistar_s,kron([1-Params.g_tau, Params.g_t
 
 elseif type==2
   % correlated case: subsidize a fraction g_tau of poor credit access firms
-   taupsi_upsilon =  [1,0;0,1].*[1-Params.g_ear; Params.g_ear];
-   %taupsi_upsilon =  kron([0, 1],[1-Params.g_ear; Params.g_ear]);
-   Params.upsilon(1,:,:,:) = reshape(kron(pistar_s,taupsi_upsilon),[10,2,2]);
-
-%while a<Params.g_tau
-%    taupsi_upsilon =  [1,0;0,1].*[1-Params.g_ear; Params.g_ear]; 
-%    Params.upsilon(1,ii,:,:) = kron(pistar_s(ii),taupsi_upsilon);
-%    a=sum(sum(sum(Params.upsilon(1,:,:,2))));
-%    ii=ii+1;
-%end
-%for i2=ii:length(s_grid)
-%taupsi_upsilon =  kron([1, 0],[1-Params.g_ear; Params.g_ear]); 
-%Params.upsilon(1,i2,:,:) = kron(pistar_s(i2),taupsi_upsilon);
-%end
-sum(sum(sum(sum(Params.upsilon))))
+   Params.upsilon(1,:,:,:) = reshape(kron([Params.g_tau,1-Params.g_tau;1-Params.g_tau,Params.g_tau].*[1-Params.g_ear; Params.g_ear],pistar_s),[10,2,2]);
 
 
 else
-    % correlated case: subsidize a fraction g_tau of good credit access firms
-  ii=1;
-  a2=0.1;
-while a2<Params.g_tau
-    taupsi_upsilon =  kron([1, 0],[1-Params.g_ear; Params.g_ear]); 
-    Params.upsilon(1,ii,:,:) = kron(pistar_s(ii),taupsi_upsilon);
-    a2=sum(sum(sum(Params.upsilon(1,:,:,1))));
-    ii=ii+1;
-end
-for i2=ii:length(s_grid)
-taupsi_upsilon =  kron([1, 0],[1-Params.g_ear; Params.g_ear]); 
-Params.upsilon(1,i2,:,:) = kron(pistar_s(i2),taupsi_upsilon);
-end
-sum(sum(sum(sum(Params.upsilon))))
+    Params.upsilon(1,:,:,:) = reshape(kron(pistar_s,kron([1, 0],[1-Params.g_ear; Params.g_ear])),[10,2,2]);
 
+  
 end
 
 %% Aspects of Entry and Exit 
@@ -172,14 +153,14 @@ end
 DiscountFactorParamNames={'beta'};
 
 % Exit status
-Params.lambda_phi=0.035;    %endogenous exit decision
-Params.lambda_infty=0.0501; %exogenous exit decision
+Params.lambda_phi=0.04;    %endogenous exit decision
+Params.lambda_infty=0.02; %exogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
 simoptions.exitprobabilities=vfoptions.exitprobabilities;
 
 % For firms facing 'endogenous exit decision', there is a continuation cost:
-Params.phi=8.8; % Continuation fixed cost for firms facing endogenous exit decision
+
 vfoptions.endogenousexitcontinuationcost={'phi'};
 
 % Return Function for Remaning Firms
@@ -486,7 +467,7 @@ FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_output, FnsToEvaluateFn_nba
     FnsToEvaluateFn_POORnbar, FnsToEvaluateFn_GOODnbar,FnsToEvaluateFn_r};
 
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, Parallel, simoptions, EntryExitParamNames, PolicyWhenExiting);
-AggVars(18)-((1+0.2142)^(1/4)-1)
+
 
 ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1(StationaryDist,...
     Policy, FnsToEvaluate, Params,...
@@ -498,30 +479,7 @@ ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate
     Params, FnsToEvaluateParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid,...
     simoptions.parallel,simoptions,EntryExitParamNames);
 
-% kbar output nbar
-% Normal 1 2 3
-% SUB 4 5 6
-% TAX 7 8 9
-%% Agggregate Values
-%Output.Y=AggVars(2);
-%Output.N=AggVars(3);
-%Output.K=AggVars(1);
-%Output.KdivY=Output.K/Output.Y;
-%Output.TFP=(Output.Y/((Output.K^ Params.alpha)*(Output.N^ Params.gamma)));
 
-%% Agggregate Values without Subsidy
-%TAX.Output.Y=AggVars(8);
-%TAX.Output.N=AggVars(9);
-%TAX.Output.K=AggVars(7);
-%TAX.Output.KdivY=TAX.Output.K/TAX.Output.Y;
-%TAX.Output.TFP=(TAX.Output.Y/((TAX.Output.K^ Params.alpha)*(TAX.Output.N^ Params.gamma)));
-
-%% Agggregate Values with Subsidy
-%SUB.Output.Y=AggVars(5);
-%SUB.Output.N=AggVars(6);
-%SUB.Output.K=AggVars(4);
-%SUB.Output.KdivY=SUB.Output.K/SUB.Output.Y;
-%SUB.Output.TFP=(SUB.Output.Y/((SUB.Output.K^ Params.alpha)*(SUB.Output.N^ Params.gamma)));
 
 %% Average values
 
@@ -551,13 +509,6 @@ SUBnbarValues=SUBnbarValues./(normalize_employment);
 NONnbarValues=shiftdim(ValuesOnGrid(9,:,:,:,:),1);
 NONnbarValues=NONnbarValues./(normalize_employment);
 
-% Good
-GOODnbarValues=shiftdim(ValuesOnGrid(17,:,:,:,:),1);
-GOODnbarValues=GOODnbarValues./(normalize_employment);
-
-% Poor
-POORnbarValues=shiftdim(ValuesOnGrid(16,:,:,:,:),1);
-POORnbarValues=POORnbarValues./(normalize_employment);
 
 %%
 Partion1Indicator=logical(nbarValues<5);
@@ -635,9 +586,6 @@ SUBShareOfCapital(2)=100*(sum(sum(sum(SUBCapital_pdf(logical((nbarValues>=5).*(n
 SUBShareOfCapital(3)=100*(sum(sum(sum(SUBCapital_pdf(logical(nbarValues>=50)))))/sum(sum(sum(SUBCapital_pdf))));
 
 %%
-min(min(min(ValuesOnGrid(18,:,:,:,1))))
-min(min(min(ValuesOnGrid(18,:,:,:,2))))
-max(max(max(ValuesOnGrid(18,:,:,:,1))))
-max(max(max(ValuesOnGrid(18,:,:,:,2))))
-sum(sum(sum(ProbDensityFns(18,:,:,:,2)))
 
+
+plot_creditmodel
