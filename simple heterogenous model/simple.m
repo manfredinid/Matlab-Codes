@@ -114,7 +114,7 @@ end
 disp('Calculating price vector corresponding to the stationary eqm')
 % tic;
 % NOTE: EntryExitParamNames has to be passed as an additional input compared to the standard case.
-[p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1(V0, n_d, n_a, n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
+[p_eqm,p_eqm_index, GeneralEqmCondition]=HeteroAgentStationaryEqm_Case1(n_d, n_a, n_z, n_p, pi_z, d_grid, a_grid, z_grid, ReturnFn, FnsToEvaluate, GeneralEqmEqns, Params, DiscountFactorParamNames, ReturnFnParamNames, FnsToEvaluateParamNames, GeneralEqmEqnParamNames, GEPriceParamNames,heteroagentoptions, simoptions, vfoptions, EntryExitParamNames);
 
 
 %% Value Function, Policy and Firm Distribution in GE
@@ -122,7 +122,7 @@ disp('Calculating price vector corresponding to the stationary eqm')
 disp('Calculating various equilibrium objects')
 Params.p=p_eqm.p;
 Params.Ne=p_eqm.Ne;
-[V,Policy]=ValueFnIter_Case1(V0, n_d,n_a,n_z,[],a_grid,z_grid, pi_z,...
+[V,Policy]=ValueFnIter_Case1(n_d,n_a,n_z,[],a_grid,z_grid, pi_z,...
     ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames,vfoptions);
 
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z,...
@@ -149,11 +149,14 @@ FnsToEvaluate={FnsToEvaluateFn_kbar, FnsToEvaluateFn_s,FnsToEvaluateFn_output};
 AggVars=EvalFnOnAgentDist_AggVars_Case1(StationaryDist, Policy,...
     FnsToEvaluate, Params, FnsToEvaluateParamNames, n_d, n_a, n_z,...
     d_grid, a_grid, z_grid, simoptions.parallel,simoptions,EntryExitParamNames);
+%%
+%ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1_mass(StationaryDist, Policy, FnsToEvaluate, Params,...
+%    FnsToEvaluateParamNames,EntryExitParamNames, n_d, n_a, n_z,...
+%    [], a_grid, z_grid, simoptions.parallel,simoptions);
 
-ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1_Mass(StationaryDist.pdf,...
-    StationaryDist.mass, Policy, FnsToEvaluate, Params,...
-    FnsToEvaluateParamNames,EntryExitParamNames, n_d, n_a, n_z,...
-    [], a_grid, z_grid, simoptions.parallel,simoptions);
+ValuesOnGrid=EvalFnOnAgentDist_ValuesOnGrid_Case1_Mass(StationaryDist.mass,...
+    Policy, FnsToEvaluate, Params, FnsToEvaluateParamNames,...
+    EntryExitParamNames, n_d, n_a, n_z, d_grid, a_grid, z_grid, simoptions.parallel,simoptions);
 
 
 ProbDensityFns=EvalFnOnAgentDist_pdf_Case1(StationaryDist, Policy, FnsToEvaluate,...
@@ -183,7 +186,7 @@ plot(z_grid,(ones(size(z_grid))*AggVars(2))/StationaryDist.mass)
 hold on
 plot(z_grid,(ones(size(z_grid))*AggVars(3))/StationaryDist.mass)
 legend('Capital','Productivity','Output','Location', 'Best');
-
+%%
 % AggVars(1) is the same as StationaryDist.pdf.*StationaryDist.mass*shiftdim(ValuesOnGrid(1,1,:),1)
 
 z_grid = linspace(0,max(squeeze(ProbDensityFns(2,1,:))),6)';
@@ -193,17 +196,17 @@ figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder','-.|-|--|:')
 subplot(3,1,1);
-plot(shiftdim(ValuesOnGrid(1,1,:),1),shiftdim(ProbDensityFns(1,1,:),1),'-','LineWidth',1);
+plot(shiftdim(ValuesOnGrid(1,1,:),1),StationaryDist.pdf,'-','LineWidth',1);
 hold on;
 plot((ones(size(z_grid))*AggVars(1))/StationaryDist.mass,z_grid,'-r')
 legend('Capital Distribution','Aggregate Average','Location', 'Best');
 subplot(3,1,2);
-plot(squeeze(ValuesOnGrid(2,1,:)),squeeze(ProbDensityFns(2,1,:)) ,'-.','LineWidth',1);
+plot(squeeze(ValuesOnGrid(2,1,:)),StationaryDist.pdf ,'-.','LineWidth',1);
 hold on;
 plot((ones(size(z_grid))*AggVars(2))/StationaryDist.mass,z_grid,'-r')
 legend('Productivity Distribution','Aggregate Average','Location', 'Best');
 subplot(3,1,3);
-plot(squeeze(ValuesOnGrid(3,1,:)),squeeze(ProbDensityFns(3,1,:)) ,':','LineWidth',1);
+plot(squeeze(ValuesOnGrid(3,1,:)),StationaryDist.pdf ,':','LineWidth',1);
 hold on;
 plot((ones(size(z_grid))*AggVars(3))/StationaryDist.mass,z_grid,'-r')
 set(gca,'Fontsize',8);
