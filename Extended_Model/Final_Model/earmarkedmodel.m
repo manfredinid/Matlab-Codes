@@ -31,10 +31,8 @@ Params.adjustcostparam = 3.219;
 Params.ce=2; % Fixed cost of entry 
 Params.phi=2; % Continuation fixed cost for firms facing endogenous exit decision
 
-Params.ctau=0.0210; % this is like a tax --- so if ctau is higher we need
-% a lower earmarket interest-rate to offset the cost of poor credit access
-Params.g_tau=0.8; % tau 1 and type 2 implies that psi and tau are 100% correlated
-% larger ce implies lower lambda %%% REVISAR
+
+
 
 %% States
 
@@ -135,7 +133,8 @@ a_grid = [0 logspace(0.0001,6.28,n_a-1)]';
 d_grid=[]; 
 n_d=0;
 
-Params.upsilon(1,:,:,:) = reshape(kron(pistar_s,kron([1-Params.g_tau, Params.g_tau],[1-Params.g_ear; Params.g_ear])),[10,2,2]);
+teste =([Params.g_tau,1-Params.g_tau;1-Params.g_tau,Params.g_tau].*[1-Params.g_ear; Params.g_ear]);
+Params.upsilon(1,:,:,:) = reshape(kron(teste,pistar_s),[10,2,2]);
 
 %%% Revisar se eu tenho tipi 1, 2 e 3 so mudando gtau
 % FIX FIX FIX

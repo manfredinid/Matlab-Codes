@@ -6,6 +6,17 @@
 %Params.r_international: Interest rate on non-earmarked credit (quarterly) [0,1]
 %Params.g_tau: subsidized credit and poor credit acess correlation [0,1]
 % FIX FIX 0 is uncorrelated
+%g_tau=1
+%Percentage tax and good credit     0.00
+%Percentage tax and bad credit      0.64
+%Percentage sub and good credit     0.00
+%Percentage sub and bad credit      0.36
+
+%Params.ctau: Interest rate on credit constrained firms (quarterly) [0,1]
+%Params.g_tau: correlation between poor credit access and subsidy
+   % if 1 all subsidized firms are credit constrain (good credit access)
+   % if 0 all non-subsidized firms are credit constrain (poor credit
+   % access)
 
 %% Initial setups
 clear all; clear mex; clear functions;clear java;
@@ -22,25 +33,29 @@ tic;
 A.Params.r_ear=(1+0.12)^(1/4)-1; 
 A.Params.g_ear=0.4336;
 A.Params.r_international= (1+0.2142)^(1/4)-1;
-A.Params.g_tau=1;
+A.Params.g_tau=0.43;
+Params.ctau=0.0210;
 
 % Uncorrelated Distortions (Model B)
 B.Params.r_ear= (1+0.11)^(1/4)-1; 
 B.Params.g_ear=0.5031;
 B.Params.r_international =(1+0.2216)^(1/4)-1 ;
-B.Params.g_tau=0.8;
+B.Params.g_tau=0;
+Params.ctau=0.0210;
 
 % Correlated Distortions (Model C)
-C.Params.r_ear=(1+0.15)^(1/4)-1; 
-C.Params.g_ear=0;
-C.Params.r_international = (1+0.15)^(1/4)-1;
-C.Params.g_tau=0.8;
+C.Params.r_ear=(1+0.11)^(1/4)-1; 
+C.Params.g_ear=0.5031;
+C.Params.r_international = (1+0.2216)^(1/4)-1 ;
+C.Params.g_tau=1;
+Params.ctau=0.0210;
 
 % International Capital Flows (Model D)
 D.Params.r_ear=(1+0.12)^(1/4)-1; 
 D.Params.g_ear=0.4336;
 %D.Params.r_international =1/Params.beta-1;
-D.Params.g_tau=0.8;
+D.Params.g_tau=0.43;
+Params.ctau=0.0210;
 
 %% Benchmark Model (Model A)
 fprintf(2,'\nBenchmark Model (Model A) \n');
@@ -163,7 +178,7 @@ B.TFP_nonear =AggVars(14);
 B.ebar=Params.ebar;
 B.ExitRateOfFirms=ExitRateOfFirms;
 %B.probenter=probenter;
-B.ProbnbarValues=ProbnbarValues;
+%B.ProbnbarValues=ProbnbarValues;
 
 %% Correlated Distortions (Model C)
 
@@ -227,7 +242,7 @@ C.ebar=Params.ebar;
 
 C.ExitRateOfFirms=ExitRateOfFirms;
 %C.probenter=probenter;
-C.ProbnbarValues=ProbnbarValues;
+%C.ProbnbarValues=ProbnbarValues;
 
 %% International Capital Flows (Model D)
 
@@ -293,4 +308,4 @@ D.ebar=Params.ebar;
 
 D.ExitRateOfFirms=ExitRateOfFirms;
 %D.probenter=probenter;
-D.ProbnbarValues=ProbnbarValues;
+%D.ProbnbarValues=ProbnbarValues;
