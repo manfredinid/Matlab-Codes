@@ -13,7 +13,7 @@ simoptions.agententryandexit=1;
 simoptions.endogenousexit=2;
 simoptions.iterate=1;
 
-type=3;
+type=2;
 % type 1: uncorrelated psi and tau
 % type 2: correlated psi and tau
 % type 3: tau is zero
@@ -41,7 +41,7 @@ Params.phi=2; % Continuation fixed cost for firms facing endogenous exit decisio
 
 Params.ctau=0.0210; % this is like a tax --- so if ctau is higher we need
 % a lower earmarket interest-rate to offset the cost of poor credit access
-Params.g_tau=1; % tau 1 and type 2 implies that psi and tau are 100% correlated
+Params.g_tau=0.8; % tau 1 and type 2 implies that psi and tau are 100% correlated
 % larger ce implies lower lambda
 
 %% States

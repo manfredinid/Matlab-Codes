@@ -83,7 +83,9 @@ hold on;
 %ylim([30 180]);
 line([quarter_gad(1) quarter_gad(end)],[mean(GAD),mean(GAD)],'Color','red','LineStyle','-');
 legend('Antidumping Investigations', 'Average','Location', 'northwest');
-snapnow
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 10]);
+saveas(gcf,'credit_real','epsc')
 
 %%
 load Private
@@ -164,7 +166,54 @@ ylabel('BNDES disbursements to GFCF')
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 15]);
 saveas(gcf,'BNDES1','epsc')
+%%
+format shortG
+load CF
+year = 1995:2019;
 
 
+figure;
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder','--|-.|--|:');
+  plot(year, CF);
+  hold on
+  plot(year, zeros(1,25), '-r')
+  xlim([1995 2019])
+ylabel('Financial Flows (US$ mill.)')
+set(gca, 'YTickLabel', num2cell(get(gca, 'YTick')))
 
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 10]);
+saveas(gcf,'ck','epsc')
 
+figure;
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder','--|-.|--|:');
+  plot(year(10:end-2), CF(10:end-2));
+  hold on
+  plot(year(10:end-2), zeros(1,14), '-r')
+  xlim([2004 2017])
+ylabel('Financial Flows (US$ mill.)')
+set(gca, 'YTickLabel', num2cell(get(gca, 'YTick')))
+
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 10]);
+saveas(gcf,'ck2','epsc')
+%%
+load('credit_real')
+% create quarter from July 1989 until April 2016
+quarter = datetime(1952,01,30):calquarters(1):datetime(2019,12,31);
+quarter =dateshift(quarter,'end','month');
+
+figure;
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder','-|-.|--|:');
+  plot(quarter, credit_real);
+  xtickformat('QQQ-yyyy')
+  xtickangle(45)
+  hold on;
+  line([quarter(1) quarter(end)],[0,0],'Color','red','LineStyle','-');
+ylabel('Real Credit Growth (Y/Y)')
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 10]);
+saveas(gcf,'credit_real','epsc')
