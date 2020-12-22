@@ -3,12 +3,12 @@
 clear all;
 close all;
 clc;
-sensitivity = 1;
+sensitivity = 0;
 
 % Escolha dos anos da FIR
-FIR1 = 1955;
-FIR2 = 1974;
-FIR3 = 2011;
+FIR1 = 1963;
+FIR2 = 1979;
+FIR3 = 2015;
 
 
 % Hiperparameters k
@@ -93,12 +93,13 @@ if istore == 1
 figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder',':|-|--|:')
- plot(1:nhor,squeeze(imp75XY(2,1,:)))
+ plot(1:nhor,squeeze(imp75XY(2,1,:)),'LineWidth',1.2)
     hold on
-    plot(1:nhor,squeeze(imp81XY(2,1,:)))
+    plot(1:nhor,squeeze(imp81XY(2,1,:)),'LineWidth',1.2)
     hold on
-    plot(1:nhor,squeeze(imp96XY(2,1,:)))
-    legend('1963','1979','2015');
+    plot(1:nhor,squeeze(imp96XY(2,1,:)),'LineWidth',1.2)
+    lgd=legend('1963','1979','2015');
+    lgd.FontSize = 12;
 set(gca,'Fontsize',8);
  xlim([1 nhor]);
 %title(['Response Growth'],'FontSize',8,'FontWeight','bold');
@@ -108,21 +109,21 @@ saveas(gcf,'ResponseGrowth','epsc')
 figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
       'DefaultAxesLineStyleOrder',':|-|--|:')
- plot(1:nhor,squeeze(imp75XY(2,2,:)))
+ plot(1:nhor,squeeze(imp75XY(2,2,:)),'LineWidth',1.2)
     hold on
-    plot(1:nhor,squeeze(imp81XY(2,2,:)))
+    plot(1:nhor,squeeze(imp81XY(2,2,:)),'LineWidth',1.2)
     hold on
-    plot(1:nhor,squeeze(imp96XY(2,2,:)))
+    plot(1:nhor,squeeze(imp96XY(2,2,:)),'LineWidth',1.2)
  xlim([1 nhor]);
 %title(['Response TFP'],'FontSize',8,'FontWeight','bold');
-saveas(gcf,'ResponseTFP','epsc')
+saveas(gcf,'ResponseTFP1','epsc')
 
 figure;
-  plot(1:nhor,squeeze(imp75XY(2,3,:)))
+  plot(1:nhor,squeeze(imp75XY(2,3,:)),'LineWidth',1.2)
     hold on
-    plot(1:nhor,squeeze(imp81XY(2,3,:)))
+    plot(1:nhor,squeeze(imp81XY(2,3,:)),'LineWidth',1.2)
     hold on
-    plot(1:nhor,squeeze(imp96XY(2,3,:)))
+    plot(1:nhor,squeeze(imp96XY(2,3,:)),'LineWidth',1.2)
  xlim([1 nhor]);
 %title(['Response BNDES'],'FontSize',10,'FontWeight','bold');
 saveas(gcf,'ResponseBNDES','epsc')
@@ -138,8 +139,8 @@ set(groot,'DefaultAxesColorOrder',[0 0 0],...
   
 subplot(3,1,1)
 plot(yearlab,sigmean(:,1),'LineWidth',0.6);
-hold on;
-plot(yearlab,[0 0], '-r');
+%hold on;
+%plot(yearlab,zeros(length(yearlab)), '-r');
 set(gca,'Fontsize',8);
 title('GDP per capita (annual %)')
 xlim([1954 2017])
@@ -248,15 +249,22 @@ quantil90 = quantile(Bt_save,q,3);
 
 error3 = squeeze(quantil(3,:,:));
 error4 = squeeze(quantil(4,:,:));
+error6 = squeeze(quantil(6,:,:));
+error7 = squeeze(quantil(7,:,:));
 error8 = squeeze(quantil(8,:,:));
 error10 = squeeze(quantil(10,:,:));
 error11 = squeeze(quantil(11,:,:));
+error12 = squeeze(quantil(12,:,:));
 
 error3n = squeeze(quantil90(3,:,:));
 error4n = squeeze(quantil90(4,:,:));
+error6n = squeeze(quantil90(6,:,:));
+error7n = squeeze(quantil90(7,:,:));
 error8n = squeeze(quantil90(8,:,:));
 error10n = squeeze(quantil90(10,:,:));
 error11n = squeeze(quantil90(11,:,:));
+error12n = squeeze(quantil90(12,:,:));
+
 %%
 figure;
 set(0,'DefaultAxesColorOrder','remove') 
@@ -318,9 +326,43 @@ alpha(.3)
 set(gca,'Fontsize',8);
 %title('Efeito da Produtividade no Investimento')
 set(gcf, 'PaperUnits', 'centimeters');
-set(gcf, 'PaperPosition', [0 0 20 9]);6
+set(gcf, 'PaperPosition', [0 0 20 9]);
 xlim([1954 2017])
 saveas(gcf,'TFPBNDES_1','epsc')
+
+figure;
+plot(yearlab,Bt_postmean(12,:),'-','LineWidth',1);
+hold on;
+shadedplot(yearlab, error12(:,1)', error12(:,2)');
+hold off
+alpha(.3)
+hold on;
+shadedplot(yearlab, error12n(:,1)', error12n(:,2)'  , [0.7 0.8 0.8]);
+hold off
+alpha(.3)
+set(gca,'Fontsize',8);
+%title('Subsidy on Subsidy')
+xlim([1954 2017])
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
+saveas(gcf,'BNDESBNDES_1','epsc')
+
+figure;
+plot(yearlab,Bt_postmean(6,:),'-','LineWidth',1);
+hold on;
+shadedplot(yearlab, error6(:,1)', error6(:,2)');
+hold off
+alpha(.3)
+hold on;
+shadedplot(yearlab, error6n(:,1)', error6n(:,2)'  , [0.7 0.8 0.8]);
+hold off
+alpha(.3)
+set(gca,'Fontsize',8);
+%title('Growth on PTF')
+xlim([1954 2017])
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
+saveas(gcf,'TFPGDP_1','epsc')
 
 
 %%
@@ -375,7 +417,7 @@ load('Model2')
 plot(yearlab,Bt_postmean(3,:),':','LineWidth',1);
 alpha(.3)
 set(gca,'Fontsize',8);
-legend('Model1', 'Model2')
+legend('benchmark prior', 'alternative prior')
 xlim([1954 2017])
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 9]);
@@ -390,7 +432,7 @@ load('Model2')
 plot(yearlab,Bt_postmean(4,:),':','LineWidth',1);
 alpha(.3)
 set(gca,'Fontsize',8);
-legend('Model1', 'Model2')
+legend('benchmark prior', 'alternative prior')
 xlim([1954 2017])
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 9]);
@@ -409,6 +451,10 @@ xlim([1954 2017])
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 9]);
 saveas(gcf,'STFPBNDES_1','epsc')
+
+
+
+
 
 if istore == 1
     load('Model1')
@@ -443,11 +489,13 @@ subplot(1,3,2);
     %legend('1963','1979','2015');
     
     set(gca,'Fontsize',8);
-    legend('Model1', 'Model2')
+    legend('benchmark prior', 'alternative prior')
  xlim([1 nhor]);
   %ylim([-0.1 0.6]);
 
 %title(['Response Growth'],'FontSize',8,'FontWeight','bold');
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
 saveas(gcf,'sensiResponseGrowth','epsc')
 %%
 
@@ -472,10 +520,40 @@ subplot(1,3,2);
     %legend('1963','1979','2015');
     
     set(gca,'Fontsize',8);
-    legend('Model1', 'Model2')
+    legend('benchmark prior', 'alternative prior')
  xlim([1 nhor]);
   %ylim([-0.002 0.014])%title(['Response TFP'],'FontSize',8,'FontWeight','bold');
-saveas(gcf,'sensiResponseTFP','epsc')
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 20 9]);
+  saveas(gcf,'sensiResponseTFP','epsc')
+  
+  
+  figure;
+set(groot,'DefaultAxesColorOrder',[0 0 0],...
+      'DefaultAxesLineStyleOrder',':|-|--|:')
+ plot(1:nhor,squeeze(M2_imp75XY(2,2,:)))
+    hold on
+    plot(1:nhor,squeeze(M2_imp81XY(2,2,:)))
+    hold on
+    plot(1:nhor,squeeze(M2_imp96XY(2,2,:)))
+ xlim([1 nhor]);
+%title(['Response TFP'],'FontSize',8,'FontWeight','bold');
+
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 16 6]);
+  saveas(gcf,'sensiResponseTFPall','epsc')
+ 
+
+figure;
+  plot(1:nhor,squeeze(M2_imp75XY(2,3,:)))
+    hold on
+    plot(1:nhor,squeeze(M2_imp81XY(2,3,:)))
+    hold on
+    plot(1:nhor,squeeze(M2_imp96XY(2,3,:)))
+ xlim([1 nhor]);
+set(gcf, 'PaperUnits', 'centimeters');
+set(gcf, 'PaperPosition', [0 0 16 6]);
+saveas(gcf,'sensiResponseBNDESall','epsc')
 
     
 end

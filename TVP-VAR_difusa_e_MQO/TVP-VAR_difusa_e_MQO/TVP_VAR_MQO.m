@@ -54,9 +54,9 @@ t=size(y,2);   % t is now 215 - p - tau = 173
 
 %----------------------------PRELIMINARES---------------------------------
 % Preliminares para o Gibbs
-nrep = 100000;  % Amostragens
+nrep = 200000;  % Amostragens
 nburn = round(0.1*nrep);   % burn-in
-it_print = 1000;
+it_print = 50000;
 
 % Escolha dos anos da FIR
 FIR1 = 1976;
@@ -176,7 +176,7 @@ cor2mo = zeros(t,numa);
 
 istore = 1;
 if istore == 1;
-    nhor = 12;  % Impulse response horizon
+    nhor = 20;  % Impulse response horizon
     imp75 = zeros(nrep,M,nhor);
     imp81 = zeros(nrep,M,nhor);
     imp96 = zeros(nrep,M,nhor);

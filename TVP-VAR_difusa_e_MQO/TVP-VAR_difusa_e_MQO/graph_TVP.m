@@ -52,6 +52,18 @@ set(gca,'Fontsize',8);
 title('GDP per capita')
 xlim([1954 2017])
 
+
+%%
+figure;
+plot(yearlab,sigmean(:,1),':','LineWidth',1);
+set(gca,'Fontsize',8);
+hold on
+plot(yearlab,sigmean(:,2),'-','LineWidth',1);
+hold on;
+plot(yearlab,sigmean(:,3),'--','LineWidth',1);
+xlim([1954 2017])
+legend('BNDES/FBCF','TFP','GDP per capita')
+
 %% Cálculo das Funções Impulso Resposta
 % Os anos das Funções estão no script FIR
 
@@ -302,17 +314,20 @@ quantil90 = quantile(Bt_save,q,3);
 
 error3 = squeeze(quantil(3,:,:));
 error4 = squeeze(quantil(4,:,:));
+error6 = squeeze(quantil(6,:,:));
 error8 = squeeze(quantil(8,:,:));
 error10 = squeeze(quantil(10,:,:));
-
+error12 = squeeze(quantil(12,:,:));
 
 error3n = squeeze(quantil90(3,:,:));
 error4n = squeeze(quantil90(4,:,:));
+error6n = squeeze(quantil90(6,:,:));
 error8n = squeeze(quantil90(8,:,:));
 error10n = squeeze(quantil90(10,:,:));
+error12n = squeeze(quantil90(12,:,:));
 
   
-% Primeira Equação -- Quarto Coficiente  
+% Primeira Equação -- Terceiro Coficiente  
 subplot(2,1,1)
 plot(yearlab,Bt_postmean(3,:),'-','LineWidth',1);
 hold on;
@@ -324,10 +339,10 @@ shadedplot(yearlab, error3n(:,1)', error3n(:,2)'  , [0.7 0.7 1]);
 hold off
 alpha(.3)
 set(gca,'Fontsize',8);
-title('Efeito das Importações na Produtividade ')
+title('TFP on Growth Equation ')
 xlim([1954 2017])
 
-% Terceira Equação -- Terceiro Coficiente  
+% Primeira Equação -- Quarto Coficiente  
 subplot(2,1,2)
 plot(yearlab,Bt_postmean(4,:),'-','LineWidth',1);
 hold on;
@@ -339,14 +354,14 @@ shadedplot(yearlab, error4n(:,1)', error4n(:,2)'  , [0.7 0.7 1]);
 hold off
 alpha(.3)
 set(gca,'Fontsize',8);
-title('Efeito do Investimento na Produtividade')
+title('Subsidy on Growth')
 xlim([1954 2017])
 
  figure;
 set(groot,'DefaultAxesColorOrder',[0 0 0],...
          'DefaultAxesLineStyleOrder','-|-.|-.|:|:')
   
-% Primeira Equação -- Quarto Coficiente  
+% Segunda Equação -- Quarto Coficiente  
 subplot(2,1,1)
 plot(yearlab,Bt_postmean(8,:),'-','LineWidth',1);
 hold on;
@@ -358,7 +373,7 @@ shadedplot(yearlab, error8n(:,1)', error8n(:,2)'  , [0.7 0.7 1]);
 hold off
 alpha(.3)
 set(gca,'Fontsize',8);
-title('Efeito do Investimento nas Importações ')
+title('Subsidy on TFP ')
 xlim([1954 2017])
 
 % Terceira Equação -- Terceiro Coficiente  
@@ -373,7 +388,7 @@ shadedplot(yearlab, error10n(:,1)', error10n(:,2)'  , [0.7 0.7 1]);
 hold off
 alpha(.3)
 set(gca,'Fontsize',8);
-title('Efeito da Produtividade no Investimento')
+title('Growth on Subsidy')
 xlim([1954 2017])
 
 
