@@ -289,7 +289,8 @@ shadedplot(yearlab, error3n(:,1)', error3n(:,2)'  , [0.7 0.8 0.8]);
 hold off
 alpha(.3)
 xlim([1954 2017])
-set(gca,'Fontsize',8);
+set(gca,'FontSize',12)
+%set(gca,'Fontsize',8);
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 9]);
 saveas(gcf,'GDPTFP_1','epsc')
@@ -305,8 +306,9 @@ hold on;
 shadedplot(yearlab, error4n(:,1)', error4n(:,2)'  , [0.7 0.8 0.8]);
 hold off
 alpha(.3)
-set(gca,'Fontsize',8);
+%set(gca,'Fontsize',8);
 xlim([1954 2017])
+set(gca,'FontSize',12)
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 9]);
 %title('Efeito das Importações na Produtividade ')
@@ -323,11 +325,12 @@ hold on;
 shadedplot(yearlab, error8n(:,1)', error8n(:,2)'  , [0.7 0.8 0.8]);
 hold off
 alpha(.3)
-set(gca,'Fontsize',8);
+xlim([1954 2017])
+set(gca,'FontSize',12)
+%set(gca,'Fontsize',8);
 %title('Efeito da Produtividade no Investimento')
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 9]);
-xlim([1954 2017])
 saveas(gcf,'TFPBNDES_1','epsc')
 
 figure;
@@ -340,9 +343,9 @@ hold on;
 shadedplot(yearlab, error12n(:,1)', error12n(:,2)'  , [0.7 0.8 0.8]);
 hold off
 alpha(.3)
-set(gca,'Fontsize',8);
-%title('Subsidy on Subsidy')
 xlim([1954 2017])
+set(gca,'FontSize',12);
+%title('Subsidy on Subsidy')
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 9]);
 saveas(gcf,'BNDESBNDES_1','epsc')
@@ -357,9 +360,10 @@ hold on;
 shadedplot(yearlab, error6n(:,1)', error6n(:,2)'  , [0.7 0.8 0.8]);
 hold off
 alpha(.3)
-set(gca,'Fontsize',8);
+set(gca,'FontSize',12);
 %title('Growth on PTF')
 xlim([1954 2017])
+%set(gca,'FontSize',12)
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 20 9]);
 saveas(gcf,'TFPGDP_1','epsc')
