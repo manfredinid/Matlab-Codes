@@ -33,8 +33,8 @@ tic;
 A.Params.r_ear=(1+0.12)^(1/4)-1; 
 A.Params.g_ear=0.4336;
 A.Params.r_international= (1+0.2142)^(1/4)-1;
-A.Params.g_tau=0.43;
-Params.ctau=0.0210;
+A.Params.g_tau=1; % era 0.32
+Params.ctau=(1+0.1)^(1/4)-1;
 
 % Uncorrelated Distortions (Model B)
 B.Params.r_ear= (1+0.11)^(1/4)-1; 
@@ -66,9 +66,9 @@ Params.r_international = A.Params.r_international;
 Params.g_tau=A.Params.g_tau;
 
 % Initial Guesses
-Params.p=0.4331; % output price
-Params.Ne=0.0199; % total mass of new entrants
-
+Params.p=0.4;%0.4331; % output price
+Params.Ne=0.07;%.0199; % total mass of new entrants
+%%
 % Model A
 earmarkedmodel;
 saveas(gcf,'modelA','epsc')
@@ -113,6 +113,29 @@ A.ebar=Params.ebar;
 A.lambda=ExitRateOfFirms;
 %A.probenter=probenter;
 %A.ProbnbarValues=ProbnbarValues;
+
+
+
+fprintf(2,'\nModel A  \n'); 
+fprintf('Distribution statistics of benchmark economy  \n');
+fprintf('                              <5     5 to 49   >=50   total\n');
+fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfEstablishments);
+fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfOutput);
+fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfLabour);
+fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
+fprintf('Average Employment       %8.3f  %8.3f  %8.3f   %8.3f\n', A.AverageEmployment);
+fprintf('Exit Rate                %8.3f\n', A.lambda);
+
+fprintf(2,'\n2010  \n'); 
+fprintf('Distribution statistics of benchmark economy  \n');
+fprintf('                              <5     5 to 49   >=50   total\n');
+fprintf('Share of establishments  %8.3f  %8.3f  %8.3f   %8.3f\n', [41.03 51.59 7.38 100]);
+fprintf('Share of output          %8.3f  %8.3f  %8.3f   %8.3f\n', [1.35 8.45 90.2]);
+fprintf('Share of labor           %8.3f  %8.3f  %8.3f   %8.3f\n', [3.35 26.42 70.24 100]);
+%fprintf('Share of capital         %8.3f  %8.3f  %8.3f   %8.3f\n', A.ShareOfCapital);
+%fprintf('Average Employment       %8.3f  %8.3f  %8.3f   %8.3f\n', A.AverageEmployment);
+fprintf('Exit Rate                %8.3f\n', (0.1625)^1/4);
+
 
 %% Uncorrelated Distortions (Model B)
 

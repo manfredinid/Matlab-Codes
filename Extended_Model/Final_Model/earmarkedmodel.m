@@ -133,8 +133,13 @@ a_grid = [0 logspace(0.0001,6.28,n_a-1)]';
 d_grid=[]; 
 n_d=0;
 
-teste =([Params.g_tau,1-Params.g_tau;1-Params.g_tau,Params.g_tau].*[1-Params.g_ear; Params.g_ear]);
-Params.upsilon(1,:,:,:) = reshape(kron(teste,pistar_s),[10,2,2]);
+A=[1-Params.g_tau Params.g_tau; Params.g_tau 1-Params.g_tau].*[1-...
+    Params.g_ear, Params.g_ear];
+
+B = kron(pistar_s,A);
+
+Params.upsilon(1,:,:,:) = reshape(B,[10,2,2]);
+
 
 %%% Revisar se eu tenho tipi 1, 2 e 3 so mudando gtau
 % FIX FIX FIX
@@ -168,8 +173,9 @@ vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val,tau_val,  p,w,r_mark
     alpha,gamma,delta, ctau, adjustcostparam, cf);
 vfoptions.ReturnToExitFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta','ctau',...
      'adjustcostparam', 'cf'};
-%% Check
-[V, Policy, PolicyWhenExiting, ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
+
+
+
 
 
 %% Set up variables for entry and exit
@@ -197,6 +203,7 @@ disp('upsilon size')
 disp(size(Params.upsilon))
 disp('sum of upsilon')
 disp(sum(Params.upsilon(:)))
+
 
 %% General Equilibrium Equations
 %Now define the functions for the General Equilibrium conditions
@@ -226,6 +233,12 @@ heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
 
 GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry,GeneralEqmEqn_LabourMarket};
 
+%% Check
+[V, Policy, PolicyWhenExiting, ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
+Params.notexit=1-ExitPolicy;
+StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,Params,EntryExitParamNames);
+sum(sum(sum(StationaryDist.pdf(:,:,:,1))))
+sum(sum(sum(StationaryDist.pdf(:,:,1,:))))
 %% Find equilibrium prices
 heteroagentoptions.verbose=1;
 simoptions.endogenousexit=2;
