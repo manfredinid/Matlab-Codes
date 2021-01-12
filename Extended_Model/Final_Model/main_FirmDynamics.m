@@ -33,7 +33,7 @@ tic;
 A.Params.r_ear=(1+0.12)^(1/4)-1; 
 A.Params.g_ear=0.4336;
 A.Params.r_international= (1+0.2142)^(1/4)-1;
-A.Params.g_tau=1; % era 0.32
+A.Params.g_tau=0.32; % era 0.32
 Params.ctau=(1+0.1)^(1/4)-1;
 
 % Uncorrelated Distortions (Model B)

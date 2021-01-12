@@ -29,7 +29,7 @@ Params.adjustcostparam = 3.219;
 
 % Entry and Exit
 Params.ce=2; % Fixed cost of entry 
-Params.phi=2; % Continuation fixed cost for firms facing endogenous exit decision
+Params.phi=0.02; % Continuation fixed cost for firms facing endogenous exit decision
 
 
 
@@ -133,10 +133,10 @@ a_grid = [0 logspace(0.0001,6.28,n_a-1)]';
 d_grid=[]; 
 n_d=0;
 
-A=[1-Params.g_tau Params.g_tau; Params.g_tau 1-Params.g_tau].*[1-...
+A=[Params.g_tau 1-Params.g_tau; 1-Params.g_tau Params.g_tau].*[1-...
     Params.g_ear, Params.g_ear];
 
-B = kron(pistar_s,A);
+B = kron(A,pistar_s);
 
 Params.upsilon(1,:,:,:) = reshape(B,[10,2,2]);
 
@@ -239,6 +239,8 @@ Params.notexit=1-ExitPolicy;
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,Params,EntryExitParamNames);
 sum(sum(sum(StationaryDist.pdf(:,:,:,1))))
 sum(sum(sum(StationaryDist.pdf(:,:,1,:))))
+
+sum(sum(sum(StationaryDist.pdf(:,:,1,1))))
 %% Find equilibrium prices
 heteroagentoptions.verbose=1;
 simoptions.endogenousexit=2;
