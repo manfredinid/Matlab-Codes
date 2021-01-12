@@ -174,7 +174,10 @@ vfoptions.ReturnToExitFn=@(kprime_val, k_val,s_val, psi_val,tau_val,  p,w,r_mark
 vfoptions.ReturnToExitFnParamNames={'p','w','r_market','r_ear', 'alpha','gamma','delta','ctau',...
      'adjustcostparam', 'cf'};
 
+%% Check
 
+[V, Policy, PolicyWhenExiting, ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
+Params.notexit=1-ExitPolicy;
 
 
 
@@ -234,8 +237,7 @@ heteroagentoptions.specialgeneqmcondn={'condlentry','entry',0};
 GeneralEqmEqns={GeneralEqmEqn_CondlEntry,GeneralEqmEqn_Entry,GeneralEqmEqn_LabourMarket};
 
 %% Check
-[V, Policy, PolicyWhenExiting, ExitPolicy]=ValueFnIter_Case1(n_d,n_a,n_z,d_grid,a_grid,z_grid, pi_z, ReturnFn, Params, DiscountFactorParamNames, ReturnFnParamNames, vfoptions);
-Params.notexit=1-ExitPolicy;
+
 StationaryDist=StationaryDist_Case1(Policy,n_d,n_a,n_z,pi_z, simoptions,Params,EntryExitParamNames);
 sum(sum(sum(StationaryDist.pdf(:,:,:,1))))
 sum(sum(sum(StationaryDist.pdf(:,:,1,:))))
