@@ -20,7 +20,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.05; % Fixed cost of production
+Params.cf=0.03392 ; % Fixed cost of production
 
 Params.w=1; % Normalization
 
@@ -28,8 +28,8 @@ Params.w=1; % Normalization
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=2; % Fixed cost of entry 
-Params.phi=0.02; % Continuation fixed cost for firms facing endogenous exit decision
+Params.ce=0.00991; % Fixed cost of entry 
+Params.phi=0.00991; % Continuation fixed cost for firms facing endogenous exit decision
 
 
 
@@ -50,10 +50,10 @@ n_a=280;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
-rhoeps = 0.95; % persistence
-evallowpareto = 1.8; % lower bound
-evalhighpareto = 2.75;%upper bound
-eparampareto = 5.9;% shape parameter
+rhoeps = 0.9; % persistence
+evallowpareto = 0.393; % lower bound
+evalhighpareto = 1.122;%upper bound
+eparampareto = 4.420;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)
@@ -149,7 +149,7 @@ Params.upsilon(1,:,:,:) = reshape(B,[10,2,2]);
 DiscountFactorParamNames={'beta'};
 
 % Exit status
-Params.lambda_phi=0;    %endogenous exit decision
+Params.lambda_phi=0.04;    %endogenous exit decision
 Params.lambda_infty=0.02; %exogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};

@@ -64,10 +64,11 @@ Params.r_ear=A.Params.r_ear;
 Params.g_ear=A.Params.g_ear; 
 Params.r_international = A.Params.r_international;
 Params.g_tau=A.Params.g_tau;
+Params.ctau=A.Params.ctau;
 
 % Initial Guesses
-Params.p=0.4;%0.4331; % output price
-Params.Ne=0.07;%.0199; % total mass of new entrants
+Params.p=0.9;%0.4331; % output price
+Params.Ne=0.9;%.0199; % total mass of new entrants
 %%
 % Model A
 earmarkedmodel;
@@ -146,6 +147,7 @@ Params.r_ear=B.Params.r_ear;
 Params.g_ear=B.Params.g_ear; 
 Params.r_international = B.Params.r_international;
 Params.g_tau=B.Params.g_tau;
+Params.ctau=B.Params.ctau;
 
 % Initial Guesses
 %Params.p = 0.527;
@@ -211,6 +213,7 @@ Params.r_ear=C.Params.r_ear;
 Params.g_ear=C.Params.g_ear; 
 Params.r_international = C.Params.r_international;
 Params.g_tau=C.Params.g_tau;
+Params.ctau=C.Params.ctau;
 
 % Initial Guesses
 %Params.p = 0.54;
@@ -277,6 +280,7 @@ Params.r_ear=D.Params.r_ear; % Interest rate on earmarked credit
 Params.g_ear=D.Params.g_ear; % Share of (unconditional) potential entrants who have access to earmarket credit. Note that conditional on entry this will not be same.
 %Params.r_international = D.Params.r_international;
 Params.g_tau=D.Params.g_tau;
+Params.ctau=D.Params.ctau;
 
 % Initial Guesses
 %Params.p = 0.54;
