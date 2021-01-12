@@ -34,7 +34,7 @@ A.Params.r_ear=(1+0.12)^(1/4)-1;
 A.Params.g_ear=0.4336;
 A.Params.r_international= (1+0.2142)^(1/4)-1;
 A.Params.ctau=(1+0.1)^(1/4)-1;
-A.Params.g_tau=A.Params.ctau/0.32; % era 0.32
+A.Params.g_tau=0.32/A.Params.g_ear; % era 0.32
 
 % Uncorrelated Distortions (Model B)
 B.Params.r_ear= (1+0.11)^(1/4)-1; 
@@ -67,13 +67,13 @@ Params.g_tau=A.Params.g_tau;
 Params.ctau=A.Params.ctau;
 
 % Initial Guesses
-Params.p=0.9;%0.4331; % output price
-Params.Ne=0.9;%.0199; % total mass of new entrants
+Params.p=0.9976;%0.4331; % output price
+Params.Ne=0.6738;%.0199; % total mass of new entrants
 %%
 % Model A
 earmarkedmodel;
 saveas(gcf,'modelA','epsc')
-
+%%
 % Saved results
 
 % Agggregate Values

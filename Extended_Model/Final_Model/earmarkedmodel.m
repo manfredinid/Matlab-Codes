@@ -133,12 +133,12 @@ a_grid = [0 logspace(0.0001,6.28,n_a-1)]';
 d_grid=[]; 
 n_d=0;
 
-A=[Params.g_tau 1-Params.g_tau; 1-Params.g_tau Params.g_tau].*[1-...
+testeA=[Params.g_tau 1-Params.g_tau; 1-Params.g_tau Params.g_tau].*[1-...
     Params.g_ear, Params.g_ear];
 
-B = kron(A,pistar_s);
+testeB = kron(testeA,pistar_s);
 
-Params.upsilon(1,:,:,:) = reshape(B,[10,2,2]);
+Params.upsilon(1,:,:,:) = reshape(testeB,[10,2,2]);
 
 
 %%% Revisar se eu tenho tipi 1, 2 e 3 so mudando gtau
