@@ -13,8 +13,8 @@
 %Percentage sub and bad credit      0.36
 
 %Params.ctau: Interest rate on credit constrained firms (quarterly) [0,1]
-%Params.g_tau: correlation between poor credit access and subsidy
-   % if 1 all subsidized firms are credit constrain (good credit access)
+% to measure correlation between 0 and 1 the value is ctau*gtau
+% Params.g_tau: correlation between poor credit access and subsidy
    % if 0 all non-subsidized firms are credit constrain (poor credit
    % access)
 
@@ -33,29 +33,29 @@ tic;
 A.Params.r_ear=(1+0.12)^(1/4)-1; 
 A.Params.g_ear=0.4336;
 A.Params.r_international= (1+0.2142)^(1/4)-1;
-A.Params.g_tau=0.32; % era 0.32
-Params.ctau=(1+0.1)^(1/4)-1;
+A.Params.ctau=(1+0.1)^(1/4)-1;
+A.Params.g_tau=A.Params.ctau/0.32; % era 0.32
 
 % Uncorrelated Distortions (Model B)
 B.Params.r_ear= (1+0.11)^(1/4)-1; 
 B.Params.g_ear=0.5031;
 B.Params.r_international =(1+0.2216)^(1/4)-1 ;
+B.Params.ctau=0.0210;
 B.Params.g_tau=0;
-Params.ctau=0.0210;
 
 % Correlated Distortions (Model C)
 C.Params.r_ear=(1+0.11)^(1/4)-1; 
 C.Params.g_ear=0.5031;
 C.Params.r_international = (1+0.2216)^(1/4)-1 ;
+C.Params.ctau=0.0210;
 C.Params.g_tau=1;
-Params.ctau=0.0210;
 
 % International Capital Flows (Model D)
 D.Params.r_ear=(1+0.12)^(1/4)-1; 
 D.Params.g_ear=0.4336;
 %D.Params.r_international =1/Params.beta-1;
+D.Params.ctau=0.0210;
 D.Params.g_tau=0.43;
-Params.ctau=0.0210;
 
 %% Benchmark Model (Model A)
 fprintf(2,'\nBenchmark Model (Model A) \n');

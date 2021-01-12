@@ -149,7 +149,7 @@ Params.upsilon(1,:,:,:) = reshape(B,[10,2,2]);
 DiscountFactorParamNames={'beta'};
 
 % Exit status
-Params.lambda_phi=0.04;    %endogenous exit decision
+Params.lambda_phi=0;    %endogenous exit decision
 Params.lambda_infty=0.02; %exogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
