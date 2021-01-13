@@ -67,13 +67,13 @@ Params.g_tau=A.Params.g_tau;
 Params.ctau=A.Params.ctau;
 
 % Initial Guesses
-Params.p=0.9976;%0.4331; % output price
-Params.Ne=0.6738;%.0199; % total mass of new entrants
+Params.p=0.4976;%0.4331; % output price
+Params.Ne=0.01738;%.0199; % total mass of new entrants
 %%
 % Model A
 earmarkedmodel;
 saveas(gcf,'modelA','epsc')
-%%
+
 % Saved results
 
 % Agggregate Values
