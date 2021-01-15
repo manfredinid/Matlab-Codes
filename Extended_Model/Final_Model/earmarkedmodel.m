@@ -20,7 +20,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.05; % Fixed cost of production
+Params.cf=0; % Fixed cost of production
 
 Params.w=1; % Normalization
 
@@ -28,8 +28,8 @@ Params.w=1; % Normalization
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=2; % Fixed cost of entry 
-Params.phi=0.02; % Continuation fixed cost for firms facing endogenous exit decision
+Params.ce=0; % Fixed cost of entry 
+Params.phi=0; % Continuation fixed cost for firms facing endogenous exit decision
 
 
 
@@ -73,8 +73,6 @@ pi_tau=[1,0;0,1];
 n_z=[n_s,length(psi_grid), length(tau_grid)];
 z_grid=[s_grid; psi_grid; tau_grid];
 
-% Transition matrix for the exogenous states
-pi_z=kron(pi_tau,kron(pi_psi, pi_s));
 
 % grid for capital
 a_grid = [0 logspace(0.0001,6.28,n_a-1)]'; 
@@ -123,7 +121,7 @@ n_z=[n_s,length(psi_grid), length(tau_grid)];
 z_grid=[s_grid; psi_grid; tau_grid];
 
 % Transition matrix for the exogenous states
-pi_z=kron(pi_tau,kron(pi_psi, pi_s));
+pi_z=kron(kron(pi_psi, pi_tau),pi_s);
 
 % grid for capital
 a_grid = [0 logspace(0.0001,6.28,n_a-1)]'; 

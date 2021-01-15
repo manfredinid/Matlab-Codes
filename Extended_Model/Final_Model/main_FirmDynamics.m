@@ -31,7 +31,7 @@ tic;
 
 % Benchmark Model (Model A)
 A.Params.r_ear=(1+0.12)^(1/4)-1; 
-A.Params.g_ear=0.4336;
+A.Params.g_ear=1;%0.4336;
 A.Params.r_international= (1+0.2142)^(1/4)-1;
 A.Params.ctau=(1+0.1)^(1/4)-1;
 A.Params.g_tau=0.32/A.Params.g_ear; % era 0.32
@@ -67,8 +67,8 @@ Params.g_tau=A.Params.g_tau;
 Params.ctau=A.Params.ctau;
 
 % Initial Guesses
-Params.p=0.4976;%0.4331; % output price
-Params.Ne=0.01738;%.0199; % total mass of new entrants
+Params.p=0.2976;%0.4331; % output price
+Params.Ne=0.0738;%.0199; % total mass of new entrants
 %%
 % Model A
 earmarkedmodel;
