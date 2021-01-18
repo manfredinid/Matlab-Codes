@@ -28,8 +28,8 @@ Params.w=1; % Normalization
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=0; % Fixed cost of entry 
-Params.phi=0; % Continuation fixed cost for firms facing endogenous exit decision
+Params.ce=0.3; % Fixed cost of entry 
+Params.phi=0.3; % Continuation fixed cost for firms facing endogenous exit decision
 
 
 

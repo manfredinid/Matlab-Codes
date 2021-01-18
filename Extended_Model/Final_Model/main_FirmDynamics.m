@@ -31,9 +31,9 @@ tic;
 
 % Benchmark Model (Model A)
 A.Params.r_ear=(1+0.12)^(1/4)-1; 
-A.Params.g_ear=1;%0.4336;
+A.Params.g_ear=0.4336;
 A.Params.r_international= (1+0.2142)^(1/4)-1;
-A.Params.ctau=(1+0.1)^(1/4)-1;
+A.Params.ctau=(1+0.08)^(1/4)-1;
 A.Params.g_tau=0.32/A.Params.g_ear; % era 0.32
 
 % Uncorrelated Distortions (Model B)
