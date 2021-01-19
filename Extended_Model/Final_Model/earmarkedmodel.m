@@ -50,10 +50,10 @@ n_a=280;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
-rhoeps = 0.95; % persistence
-evallowpareto = 1.8; % lower bound
-evalhighpareto = 2.75;%upper bound
-eparampareto = 5.9;% shape parameter
+rhoeps = 0.9; % persistence
+evallowpareto = 0.4; % lower bound
+evalhighpareto = 1.2;%upper bound
+eparampareto = 4;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)
@@ -147,7 +147,7 @@ Params.upsilon(1,:,:,:) = reshape(bB,[10,2,2]);
 DiscountFactorParamNames={'beta'};
 
 % Exit status
-Params.lambda_phi=0;    %endogenous exit decision
+Params.lambda_phi=0.02;    %endogenous exit decision
 Params.lambda_infty=0.02; %exogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
