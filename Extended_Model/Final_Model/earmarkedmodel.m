@@ -20,7 +20,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.399;  % Capital share
 Params.gamma=0.491; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.04; % Fixed cost of production
+Params.cf=0.09; % Fixed cost of production
 
 Params.w=1; % Normalization
 
@@ -51,8 +51,8 @@ n_a=280;
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
 rhoeps = 0.9; % persistence
-evallowpareto = 0.292; % lower bound
-evalhighpareto = 1.122;%upper bound
+evallowpareto = 0.49; % lower bound
+evalhighpareto = 1.5;%upper bound
 eparampareto = 4.42;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
@@ -148,7 +148,7 @@ DiscountFactorParamNames={'beta'};
 
 % Exit status
 Params.lambda_phi=0.02;    %endogenous exit decision
-Params.lambda_infty=0.02; %exogenous exit decision
+Params.lambda_infty=0.03; %exogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
 simoptions.exitprobabilities=vfoptions.exitprobabilities;
