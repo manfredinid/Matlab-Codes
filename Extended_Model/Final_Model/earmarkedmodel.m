@@ -53,7 +53,7 @@ n_a=200;
 rhoeps = 0.9; % persistence
 evallowpareto = 0.6; % lower bound
 evalhighpareto = 1.15;%upper bound
-eparampareto = 9;% shape parameter
+eparampareto = 8.99;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)
@@ -131,10 +131,9 @@ a_grid = [0 logspace(0.0001,6.28,n_a-1)]';
 d_grid=[]; 
 n_d=0;
 
-aA=[Params.g_tau 1-Params.g_tau; 1-Params.g_tau Params.g_tau].*[1-...
-    Params.g_ear, Params.g_ear];
 
-bB = kron(aA,pistar_s);
+
+bB = kron(corr,pistar_s);
 
 Params.upsilon(1,:,:,:) = reshape(bB,[n_s,2,2]);
 
@@ -147,8 +146,8 @@ Params.upsilon(1,:,:,:) = reshape(bB,[n_s,2,2]);
 DiscountFactorParamNames={'beta'};
 
 % Exit status
-Params.lambda_phi=0.025;    %endogenous exit decision
-Params.lambda_infty=0.028; %exogenous exit decision
+Params.lambda_phi=0.020;    %endogenous exit decision
+Params.lambda_infty=0.027; %exogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
 simoptions.exitprobabilities=vfoptions.exitprobabilities;

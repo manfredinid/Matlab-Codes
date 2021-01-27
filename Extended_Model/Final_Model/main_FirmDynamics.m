@@ -35,13 +35,17 @@ A.Params.g_ear=0.4336;
 A.Params.r_international= (1+0.2142)^(1/4)-1;
 A.Params.ctau=(1+0.07)^(1/4)-1;
 A.Params.g_tau=0.32/A.Params.g_ear; % era 0.32
+A.corr=[A.Params.g_tau 1-A.Params.g_tau; 1-A.Params.g_tau A.Params.g_tau].*[1-...
+    Params.g_ear, Params.g_ear];
 
 % Uncorrelated Distortions (Model B)
 B.Params.r_ear= (1+0.11)^(1/4)-1; 
 B.Params.g_ear=0.5031;
 B.Params.r_international =(1+0.2216)^(1/4)-1 ;
 B.Params.ctau=0.0210;
-B.Params.g_tau=0;
+B.Params.g_tau=1;
+B.corr=[B.Params.g_tau 1-B.Params.g_tau; 1-B.Params.g_tau B.Params.g_tau].*[1-...
+    Params.g_ear, Params.g_ear];
 
 % Correlated Distortions (Model C)
 C.Params.r_ear=(1+0.11)^(1/4)-1; 
@@ -49,6 +53,8 @@ C.Params.g_ear=0.5031;
 C.Params.r_international = (1+0.2216)^(1/4)-1 ;
 C.Params.ctau=0.0210;
 C.Params.g_tau=1;
+C.corr=[C.Params.g_tau 1-C.Params.g_tau; 1-C.Params.g_tau C.Params.g_tau].*[1-...
+    Params.g_ear, Params.g_ear];
 
 % International Capital Flows (Model D)
 D.Params.r_ear=(1+0.12)^(1/4)-1; 
@@ -56,6 +62,8 @@ D.Params.g_ear=0.4336;
 %D.Params.r_international =1/Params.beta-1;
 D.Params.ctau=0.0210;
 D.Params.g_tau=0.43;
+D.corr=[D.Params.g_tau 1-D.Params.g_tau; 1-D.Params.g_tau D.Params.g_tau].*[1-...
+    Params.g_ear, Params.g_ear];
 
 %% Benchmark Model (Model A)
 fprintf(2,'\nBenchmark Model (Model A) \n');
@@ -65,6 +73,7 @@ Params.g_ear=A.Params.g_ear;
 Params.r_international = A.Params.r_international;
 Params.g_tau=A.Params.g_tau;
 Params.ctau=A.Params.ctau;
+corr = A.corr;
 
 % Initial Guesses
 Params.p=0.9776;%0.4331; % output price
@@ -148,6 +157,7 @@ Params.g_ear=B.Params.g_ear;
 Params.r_international = B.Params.r_international;
 Params.g_tau=B.Params.g_tau;
 Params.ctau=B.Params.ctau;
+corr = B.corr;
 
 % Initial Guesses
 %Params.p = 0.527;
@@ -214,6 +224,7 @@ Params.g_ear=C.Params.g_ear;
 Params.r_international = C.Params.r_international;
 Params.g_tau=C.Params.g_tau;
 Params.ctau=C.Params.ctau;
+corr = C.corr;
 
 % Initial Guesses
 %Params.p = 0.54;
@@ -281,6 +292,7 @@ Params.g_ear=D.Params.g_ear; % Share of (unconditional) potential entrants who h
 %Params.r_international = D.Params.r_international;
 Params.g_tau=D.Params.g_tau;
 Params.ctau=D.Params.ctau;
+corr = D.corr;
 
 % Initial Guesses
 %Params.p = 0.54;
