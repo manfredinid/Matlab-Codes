@@ -51,9 +51,9 @@ n_a=200;
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
 rhoeps = 0.9; % persistence
-evallowpareto = 0.65; % lower bound
+evallowpareto = 0.6; % lower bound
 evalhighpareto = 1.15;%upper bound
-eparampareto = 8.99;% shape parameter
+eparampareto = 9;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)
