@@ -131,9 +131,10 @@ a_grid = [0 logspace(0.0001,6.28,n_a-1)]';
 d_grid=[]; 
 n_d=0;
 
+aA=[Params.g_tau 1-Params.g_tau; 1-Params.g_tau Params.g_tau].*[1-...
+    Params.g_ear, Params.g_ear];
 
-
-bB = kron(corr,pistar_s);
+bB = kron(aA,pistar_s);
 
 Params.upsilon(1,:,:,:) = reshape(bB,[n_s,2,2]);
 
