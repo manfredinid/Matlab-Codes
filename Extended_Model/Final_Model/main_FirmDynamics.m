@@ -36,13 +36,12 @@ A.Params.r_international= (1+0.2142)^(1/4)-1;
 A.Params.ctau=(1+0.07)^(1/4)-1;
 A.Params.g_tau=0.32/A.Params.g_ear; % era 0.32
 
-
 % Uncorrelated Distortions (Model B)
 B.Params.r_ear= (1+0.11)^(1/4)-1; 
 B.Params.g_ear=0.5031;
 B.Params.r_international =(1+0.2216)^(1/4)-1 ;
 B.Params.ctau=0.0210;
-B.Params.g_tau=1;
+B.Params.g_tau=0;
 
 % Correlated Distortions (Model C)
 C.Params.r_ear=(1+0.11)^(1/4)-1; 
