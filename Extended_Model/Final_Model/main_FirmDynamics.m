@@ -67,8 +67,8 @@ Params.g_tau=A.Params.g_tau;
 Params.ctau=A.Params.ctau;
 
 % Initial Guesses
-Params.p=0.9776;%0.4331; % output price
-Params.Ne=0.0138;%.0199; % total mass of new entrants
+Params.p=   1.8258;%0.4331; % output price
+Params.Ne=  0.15311;%.0199; % total mass of new entrants
 %%
 % Model A
 earmarkedmodel;

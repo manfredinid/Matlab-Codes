@@ -28,7 +28,7 @@ Params.w=1; % Normalization
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=0.45; % Fixed cost of entry 
+Params.ce=0.55; % Fixed cost of entry 
 Params.phi=Params.ce; % Continuation fixed cost for firms facing endogenous exit decision
 
 
@@ -51,7 +51,7 @@ n_a=201;
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
 rhoeps = 0.9; % persistence
-evallowpareto = 0.5; % lower bound
+evallowpareto = 0.4; % lower bound
 evalhighpareto = 1.15;%upper bound
 eparampareto = 9;% shape parameter
 % lower eparampreto -- less small firms
