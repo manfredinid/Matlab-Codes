@@ -148,7 +148,7 @@ DiscountFactorParamNames={'beta'};
 
 % Exit status
 Params.lambda_phi=0.02;    %endogenous exit decision
-Params.lambda_infty=0.027; %exogenous exit decision
+Params.lambda_infty=0.026; %exogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
 simoptions.exitprobabilities=vfoptions.exitprobabilities;
