@@ -20,7 +20,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.28;  % Capital share
 Params.gamma=0.6; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.359; % Fixed cost of production
+Params.cf=0.33; % Fixed cost of production
 
 Params.w=1; % Normalization
 
@@ -53,7 +53,7 @@ n_a=201;
 rhoeps = 0.87; % persistence
 evallowpareto = 0.4; % lower bound
 evalhighpareto = 1;%upper bound
-eparampareto = 7;% shape parameter
+eparampareto = 8;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)
