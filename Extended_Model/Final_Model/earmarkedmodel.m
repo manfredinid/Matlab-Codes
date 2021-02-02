@@ -39,7 +39,7 @@ Params.phi=Params.ce; % Continuation fixed cost for firms facing endogenous exit
 % The model has three states, one endogenous state (capital), and two
 % exogenous states (productivity and subsidies)
 
-n_s=13;
+n_s=14;
 n_a=201;
 % n_psi is two since psi \in {0,1}
 % n_tau is two since psi \in {0,1}
@@ -50,10 +50,10 @@ n_a=201;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
-rhoeps = 0.9; % persistence
+rhoeps = 0.87; % persistence
 evallowpareto = 0.4; % lower bound
 evalhighpareto = 1;%upper bound
-eparampareto = 9;% shape parameter
+eparampareto = 7;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)
