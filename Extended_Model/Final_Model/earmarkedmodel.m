@@ -20,7 +20,7 @@ Params.beta=0.9798;% Discount rate
 Params.alpha=0.22;  % Capital share
 Params.gamma=0.67; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.13; % Fixed cost of production
+Params.cf=0.155; % Fixed cost of production
 
 Params.w=1; % Normalization
 
@@ -147,8 +147,8 @@ Params.upsilon(1,:,:,:) = reshape(bB,[n_s,2,2]);
 DiscountFactorParamNames={'beta'};
 
 % Exit status
-Params.lambda_phi=0.02;    %endogenous exit decision
-Params.lambda_infty=0.026; %exogenous exit decision
+Params.lambda_phi=0.023;    %endogenous exit decision
+Params.lambda_infty=0.028; %exogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
 simoptions.exitprobabilities=vfoptions.exitprobabilities;
