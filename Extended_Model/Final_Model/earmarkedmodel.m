@@ -17,10 +17,10 @@ simoptions.iterate=1;
 Params.beta=0.9798;% Discount rate
 
 % Firm-level technology
-Params.alpha=0.28;  % Capital share
-Params.gamma=0.6; % alpha + gama must be ~= 1
+Params.alpha=0.22;  % Capital share
+Params.gamma=0.67; % alpha + gama must be ~= 1
 Params.delta=0.025; % Depreciation rate of physical capital
-Params.cf=0.33; % Fixed cost of production
+Params.cf=0.13; % Fixed cost of production
 
 Params.w=1; % Normalization
 
@@ -28,7 +28,7 @@ Params.w=1; % Normalization
 Params.adjustcostparam = 3.219;
 
 % Entry and Exit
-Params.ce=0.45; % Fixed cost of entry 
+Params.ce=0.25; % Fixed cost of entry 
 Params.phi=Params.ce; % Continuation fixed cost for firms facing endogenous exit decision
 
 
@@ -50,10 +50,10 @@ n_a=201;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
-rhoeps = 0.87; % persistence
+rhoeps = 0.9426; % persistence
 evallowpareto = 0.4; % lower bound
-evalhighpareto = 1;%upper bound
-eparampareto = 8;% shape parameter
+evalhighpareto = 1.2;%upper bound
+eparampareto = 9.5;% shape parameter
 % lower eparampreto -- less small firms
 s_grid = linspace(evallowpareto,evalhighpareto,n_s);
 rand('state',1)

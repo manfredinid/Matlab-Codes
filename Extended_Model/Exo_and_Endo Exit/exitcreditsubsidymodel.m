@@ -49,8 +49,8 @@ Params.g_tau=0.8; % tau 1 and type 2 implies that psi and tau are 100% correlate
 % The model has three states, one endogenous state (capital), and two
 % exogenous states (productivity and subsidies)
 
-n_s=10;
-n_a=280;
+n_s=15;
+n_a=200;
 % n_psi is two since psi \in {0,1}
 % n_tau is two since psi \in {0,1}
 
@@ -66,7 +66,7 @@ n_a=280;
 % Exogenous AR(1) process on (log) productivity
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
-rhoeps = 0.95; % persistence
+rhoeps = 0.8; % persistence
 evallowpareto = 1.8; % lower bound
 evalhighpareto = 2.75;%upper bound
 eparampareto = 5.9;% shape parameter

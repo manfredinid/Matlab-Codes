@@ -52,7 +52,7 @@ C.Params.g_tau=1;
 
 % International Capital Flows (Model D)
 D.Params.r_ear=(1+0.12)^(1/4)-1; 
-D.Params.g_ear=0.4336;
+D.Params.g_ear=0.6336;
 %D.Params.r_international =1/Params.beta-1;
 D.Params.ctau=0.0210;
 D.Params.g_tau=0.43;
