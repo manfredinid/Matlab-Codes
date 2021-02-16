@@ -51,7 +51,7 @@ n_a=201;
 % logz=a+rho*log(z)+epsilon, epsilon~N(0,sigma_epsilon^2)
 
 rhoeps = 0.9426; % persistence
-evallowpareto = 0.41; % lower bound
+evallowpareto = 0.4; % lower bound
 evalhighpareto = 1.2;%upper bound
 eparampareto = 9.5;% shape parameter
 % lower eparampreto -- less small firms
@@ -147,8 +147,8 @@ Params.upsilon(1,:,:,:) = reshape(bB,[n_s,2,2]);
 DiscountFactorParamNames={'beta'};
 
 % Exit status
-Params.lambda_phi=0.023;    %endogenous exit decision
-Params.lambda_infty=0.028; %exogenous exit decision
+Params.lambda_phi=0.044;    %exoogenous exit decision
+Params.lambda_infty=0.017; %endogenous exit decision
 
 vfoptions.exitprobabilities={'lambda_phi','lambda_infty'};
 simoptions.exitprobabilities=vfoptions.exitprobabilities;
